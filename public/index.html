@@ -1101,10 +1101,8 @@
         // ============================================
         function normalisiereName(name) {
             if (!name) return '';
-            // Konvertiere zu Wort-Großbuchstaben: "jens meier" → "Jens Meier"
-            return name.trim().split(/\s+/).map(wort =>
-                wort.charAt(0).toUpperCase() + wort.slice(1).toLowerCase()
-            ).join(' ');
+            // 🔥 IMMER ALLES GROSS: "jens meier" → "JENS MEIER"
+            return name.trim().toUpperCase();
         }
 
         async function toggleRecording() {
