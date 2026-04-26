@@ -1089,6 +1089,7 @@
         let recognition = null;  // 🔥 WEB SPEECH API INSTANZ
         let aktuelleAuswahlPalette = null;  // 🎯 SPEICHERE DIE AKTUELLEN DATEN VOR DEM LÖSCHEN
         let recognitionTimeout = null;  // 🕐 TIMER FÜR 5-SEKUNDEN TIMEOUT
+        let audioStream = null;  // 🎤 SPEICHERE AUDIO STREAM UM IHN ZU STOPPEN
 
         // Kundenbestätigung
         let wartendeKundenZuBestaetigung = null;
@@ -1229,10 +1230,24 @@
                         console.log('🔴 2 Sekunden vorbei - schalte Mikrofon AUS');
                         try {
                             if (recognition) {
-                                recognition.abort();  // STOP Mikrofon
+                                recognition.abort();  // STOP Recognition
                                 recognition = null;   // 🔥 LÖSCHE INSTANZ
-                                console.log('✅ Mikrofon freigegeben');
+                                console.log('✅ Recognition Instanz gelöscht');
                             }
+
+                            // 🎤 CHROME WORKAROUND: Stoppe den gespeicherten Audio Stream
+                            // Das funktioniert auf Chrome/Android am besten
+                            if (audioStream) {
+                                console.log('🔴 Stoppe Audio Stream mit getTracks()...');
+                                audioStream.getTracks().forEach(track => {
+                                    console.log('   Stoppe Track:', track.kind);
+                                    track.stop();  // 🔥 CHROME BEFEHL ZUM STOPPEN
+                                });
+                                audioStream = null;
+                                console.log('✅ Audio Stream komplett gestoppt');
+                            }
+
+                            console.log('✅ Mikrofon auf Chrome-Ebene freigegeben');
                         } catch (err) {
                             console.error('Fehler beim Shutdown:', err);
                         }
@@ -1246,6 +1261,23 @@
                         showError("⚠️ Keine Sprache erkannt. Versuche es erneut!");
                     }
                 };
+
+                // 🎤 VERSUCHE AUDIO STREAM ZU SPEICHERN (CHROME WORKAROUND)
+                // Das ermöglicht uns später den Stream zu stoppen
+                try {
+                    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                        // Versuche parallel einen AudioStream zu öffnen
+                        // (die Web Speech API nutzt intern auch einen Stream)
+                        navigator.mediaDevices.getUserMedia({ audio: true })
+                            .then(stream => {
+                                audioStream = stream;
+                                console.log('🎤 Audio Stream gespeichert für späteren Stop');
+                            })
+                            .catch(err => console.log('⚠️ getUserMedia nicht verfügbar (normal):', err.name));
+                    }
+                } catch (err) {
+                    console.log('⚠️ getUserMedia Setup übersprungen');
+                }
 
                 // Starte Erkennung
                 recognition.start();
