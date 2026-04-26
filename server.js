@@ -1033,26 +1033,28 @@ app.post('/api/process-audio', async (req, res) => {
             });
         }
 
-        // Hole Audio-Buffer vom Frontend
-        const audioBuffer = req.body;
+        // Hole Base64 Audio vom Frontend
+        const { audio: base64Audio } = req.body;
 
-        if (!audioBuffer) {
+        if (!base64Audio) {
             return res.status(400).json({
                 error: 'Kein Audio empfangen'
             });
         }
 
+        // Decodiere Base64 zu Buffer
+        const audioBuffer = Buffer.from(base64Audio, 'base64');
+        console.log('📥 Audio empfangen und decodiert:', audioBuffer.length, 'bytes');
+
         // 🎯 SCHRITT 1: Whisper Transcription
         console.log('🎤 Transkribiere Audio mit Groq Whisper...');
 
-        // Verwende fetch mit multipart/form-data für Groq API
+        // Sende Audio direkt zu Groq mit multipart/form-data
         const FormData = require('form-data');
-        const { Readable } = require('stream');
-
         const formData = new FormData();
-        // Konvertiere Buffer zu Stream für FormData
-        const audioStream = Readable.from(audioBuffer);
-        formData.append('file', audioStream, { filename: 'audio.webm' });
+
+        // Append Audio Buffer direkt (nicht als Stream)
+        formData.append('file', audioBuffer, 'audio.webm');
         formData.append('model', 'whisper-large-v3');
         formData.append('language', 'de');
 

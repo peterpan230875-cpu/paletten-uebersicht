@@ -1145,14 +1145,8 @@
         }
 
         async function sendAudioToGroq() {
-            // MediaRecorder gibt Webm/Opus aus (nicht WAV!)
+            // MediaRecorder gibt Webm/Opus aus
             const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-
-            console.log('🎤 Audio Blob erstellt:', {
-                size: audioBlob.size,
-                type: audioBlob.type,
-                chunks: audioChunks.length
-            });
 
             if (audioBlob.size === 0) {
                 showError("⚠️ Keine Audio-Daten aufgenommen!");
@@ -1163,13 +1157,27 @@
                 const status = document.getElementById("status");
                 status.textContent = "📤 Sende Audio zum Server...";
 
-                // 🔥 Sende Raw Audio Buffer zum Backend
+                // Konvertiere Blob zu Base64 für sichere JSON Transmission
+                const arrayBuffer = await audioBlob.arrayBuffer();
+                const uint8Array = new Uint8Array(arrayBuffer);
+                let binaryString = '';
+                for (let i = 0; i < uint8Array.length; i++) {
+                    binaryString += String.fromCharCode(uint8Array[i]);
+                }
+                const base64Audio = btoa(binaryString);
+
+                console.log('🎤 Audio Base64 erstellt:', {
+                    size: audioBlob.size,
+                    base64Length: base64Audio.length
+                });
+
+                // 🔥 Sende Audio als Base64 JSON zum Backend
                 const res = await fetch("/api/process-audio", {
                     method: "POST",
                     headers: {
-                        'Content-Type': 'audio/webm'
+                        'Content-Type': 'application/json'
                     },
-                    body: audioBlob  // Sende den Blob direkt
+                    body: JSON.stringify({ audio: base64Audio })
                 });
 
                 if (!res.ok) {
