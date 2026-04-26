@@ -1548,12 +1548,14 @@
                 // Fallback nur wenn aktuelleAuswahlPalette nicht vorhanden
                 console.log('✅ Nutze wartendeAuswahlPaletten als Fallback');
                 wartendeAuswahlPaletten[0].palettenart = palette;
-                wartendeAuswahlPaletten.shift();
             } else {
                 console.error('❌ Fehler: Keine Palette-Daten vorhanden!');
                 showError('Fehler bei Palette-Auswahl. Bitte versuche es erneut.');
                 return;
             }
+
+            // 🔥 WICHTIG: LEERE DAS ARRAY DAMIT NUR DIE AUSGEWÄHLTE PALETTE GESPEICHERT WIRD!
+            wartendeAuswahlPaletten = [];
 
             // Fortsetzen mit saveToSupabase
             saveToSupabaseWithSelected();
