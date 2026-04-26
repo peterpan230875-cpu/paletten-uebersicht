@@ -1,3 +1,6 @@
+// Load environment variables from .env file
+require('dotenv').config();
+
 const express = require('express');
 const { createClient } = require('@supabase/supabase-js');
 const axios = require('axios');
@@ -1239,23 +1242,33 @@ app.post('/api/structure-text', async (req, res) => {
     }
 });
 
-// ============================================
-// MAIN ROUTE
-// ============================================
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/index.html'));
-});
 
 // ============================================
-// STATISCHE DATEIEN (nach allen API-Routen!)
+// STATISCHE DATEIEN + SPA FALLBACK
 // ============================================
-app.use(express.static(path.join(__dirname)));
+const publicDir = path.join(__dirname, 'public');
+console.log('📁 Serving static files from:', publicDir);
+console.log('📄 Index file at:', path.join(publicDir, 'index.html'));
+console.log('   File exists:', fs.existsSync(path.join(publicDir, 'index.html')));
+
+app.use(express.static(publicDir));
+
+// Fallback für SPA: Alle unbekannten Routen führen zu index.html (Express 5 Syntax)
+app.use((req, res, next) => {
+    const indexPath = path.join(publicDir, 'index.html');
+    console.log('🔹 Fallback middleware für:', req.path, '→ serving', indexPath);
+    res.sendFile(indexPath, (err) => {
+        if (err) {
+            console.error('❌ Fehler beim Servieren von index.html:', err.message);
+            res.status(500).send('Error: ' + err.message);
+        }
+    });
+});
 
 // ============================================
 // SERVER START
 // ============================================
 app.listen(PORT, () => {
-    console.log(`\n🚀 SERVER LÄUFT`);
-    console.log(`📝 URL: http://localhost:${PORT}`);
-    console.log(`📱 Öffne im Browser: http://localhost:${PORT}/Paletten_V1.36.html\n`);
+    console.log(`\n🚀 SERVER LÄUFT auf PORT ${PORT}`);
+    console.log(`📱 Öffne: http://localhost:${PORT}\n`);
 });
