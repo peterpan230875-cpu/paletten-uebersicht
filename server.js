@@ -1031,7 +1031,7 @@ app.post('/api/process-audio', async (req, res) => {
             });
         }
 
-        // Hole Audio-Blob vom Frontend
+        // Hole Audio-Buffer vom Frontend
         const audioBuffer = req.body;
 
         if (!audioBuffer) {
@@ -1040,18 +1040,22 @@ app.post('/api/process-audio', async (req, res) => {
             });
         }
 
-        // Konvertiere Buffer zu Blob für Groq API
-        const audioBlob = new Blob([audioBuffer], { type: 'audio/wav' });
-        const formData = new FormData();
-        formData.append("file", audioBlob, "audio.wav");
-        formData.append("model", "whisper-large-v3");
-
         // 🎯 SCHRITT 1: Whisper Transcription
         console.log('🎤 Transkribiere Audio mit Groq Whisper...');
 
+        // Verwende fetch mit multipart/form-data für Groq API
+        const FormData = require('form-data');
+        const formData = new FormData();
+        formData.append('file', audioBuffer, { filename: 'audio.wav' });
+        formData.append('model', 'whisper-large-v3');
+        formData.append('language', 'de');
+
         const whisperRes = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", {
             method: "POST",
-            headers: { "Authorization": "Bearer " + GROQ_API_KEY },
+            headers: {
+                "Authorization": "Bearer " + GROQ_API_KEY,
+                ...formData.getHeaders()
+            },
             body: formData
         });
 
