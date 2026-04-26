@@ -1069,9 +1069,13 @@ app.post('/api/process-audio', async (req, res) => {
 
         if (!whisperRes.ok) {
             const errorData = await whisperRes.text();
-            console.error('❌ Whisper Fehler:', whisperRes.status, errorData);
+            console.error('❌ Whisper Fehler Details:');
+            console.error('   Status:', whisperRes.status);
+            console.error('   Response:', errorData);
+            console.error('   Audio Buffer Size:', audioBuffer.length);
+
             return res.status(whisperRes.status).json({
-                error: `Whisper-Fehler: ${whisperRes.status}`
+                error: `Whisper-Fehler: ${whisperRes.status} - ${errorData}`
             });
         }
 
