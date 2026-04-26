@@ -1562,6 +1562,11 @@ ${err.message}
                 }
             }
 
+            // 🎯 SPEICHERE ERKANNTE PALETTEN SOFORT, BEVOR ERROR GEWORFEN WIRD!
+            // Das ist KRITISCH: Wenn unten eine Error geworfen wird, brauchen wir diese Daten noch
+            erkannteAuswahlPaletten = palettenListe;
+            console.log('✅ Erkannte Paletten gespeichert:', erkannteAuswahlPaletten);
+
             // Wenn wartende Auswahl existiert, unterbreche und zeige Dialog
             if (wartendeAuswahlPaletten.length > 0) {
                 showPaletteSelectionForCandidates(wartendeAuswahlPaletten[0]);
@@ -1584,10 +1589,6 @@ ${err.message}
                     throw new Error("⚠️ Menge fehlt oder ist ungültig!");
                 }
             }
-
-            // 🎯 SPEICHERE ERKANNTE PALETTEN FÜR SPÄTER!
-            erkannteAuswahlPaletten = palettenListe;
-            console.log('✅ Erkannte Paletten gespeichert:', erkannteAuswahlPaletten);
 
             return palettenListe;  // Array statt einzelnes Objekt!
         }
