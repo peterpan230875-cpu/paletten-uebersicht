@@ -9,6 +9,7 @@ const app = express();
 // ============================================
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const TABLE_NAME = "Paletten";
 const PORT = process.env.PORT || 3000;
 
@@ -983,6 +984,115 @@ app.get('/api/employees', async (req, res) => {
     } catch (err) {
         console.error('❌ Fehler in employees:', err);
         res.json({
+            error: err.message
+        });
+    }
+});
+
+// ============================================
+// API: TEXT MIT GROQ STRUKTURIEREN (Backend-Proxy)
+// ============================================
+app.post('/api/structure-text', async (req, res) => {
+    try {
+        const { text } = req.body;
+
+        if (!text || text.trim() === '') {
+            return res.json({
+                success: false,
+                error: 'Text erforderlich'
+            });
+        }
+
+        if (!GROQ_API_KEY) {
+            console.error('❌ GROQ_API_KEY nicht konfiguriert!');
+            return res.json({
+                success: false,
+                error: 'Groq API nicht konfiguriert'
+            });
+        }
+
+        console.log('📤 Sende Text zu Groq:', text.substring(0, 100));
+
+        const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${GROQ_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: 'llama-3.1-8b-instant',
+                messages: [{
+                    role: 'system',
+                    content: `Du bist ein Paletten-Tracker. Analysiere den GESPROCHENEN Text und gib EXAKT in diesem Format zurück:
+
+Kundenname: Der Name des Kunden
+Kundennummer: Die Kundennummer WENN EXPLIZIT genannt - sonst LEER lassen
+Aktion: mitgenommen oder erhalten
+
+Dann FÜR JEDE Palettenart:
+Palettenart: Art der Palette
+Menge: Die Anzahl als Zahl
+
+Trenne mehrere Palettenarten mit '---' auf einer neuen Zeile!
+
+Beispiel 1 (eine Palettenart):
+Input: 'Quadriga Bau nimmt 10 Euro-Paletten mit'
+Output:
+Kundenname: Quadriga Bau
+Kundennummer:
+Aktion: mitgenommen
+Palettenart: Euro-Palette
+Menge: 10
+
+Beispiel 2 (MEHRERE Palettenarten):
+Input: 'Quadriga Bau nimmt eine Europalette und zwei Ziegelpaletten mit'
+Output:
+Kundenname: Quadriga Bau
+Kundennummer:
+Aktion: mitgenommen
+Palettenart: Europalette
+Menge: 1
+---
+Palettenart: Ziegelpalette
+Menge: 2`
+                }, {
+                    role: 'user',
+                    content: text
+                }],
+                temperature: 0.3,
+                max_tokens: 300
+            })
+        });
+
+        if (!groqRes.ok) {
+            const errorText = await groqRes.text();
+            console.error('🔴 Groq API Fehler:', groqRes.status, errorText);
+            return res.json({
+                success: false,
+                error: `Groq API ${groqRes.status}: ${errorText.substring(0, 200)}`
+            });
+        }
+
+        const groqData = await groqRes.json();
+        if (!groqData.choices || !groqData.choices[0]) {
+            return res.json({
+                success: false,
+                error: 'Keine Antwort von Groq'
+            });
+        }
+
+        const structuredText = groqData.choices[0].message.content;
+        console.log('✅ Groq strukturiert:', structuredText.substring(0, 100));
+
+        res.json({
+            success: true,
+            text: structuredText
+        });
+
+    } catch (err) {
+        console.error('❌ Fehler in /api/structure-text:', err);
+        res.json({
+            success: false,
             error: err.message
         });
     }

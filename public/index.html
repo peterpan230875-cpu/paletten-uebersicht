@@ -1009,7 +1009,8 @@
 
     <script>
         // GROQ API Key wird von Backend bereitgestellt (sicherer als hardcodiert!)
-        const GROQ_API_KEY = "REPLACE_WITH_YOUR_KEY_IN_ENV";
+        // 🔐 GROQ API wird jetzt über Backend-Proxy aufgerufen (sicherer!)
+        // const GROQ_API_KEY wird NICHT mehr im Frontend genutzt
 
         // ============================================
         // PALETTENLISTE MIT SYNONYMEN
@@ -1302,69 +1303,76 @@
             console.log('🧹 processWithGroq() aufgerufen mit:', rohText);
 
             const status = document.getElementById("status");
-            status.textContent = "🧹 Strukturiere mit Groq...";
+            status.textContent = "🧹 Strukturiere mit Backend...";
 
             try {
-                if (!GROQ_API_KEY || GROQ_API_KEY === 'REPLACE_WITH_YOUR_KEY_IN_ENV') {
-                    throw new Error('Groq API Key nicht konfiguriert!');
-                }
+                console.log('📤 Sende Text zum Backend-Proxy: ' + rohText.substring(0, 100));
 
-                console.log('📤 Sende Text zu Groq: ' + rohText.substring(0, 100));
-
-                const payload = {
-                    model: "llama-3.1-8b-instant",
-                    messages: [{
-                        role: "system",
-                        content: "Du bist ein Paletten-Tracker. Analysiere den GESPROCHENEN Text und gib EXAKT in diesem Format zurück:\n\nKundenname: Der Name des Kunden\nKundennummer: Die Kundennummer WENN EXPLIZIT genannt - sonst LEER lassen\nAktion: mitgenommen oder erhalten\n\nDann FÜR JEDE Palettenart:\nPalettenart: Art der Palette\nMenge: Die Anzahl als Zahl\n\nTrenne mehrere Palettenarten mit '---' auf einer neuen Zeile!\n\nBeispiel 1 (eine Palettenart):\nInput: 'Quadriga Bau nimmt 10 Euro-Paletten mit'\nOutput:\nKundenname: Quadriga Bau\nKundennummer: \nAktion: mitgenommen\nPalettenart: Euro-Palette\nMenge: 10\n\nBeispiel 2 (MEHRERE Palettenarten):\nInput: 'Quadriga Bau nimmt eine Europalette und zwei Ziegelpaletten mit'\nOutput:\nKundenname: Quadriga Bau\nKundennummer: \nAktion: mitgenommen\nPalettenart: Europalette\nMenge: 1\n---\nPalettenart: Ziegelpalette\nMenge: 2"
-                    }, {
-                        role: "user",
-                        content: rohText
-                    }],
-                    temperature: 0.3,
-                    max_tokens: 300
-                };
-
-                console.log('📡 Sende Payload:', JSON.stringify(payload).substring(0, 200) + '...');
-
-                const cleanRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                // 🔐 NUTZE BACKEND-PROXY STATT DIREKTER GROQ-AUFRUF (sicherer!)
+                const backendRes = await fetch("/api/structure-text", {
                     method: "POST",
                     headers: {
-                        "Authorization": "Bearer " + GROQ_API_KEY,
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({
+                        text: rohText
+                    })
                 });
 
-                console.log('📨 Groq Response Status:', cleanRes.status);
+                console.log('📨 Backend Response Status:', backendRes.status);
 
-                if (!cleanRes.ok) {
-                    const errorText = await cleanRes.text();
-                    console.error('🔴 Groq API Fehler:', cleanRes.status, errorText);
-                    throw new Error(`Groq API ${cleanRes.status}: ${errorText.substring(0, 200)}`);
+                const backendData = await backendRes.json();
+                console.log('📨 Backend Response:', backendData);
+
+                if (!backendRes.ok || !backendData.success) {
+                    const errorMsg = backendData.error || 'Unbekannter Fehler';
+                    console.error('🔴 Backend Fehler:', errorMsg);
+                    throw new Error(errorMsg);
                 }
 
-                const cleanData = await cleanRes.json();
-                console.log('✅ Groq Response:', cleanData);
-
-                if (!cleanData.choices || !cleanData.choices[0]) {
-                    throw new Error("Groq: Keine Antwort erhalten");
-                }
-
-                recognizedText = cleanData.choices[0].message.content;
-                console.log('✅ Groq strukturiert:', recognizedText.substring(0, 150));
+                recognizedText = backendData.text;
+                console.log('✅ Backend strukturiert:', recognizedText.substring(0, 150));
 
                 // Zeige Review-Phase
                 console.log('📋 Rufe showReviewPhase auf');
                 showReviewPhase(recognizedText);
 
             } catch (err) {
-                console.error('❌ processWithGroq Fehler:', err.message);
-                status.textContent = `❌ Fehler: ${err.message}`;
-                showError("Fehler bei Strukturierung: " + err.message);
+                console.error('❌ processWithGroq Fehler:', err);
+                console.error('   Message:', err.message);
+                console.error('   Stack:', err.stack);
+
+                // 🔴 ZEIGE FEHLER DIREKT AUF BILDSCHIRM FÜR DEBUGGING
+                const errorMsg = `
+❌ GROQ FEHLER:
+
+${err.message}
+
+📝 Erkannter Text war:
+"${rohText}"
+
+💡 Mögliche Lösung:
+- Refresh die Seite (F5)
+- Versuche es nochmal
+- Sprich langsamer/deutlicher
+                `;
+
+                status.textContent = errorMsg;
+                status.style.whiteSpace = "pre-wrap";
+                status.style.textAlign = "left";
+                status.style.fontSize = "12px";
+                status.style.color = "#d32f2f";
+                status.style.background = "#ffebee";
+                status.style.padding = "10px";
+                status.style.borderRadius = "5px";
+
+                showError("Groq API Fehler: " + err.message);
 
                 const btn = document.getElementById("recordingButton");
                 if (btn) {
+                    btn.textContent = "🎤 Aufnahme starten";
                     btn.disabled = false;
+                    btn.classList.remove("recording");
                 }
             }
         }
