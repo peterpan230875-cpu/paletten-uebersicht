@@ -1086,6 +1086,7 @@
         let audioStream = null;
         let wartendeAuswahlPaletten = [];
         let selectedPalette = null;
+        let recognition = null;  // 🔥 WEB SPEECH API INSTANZ
         let aktuelleAuswahlPalette = null;  // 🎯 SPEICHERE DIE AKTUELLEN DATEN VOR DEM LÖSCHEN
 
         // Kundenbestätigung
@@ -1103,6 +1104,12 @@
         async function startRecording() {
             try {
                 // 🎤 NEUE METHODE: Web Speech API (funktioniert auf Handy!)
+                // 🔥 STOPPE ALTE INSTANZ FALLS NOCH LAUFEN
+                if (recognition) {
+                    recognition.abort();
+                    recognition = null;
+                }
+
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
                 if (!SpeechRecognition) {
@@ -1110,7 +1117,7 @@
                     return;
                 }
 
-                const recognition = new SpeechRecognition();
+                recognition = new SpeechRecognition();  // 🔥 SPEICHERE ALS GLOBALE VARIABLE
 
                 // Konfiguration
                 recognition.continuous = false;  // Stoppt nach einer Phrase
@@ -1319,6 +1326,16 @@
             recognizedText = "";
             audioChunks = [];
             isRecording = false;
+
+            // 🔥 STOPPE WEB SPEECH API FALLS NOCH LÄUFT
+            if (recognition) {
+                try {
+                    recognition.abort();
+                } catch (err) {
+                    console.error('Fehler beim Stoppen der Recognition:', err);
+                }
+                recognition = null;
+            }
 
             document.querySelectorAll(".phase").forEach(p => p.classList.remove("active"));
             document.getElementById("recordingPhase").classList.add("active");
