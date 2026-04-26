@@ -1232,7 +1232,16 @@
         }
 
         function stopRecording() {
-            // Mit Web Speech API: Stoppt automatisch nach Spracherkennung
+            // 🔥 STOPPE SOFORT DAS MIKROFON
+            if (recognition) {
+                try {
+                    recognition.abort();  // SOFORT STOPPEN - NICHT WARTEN!
+                    console.log('🛑 Mikrofon sofort gestoppt');
+                } catch (err) {
+                    console.error('Fehler beim Stoppen:', err);
+                }
+            }
+
             isRecording = false;
 
             const btn = document.getElementById("recordingButton");
