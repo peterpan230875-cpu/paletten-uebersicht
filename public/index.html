@@ -1180,6 +1180,7 @@
 
                 recognition.onstart = () => {
                     console.log('🎤 Spracherkennung gestartet');
+                    console.log('✅ Recognition läuft, wird nach 5 Sekunden automatisch gestoppt wenn noch nicht beendet');
                 };
 
                 recognition.onresult = (event) => {
@@ -1202,6 +1203,11 @@
 
                 recognition.onerror = (event) => {
                     console.error('❌ Spracherkennung Fehler:', event.error);
+                    // 🕐 LÖSCHE TIMEOUT BEI FEHLER
+                    if (recognitionTimeout) {
+                        clearTimeout(recognitionTimeout);
+                        recognitionTimeout = null;
+                    }
                     showError(`❌ Fehler: ${event.error}`);
                     isRecording = false;
                     btn.classList.remove("recording");
@@ -1211,6 +1217,12 @@
                 recognition.onend = () => {
                     console.log('🎤 Spracherkennung beendet');
                     console.log('Erkannter Text:', finalTranscript);
+
+                    // 🕐 LÖSCHE TIMEOUT WENN onend AUFGERUFEN WIRD
+                    if (recognitionTimeout) {
+                        clearTimeout(recognitionTimeout);
+                        recognitionTimeout = null;
+                    }
 
                     isRecording = false;
                     btn.classList.remove("recording");
@@ -1227,12 +1239,17 @@
                 // Starte Erkennung
                 recognition.start();
 
-                // 🕐 SETZE 5-SEKUNDEN TIMEOUT
+                // 🕐 SETZE 5-SEKUNDEN TIMEOUT (nur wenn noch kein onend aufgerufen wurde)
                 if (recognitionTimeout) clearTimeout(recognitionTimeout);
                 recognitionTimeout = setTimeout(() => {
-                    console.log('⏰ 5-Sekunden Timeout erreicht - stoppe Recognition');
-                    if (recognition) {
-                        recognition.stop();  // Stoppt sanft, gibt noch Zeit für Text-Verarbeitung
+                    // Nur stoppen wenn Recognition noch läuft
+                    if (isRecording && recognition) {
+                        console.log('⏰ 5-Sekunden Timeout erreicht - stoppe Recognition');
+                        try {
+                            recognition.stop();  // Sanft stoppen
+                        } catch (err) {
+                            console.error('Fehler beim Timeout-Stop:', err);
+                        }
                     }
                     recognitionTimeout = null;
                 }, 5000);  // 5 SEKUNDEN
