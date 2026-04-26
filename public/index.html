@@ -1144,18 +1144,106 @@
         });
 
         // ============================================
-        // 🔐 EINFACHES MIKROFON-CLEANUP BEI APP-WECHSEL
+        // 🔐 UMFASSENDE MIKROFON-CLEANUP BEI APP-WECHSEL
         // ============================================
+        function stopAllAudio() {
+            try {
+                console.log('🛑 STOPPE ALLE AUDIO STREAMS');
 
-        // Stoppe Mikrofon wenn Seite unsichtbar wird (Handy sperren, App Hintergrund)
-        document.addEventListener('visibilitychange', function() {
-            if (document.hidden && recognition && isRecording) {
-                console.log('⚠️ Seite versteckt - stoppe Mikrofon');
-                try {
-                    recognition.abort();
-                } catch (e) {}
+                // 1. Stoppe Recognition
+                if (typeof recognition !== 'undefined' && recognition) {
+                    try {
+                        recognition.abort();
+                        recognition = null;
+                    } catch (err) {
+                        console.error('Recognition stop Fehler:', err);
+                    }
+                }
+
+                // 2. Stoppe AudioStream Tracks
+                if (typeof audioStream !== 'undefined' && audioStream) {
+                    try {
+                        audioStream.getTracks().forEach(track => {
+                            console.log('   Stoppe Track:', track.kind);
+                            track.stop();
+                        });
+                        audioStream = null;
+                    } catch (err) {
+                        console.error('AudioStream stop Fehler:', err);
+                    }
+                }
+
+                // 3. Stoppe Timer
+                if (typeof recognitionTimeout !== 'undefined' && recognitionTimeout) {
+                    clearTimeout(recognitionTimeout);
+                    recognitionTimeout = null;
+                }
+
+                // 4. Setze Recording-Flag
+                if (typeof isRecording !== 'undefined') {
+                    isRecording = false;
+                }
+
+                // 5. Update UI (mit null-checks!)
+                const btn = document.getElementById("recordingButton");
+                if (btn && typeof btn.textContent !== 'undefined') {
+                    btn.textContent = "🎤 Aufnahme starten";
+                    btn.classList.remove("recording");
+                }
+
+                console.log('✅ Alle Audio-Streams gestoppt');
+            } catch (err) {
+                console.error('⚠️ Fehler in stopAllAudio():', err);
             }
-        });
+        }
+
+        // 🔐 EVENT LISTENER NUR REGISTRIEREN WENN SEITE GELADEN IST
+        function registerAudioCleanupListeners() {
+            try {
+                // 🔐 EVENT 1: HANDY WIRD GESPERRT oder APP GEHT IN HINTERGRUND
+                document.addEventListener('visibilitychange', () => {
+                    try {
+                        if (document.hidden) {
+                            console.log('⚠️ [visibilitychange] Seite unsichtbar');
+                            stopAllAudio();
+                        }
+                    } catch (err) {
+                        console.error('visibilitychange Fehler:', err);
+                    }
+                });
+
+                // 🔐 EVENT 2: USER WECHSELT ZU ANDERER APP
+                window.addEventListener('pagehide', (event) => {
+                    try {
+                        console.log('⚠️ [pagehide] App verlässt');
+                        stopAllAudio();
+                    } catch (err) {
+                        console.error('pagehide Fehler:', err);
+                    }
+                });
+
+                // 🔐 EVENT 3: USER SCHLIESS BROWSER/TAB
+                window.addEventListener('beforeunload', (event) => {
+                    try {
+                        console.log('⚠️ [beforeunload] Seite wird verlassen');
+                        stopAllAudio();
+                    } catch (err) {
+                        console.error('beforeunload Fehler:', err);
+                    }
+                });
+
+                console.log('✅ Audio Cleanup Listener registriert');
+            } catch (err) {
+                console.error('⚠️ Fehler beim Registrieren der Listener:', err);
+            }
+        }
+
+        // Registriere Listener wenn DOM bereit ist
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', registerAudioCleanupListeners);
+        } else {
+            registerAudioCleanupListeners();
+        }
 
         async function startRecording() {
             try {
