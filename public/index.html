@@ -1546,6 +1546,11 @@ ${err.message}
                             // 🛑 NUR zu aktuelleAuswahlPalette, NICHT zu wartendeAuswahlPaletten!
                             // (wartendeAuswahlPaletten ist für Paletten mit Kandidaten, nicht für nicht erkannte)
                             aktuelleAuswahlPalette = palettenData;  // 🎯 WICHTIG: Speichere für Modal
+
+                            // 🎯 SPEICHERE ERKANNTE PALETTEN JETZT, BEVOR ERROR GEWORFEN WIRD!
+                            erkannteAuswahlPaletten = palettenListe;
+                            console.log('✅ Erkannte Paletten vor Error gespeichert:', erkannteAuswahlPaletten);
+
                             showPaletteSelectionAllPalettes(palettenartRaw);
                             throw new Error(`⚠️ Palette nicht erkannt: "${palettenartRaw}" – bitte auswählen`);
                         }
