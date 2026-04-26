@@ -1145,19 +1145,31 @@
         }
 
         async function sendAudioToGroq() {
-            const audioBlob = new Blob(audioChunks);
+            // Erstelle Audio Blob mit korrektem Type
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+
+            console.log('🎤 Audio Blob erstellt:', {
+                size: audioBlob.size,
+                type: audioBlob.type,
+                chunks: audioChunks.length
+            });
+
+            if (audioBlob.size === 0) {
+                showError("⚠️ Keine Audio-Daten aufgenommen!");
+                return;
+            }
 
             try {
                 const status = document.getElementById("status");
                 status.textContent = "📤 Sende Audio zum Server...";
 
-                // 🔥 NEUER WEG: Audio an Backend senden!
-                const formData = new FormData();
-                formData.append("audio", audioBlob, "audio.wav");
-
+                // 🔥 Sende Raw Audio Buffer zum Backend
                 const res = await fetch("/api/process-audio", {
                     method: "POST",
-                    body: audioBlob  // Sende Raw Buffer
+                    headers: {
+                        'Content-Type': 'audio/wav'
+                    },
+                    body: audioBlob  // Sende den Blob direkt
                 });
 
                 if (!res.ok) {
