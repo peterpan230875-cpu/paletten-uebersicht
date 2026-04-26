@@ -1218,15 +1218,24 @@
                     console.log('🎤 Spracherkennung beendet');
                     console.log('Erkannter Text:', finalTranscript);
 
-                    // 🕐 LÖSCHE TIMEOUT WENN onend AUFGERUFEN WIRD
-                    if (recognitionTimeout) {
-                        clearTimeout(recognitionTimeout);
-                        recognitionTimeout = null;
-                    }
-
                     isRecording = false;
                     btn.classList.remove("recording");
                     btn.textContent = "🎤 Aufnahme starten";
+
+                    // 🔥 JETZT ERST: SETZE 2-SEKUNDEN TIMER UM MIKROFON AUSZUSCHALTEN
+                    console.log('⏰ Starte 2-Sekunden Timer zum Ausschalten des Mikrofons');
+                    if (recognitionTimeout) clearTimeout(recognitionTimeout);
+                    recognitionTimeout = setTimeout(() => {
+                        console.log('🔴 2 Sekunden vorbei - schalte Mikrofon AUS');
+                        try {
+                            if (recognition) {
+                                recognition.abort();  // Jetzt erst aggressive Shutdown!
+                            }
+                        } catch (err) {
+                            console.error('Fehler beim Shutdown:', err);
+                        }
+                        recognitionTimeout = null;
+                    }, 2000);  // 2 SEKUNDEN NACH ERKENNUNG ENDET
 
                     if (finalTranscript.trim()) {
                         // 🔥 SENDE ZU GROQ FÜR STRUKTURIERUNG
@@ -1246,8 +1255,17 @@
 
         function stopRecording() {
             // Mit Web Speech API: Benutzer drückt Button zum Stoppen
-            // 🔥 MIKROFON LÄUFT NOCH 2 SEKUNDEN FÜR TEXT-ERFASSUNG
+            // 🎤 Stoppe Recognition sanft (nicht aggressive abort!)
             isRecording = false;
+
+            if (recognition) {
+                try {
+                    recognition.stop();  // SANFT stoppen, nicht abort - lässt onend aufrufen!
+                    console.log('🛑 Stoppe Recognition sanft');
+                } catch (err) {
+                    console.error('Fehler beim Stop:', err);
+                }
+            }
 
             const btn = document.getElementById("recordingButton");
             btn.textContent = "🎤 Aufnahme starten";
@@ -1256,20 +1274,6 @@
             const status = document.getElementById("status");
             status.textContent = "Wird verarbeitet...";
             status.className = "status-processing";
-
-            // 🕐 SETZE 2-SEKUNDEN TIMER UM MIKROFON AUSZUSCHALTEN
-            if (recognitionTimeout) clearTimeout(recognitionTimeout);
-            recognitionTimeout = setTimeout(() => {
-                console.log('⏰ 2-Sekunden abgelaufen - schalte Mikrofon AUS');
-                if (recognition) {
-                    try {
-                        recognition.abort();  // SOFORT AUS nach 2 Sekunden
-                    } catch (err) {
-                        console.error('Fehler beim Shutdown:', err);
-                    }
-                }
-                recognitionTimeout = null;
-            }, 2000);  // 2 SEKUNDEN
         }
 
         async function sendTextToGroq(spokenText) {
