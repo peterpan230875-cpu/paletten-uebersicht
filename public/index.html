@@ -1232,16 +1232,8 @@
         }
 
         function stopRecording() {
-            // 🔥 STOPPE SOFORT DAS MIKROFON
-            if (recognition) {
-                try {
-                    recognition.abort();  // SOFORT STOPPEN - NICHT WARTEN!
-                    console.log('🛑 Mikrofon sofort gestoppt');
-                } catch (err) {
-                    console.error('Fehler beim Stoppen:', err);
-                }
-            }
-
+            // Mit Web Speech API: Stoppt automatisch nach Spracherkennung
+            // 🔥 NUR isRecording setzen - nicht abort() da es den Text blockiert!
             isRecording = false;
 
             const btn = document.getElementById("recordingButton");
