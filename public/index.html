@@ -19,6 +19,8 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
         }
 
         .container {
@@ -33,6 +35,8 @@
             flex-direction: column;
             overflow-y: auto;
             overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            position: relative;
         }
 
         .phase {
@@ -41,6 +45,7 @@
             overflow-y: auto;
             overflow-x: hidden;
             width: 100%;
+            -webkit-overflow-scrolling: touch;
         }
 
         .phase.active {
@@ -820,7 +825,7 @@
             <button onclick="logoutUser()" style="padding: 10px 16px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap;">👋 Logout (<span id="mitarbeiterDisplay">Marcel</span>)</button>
         </div>
 
-        <h1>Paletten Übersicht</h1>
+        <h1>🚀 Paletten Übersicht V1.375 (Web Speech API) 🚀</h1>
         <p class="subtitle">Spracherkennung mit Saldo-Tracking</p>
 
         <!-- LOGIN PHASE -->
@@ -892,8 +897,8 @@
                 <!-- Übersicht-Button unten mittig -->
                 <button onclick="showOverview()" style="margin-top: 15px; margin-bottom: 30px; padding: 15px 40px; background: #51cf66; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; max-width: 300px;">📊 Übersicht</button>
 
-                <!-- V1.37 schwarz, fett, unten in der mitte UNTER Übersicht Button -->
-                <span style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); font-size: 14px; color: #000; font-weight: bold;">V1.37</span>
+                <!-- V1.371 schwarz, fett, unten in der mitte UNTER Übersicht Button -->
+                <span style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); font-size: 14px; color: #000; font-weight: bold;">V1.375</span>
             </div>
         </div>
 
@@ -1008,8 +1013,8 @@
     </div>
 
     <script>
-        // GROQ API Key wird von Backend bereitgestellt (sicherer als hardcodiert!)
-        const GROQ_API_KEY = "REPLACE_WITH_YOUR_KEY_IN_ENV";
+        // GROQ API Key für Spracherkennung
+        const GROQ_API_KEY = "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";
 
         // ============================================
         // PALETTENLISTE MIT SYNONYMEN
@@ -1081,7 +1086,10 @@
         let audioStream = null;
         let wartendeAuswahlPaletten = [];
         let selectedPalette = null;
+        let recognition = null;  // 🔥 WEB SPEECH API INSTANZ
         let aktuelleAuswahlPalette = null;  // 🎯 SPEICHERE DIE AKTUELLEN DATEN VOR DEM LÖSCHEN
+        let recognitionTimeout = null;  // 🕐 TIMER FÜR 5-SEKUNDEN TIMEOUT
+        let audioStream = null;  // 🎤 SPEICHERE AUDIO STREAM UM IHN ZU STOPPEN
 
         // Kundenbestätigung
         let wartendeKundenZuBestaetigung = null;
@@ -1090,109 +1098,342 @@
         // Login & Mitarbeiter
         let mitarbeiterName = null;
 
+        // ============================================
+        // HILFSFUNKTION: NAMEN NORMALISIEREN
+        // ============================================
+        function normalisiereName(name) {
+            if (!name) return '';
+            // 🔥 IMMER ALLES GROSS: "jens meier" → "JENS MEIER"
+            return name.trim().toUpperCase();
+        }
+
         async function toggleRecording() {
             if (!isRecording) startRecording();
             else stopRecording();
         }
 
+        // ============================================
+        // 🔐 DATENSCHUTZ: STOPPE MIKROFON BEI BROWSER IM HINTERGRUND
+        // ============================================
+        window.addEventListener('blur', () => {
+            console.log('⚠️ Browser im Hintergrund - stoppe Spracherkennung');
+            if (recognition && isRecording) {
+                recognition.abort();
+                isRecording = false;
+                const btn = document.getElementById("recordingButton");
+                if (btn) {
+                    btn.textContent = "🎤 Aufnahme starten";
+                    btn.classList.remove("recording");
+                }
+                const status = document.getElementById("status");
+                if (status) {
+                    status.textContent = "⚠️ Browser im Hintergrund - Aufnahme gestoppt";
+                    status.className = "status-error";
+                }
+            }
+        });
+
+        window.addEventListener('focus', () => {
+            console.log('✅ Browser wieder aktiv');
+            // Optional: Zeige dass Browser wieder aktiv ist
+            const status = document.getElementById("status");
+            if (status && status.textContent.includes('Hintergrund')) {
+                status.textContent = "";
+                status.className = "";
+            }
+        });
+
+        // ============================================
+        // 🔐 UMFASSENDE MIKROFON-CLEANUP BEI APP-WECHSEL
+        // ============================================
+        function stopAllAudio() {
+            console.log('🛑 STOPPE ALLE AUDIO STREAMS');
+
+            // 1. Stoppe Recognition
+            if (recognition) {
+                try {
+                    recognition.abort();
+                    recognition = null;
+                } catch (err) {
+                    console.error('Recognition stop Fehler:', err);
+                }
+            }
+
+            // 2. Stoppe AudioStream Tracks
+            if (audioStream) {
+                try {
+                    audioStream.getTracks().forEach(track => {
+                        console.log('   Stoppe Track:', track.kind);
+                        track.stop();
+                    });
+                    audioStream = null;
+                } catch (err) {
+                    console.error('AudioStream stop Fehler:', err);
+                }
+            }
+
+            // 3. Stoppe Timer
+            if (recognitionTimeout) {
+                clearTimeout(recognitionTimeout);
+                recognitionTimeout = null;
+            }
+
+            // 4. Setze Recording-Flag
+            isRecording = false;
+
+            // 5. Update UI
+            const btn = document.getElementById("recordingButton");
+            if (btn) {
+                btn.textContent = "🎤 Aufnahme starten";
+                btn.classList.remove("recording");
+            }
+
+            console.log('✅ Alle Audio-Streams gestoppt');
+        }
+
+        // 🔐 EVENT 1: HANDY WIRD GESPERRT oder APP GEHT IN HINTERGRUND
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                console.log('⚠️ [visibilitychange] Seite unsichtbar (App Hintergrund oder Handy gesperrt)');
+                stopAllAudio();
+            } else {
+                console.log('✅ [visibilitychange] Seite wieder sichtbar');
+            }
+        });
+
+        // 🔐 EVENT 2: USER WECHSELT ZU ANDERER APP oder SCHLIESS SEITE (iOS + Android)
+        window.addEventListener('pagehide', (event) => {
+            console.log('⚠️ [pagehide] User verlässt Seite oder wechselt App');
+            stopAllAudio();
+        });
+
+        // 🔐 EVENT 3: USER SCHLIESS BROWSER/TAB (auch Refresh)
+        window.addEventListener('beforeunload', (event) => {
+            console.log('⚠️ [beforeunload] Seite wird verlassen oder refreshed');
+            stopAllAudio();
+        });
+
+        // 🔐 EVENT 4: HANDY GEHT IN STANDBY (zusätzliche Sicherheit)
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && isRecording) {
+                console.log('🔴 Recording war aktiv aber Seite versteckt - NOTFALL STOP');
+                stopAllAudio();
+                const status = document.getElementById("status");
+                if (status) {
+                    status.textContent = "🔴 Mikrofon gestoppt (Handy gesperrt)";
+                    status.className = "status-error";
+                }
+            }
+        });
+
         async function startRecording() {
             try {
-                if (audioStream) {
-                    audioStream.getTracks().forEach(track => track.stop());
-                    audioStream = null;
+                // 🎤 NEUE METHODE: Web Speech API (funktioniert auf Handy!)
+                // 🔥 STOPPE ALTE INSTANZ FALLS NOCH LAUFEN
+                if (recognition) {
+                    recognition.abort();
+                    recognition = null;
                 }
-                mediaRecorder = null;
-                audioChunks = [];
 
-                audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(audioStream);
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-                mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
-                mediaRecorder.onstop = () => sendAudioToGroq();
+                if (!SpeechRecognition) {
+                    showError("❌ Spracherkennung wird von deinem Browser nicht unterstützt!");
+                    return;
+                }
 
-                mediaRecorder.start();
+                recognition = new SpeechRecognition();  // 🔥 SPEICHERE ALS GLOBALE VARIABLE
+
+                // Konfiguration
+                recognition.continuous = false;  // Stoppt nach einer Phrase
+                recognition.interimResults = true;  // Zeige Zwischenergebnisse
+                recognition.lang = 'de-DE';  // Deutsch
+
+                console.log('🎤 Web Speech API gestartet - Deutsch');
+
                 isRecording = true;
-
                 const btn = document.getElementById("recordingButton");
                 btn.textContent = "🔴 Aufnahme läuft - jetzt sprechen!";
                 btn.classList.add("recording");
 
                 const status = document.getElementById("status");
-                status.textContent = "Hörst du das Mikrofon? 🎧";
+                status.textContent = "Höre zu...🎧";
                 status.className = "status-recording";
+
+                let finalTranscript = '';
+
+                recognition.onstart = () => {
+                    console.log('🎤 Spracherkennung gestartet');
+                    console.log('✅ Recognition läuft, wird nach 5 Sekunden automatisch gestoppt wenn noch nicht beendet');
+                };
+
+                recognition.onresult = (event) => {
+                    let interimTranscript = '';
+
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const transcript = event.results[i][0].transcript;
+
+                        if (event.results[i].isFinal) {
+                            finalTranscript += transcript + ' ';
+                            console.log('✅ Final:', transcript);
+                        } else {
+                            interimTranscript += transcript;
+                            console.log('⏳ Interim:', transcript);
+                        }
+                    }
+
+                    status.textContent = interimTranscript || finalTranscript || "Höre zu...";
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('❌ Spracherkennung Fehler:', event.error);
+                    // 🕐 LÖSCHE TIMEOUT BEI FEHLER
+                    if (recognitionTimeout) {
+                        clearTimeout(recognitionTimeout);
+                        recognitionTimeout = null;
+                    }
+                    showError(`❌ Fehler: ${event.error}`);
+                    isRecording = false;
+                    btn.classList.remove("recording");
+                    btn.textContent = "🎤 Aufnahme starten";
+                };
+
+                recognition.onend = () => {
+                    console.log('🎤 Spracherkennung beendet');
+                    console.log('Erkannter Text:', finalTranscript);
+
+                    isRecording = false;
+                    btn.classList.remove("recording");
+                    btn.textContent = "🎤 Aufnahme starten";
+
+                    // 🔥 JETZT ERST: SETZE 2-SEKUNDEN TIMER UM MIKROFON AUSZUSCHALTEN
+                    console.log('⏰ Starte 2-Sekunden Timer zum Ausschalten des Mikrofons');
+                    if (recognitionTimeout) clearTimeout(recognitionTimeout);
+                    recognitionTimeout = setTimeout(() => {
+                        console.log('🔴 2 Sekunden vorbei - schalte Mikrofon AUS');
+                        try {
+                            if (recognition) {
+                                recognition.abort();  // STOP Recognition
+                                recognition = null;   // 🔥 LÖSCHE INSTANZ
+                                console.log('✅ Recognition Instanz gelöscht');
+                            }
+
+                            // 🎤 CHROME WORKAROUND: Stoppe den gespeicherten Audio Stream
+                            // Das funktioniert auf Chrome/Android am besten
+                            if (audioStream) {
+                                console.log('🔴 Stoppe Audio Stream mit getTracks()...');
+                                audioStream.getTracks().forEach(track => {
+                                    console.log('   Stoppe Track:', track.kind);
+                                    track.stop();  // 🔥 CHROME BEFEHL ZUM STOPPEN
+                                });
+                                audioStream = null;
+                                console.log('✅ Audio Stream komplett gestoppt');
+                            }
+
+                            console.log('✅ Mikrofon auf Chrome-Ebene freigegeben');
+                        } catch (err) {
+                            console.error('Fehler beim Shutdown:', err);
+                        }
+                        recognitionTimeout = null;
+                    }, 2000);  // 2 SEKUNDEN NACH ERKENNUNG ENDET
+
+                    if (finalTranscript.trim()) {
+                        // 🔥 SENDE ZU GROQ FÜR STRUKTURIERUNG
+                        sendTextToGroq(finalTranscript.trim());
+                    } else {
+                        showError("⚠️ Keine Sprache erkannt. Versuche es erneut!");
+                    }
+                };
+
+                // 🎤 VERSUCHE AUDIO STREAM ZU SPEICHERN (CHROME WORKAROUND)
+                // Das ermöglicht uns später den Stream zu stoppen
+                try {
+                    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                        // Versuche parallel einen AudioStream zu öffnen
+                        // (die Web Speech API nutzt intern auch einen Stream)
+                        navigator.mediaDevices.getUserMedia({ audio: true })
+                            .then(stream => {
+                                audioStream = stream;
+                                console.log('🎤 Audio Stream gespeichert für späteren Stop');
+                            })
+                            .catch(err => console.log('⚠️ getUserMedia nicht verfügbar (normal):', err.name));
+                    }
+                } catch (err) {
+                    console.log('⚠️ getUserMedia Setup übersprungen');
+                }
+
+                // Starte Erkennung
+                recognition.start();
+
             } catch (err) {
-                showError("Mikrofon konnte nicht aktiviert werden: " + err.message);
+                showError("Fehler bei Spracherkennung: " + err.message);
             }
         }
 
         function stopRecording() {
-            mediaRecorder.stop();
+            // Mit Web Speech API: Benutzer drückt Button zum Stoppen
+            // 🎤 Stoppe Recognition sanft (nicht aggressive abort!)
             isRecording = false;
+
+            if (recognition) {
+                try {
+                    recognition.stop();  // SANFT stoppen, nicht abort - lässt onend aufrufen!
+                    console.log('🛑 Stoppe Recognition sanft');
+                } catch (err) {
+                    console.error('Fehler beim Stop:', err);
+                }
+            }
 
             const btn = document.getElementById("recordingButton");
             btn.textContent = "🎤 Aufnahme starten";
             btn.classList.remove("recording");
-            btn.disabled = true;
 
             const status = document.getElementById("status");
             status.textContent = "Wird verarbeitet...";
             status.className = "status-processing";
         }
 
-        async function sendAudioToGroq() {
-            const audioBlob = new Blob(audioChunks);
-            const formData = new FormData();
-            formData.append("file", audioBlob, "audio.wav");
-            formData.append("model", "whisper-large-v3");
+        async function sendTextToGroq(spokenText) {
+            // 🎤 NEUE METHODE: Sende erkannten Text zu Groq Llama für Strukturierung
+            // (Nicht mehr Audio! Nur Text!)
+
+            if (!spokenText || spokenText.trim() === '') {
+                showError("⚠️ Keine Sprache erkannt!");
+                return;
+            }
 
             try {
                 const status = document.getElementById("status");
-                status.textContent = "🎯 Transkribiere Audio...";
-
-                const whisperRes = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", {
-                    method: "POST",
-                    headers: { "Authorization": "Bearer " + GROQ_API_KEY },
-                    body: formData
-                });
-
-                if (!whisperRes.ok) throw new Error(`Whisper-Fehler: ${whisperRes.status}`);
-
-                const whisperData = await whisperRes.json();
-                const rohText = whisperData.text || "";
-
-                if (!rohText) throw new Error("Keine Sprache erkannt. Bitte versuche es nochmal.");
-
                 status.textContent = "🧹 Strukturiere Text...";
 
-                const cleanRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                console.log('📝 Sende Text zu Groq Llama:', spokenText);
+
+                // 🔥 Sende Text zum Backend für Llama-Strukturierung
+                const res = await fetch("/api/structure-text", {
                     method: "POST",
                     headers: {
-                        "Authorization": "Bearer " + GROQ_API_KEY,
-                        "Content-Type": "application/json"
+                        'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        model: "llama-3.1-8b-instant",
-                        messages: [{
-                            role: "system",
-                            content: "Du bist ein Paletten-Tracker. Analysiere den GESPROCHENEN Text und gib EXAKT in diesem Format zurück:\n\nKundenname: Der Name des Kunden\nKundennummer: Die Kundennummer WENN EXPLIZIT genannt - sonst LEER lassen\nAktion: mitgenommen oder erhalten\n\nDann FÜR JEDE Palettenart:\nPalettenart: Art der Palette\nMenge: Die Anzahl als Zahl\n\nTrenne mehrere Palettenarten mit '---' auf einer neuen Zeile!\n\nBeispiel 1 (eine Palettenart):\nInput: 'Quadriga Bau nimmt 10 Euro-Paletten mit'\nOutput:\nKundenname: Quadriga Bau\nKundennummer: \nAktion: mitgenommen\nPalettenart: Euro-Palette\nMenge: 10\n\nBeispiel 2 (MEHRERE Palettenarten):\nInput: 'Quadriga Bau nimmt eine Europalette und zwei Ziegelpaletten mit'\nOutput:\nKundenname: Quadriga Bau\nKundennummer: \nAktion: mitgenommen\nPalettenart: Europalette\nMenge: 1\n---\nPalettenart: Ziegelpalette\nMenge: 2"
-                        }, {
-                            role: "user",
-                            content: rohText
-                        }],
-                        temperature: 0.3,
-                        max_tokens: 300
-                    })
+                    body: JSON.stringify({ text: spokenText })
                 });
 
-                if (!cleanRes.ok) throw new Error(`Llama-Fehler: ${cleanRes.status}`);
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.error || `Server-Fehler: ${res.status}`);
+                }
 
-                const cleanData = await cleanRes.json();
-                if (!cleanData.choices || !cleanData.choices[0]) throw new Error("Keine Antwort");
+                const data = await res.json();
 
-                recognizedText = cleanData.choices[0].message.content;
+                if (!data.success) {
+                    throw new Error(data.error || "Unbekannter Fehler");
+                }
+
+                console.log('✅ Strukturierter Text:', data.text);
+                recognizedText = data.text;
                 showReviewPhase(recognizedText);
 
             } catch (err) {
+                console.error('❌ Text-Fehler:', err);
                 showError(err.message);
                 document.getElementById("recordingButton").disabled = false;
             }
@@ -1209,8 +1450,8 @@
             // Erste Phase: Parse Kundeninfo
             for (let line of lines) {
                 if (line.startsWith('Kundenname:')) {
-                    kundenname = line.replace('Kundenname:', '').trim();
-                    normalisierterText += line + '\n';
+                    kundenname = normalisiereName(line.replace('Kundenname:', '').trim());  // 🔥 NORMALISIERE
+                    normalisierterText += 'Kundenname: ' + kundenname + '\n';
                 } else if (line.startsWith('Kundennummer:')) {
                     kundennummer = line.replace('Kundennummer:', '').trim();
                     normalisierterText += line + '\n';
@@ -1255,7 +1496,7 @@
 
             for (let line of lines) {
                 if (line.startsWith('Kundenname:')) {
-                    kundenname = line.replace('Kundenname:', '').trim();
+                    kundenname = normalisiereName(line.replace('Kundenname:', '').trim());  // 🔥 NORMALISIERE
                 } else if (line.startsWith('Kundennummer:')) {
                     kundennummer = line.replace('Kundennummer:', '').trim();
                 }
@@ -1274,6 +1515,22 @@
             recognizedText = "";
             audioChunks = [];
             isRecording = false;
+
+            // 🕐 LÖSCHE TIMEOUT
+            if (recognitionTimeout) {
+                clearTimeout(recognitionTimeout);
+                recognitionTimeout = null;
+            }
+
+            // 🔥 STOPPE WEB SPEECH API FALLS NOCH LÄUFT
+            if (recognition) {
+                try {
+                    recognition.abort();
+                } catch (err) {
+                    console.error('Fehler beim Stoppen der Recognition:', err);
+                }
+                recognition = null;
+            }
 
             document.querySelectorAll(".phase").forEach(p => p.classList.remove("active"));
             document.getElementById("recordingPhase").classList.add("active");
@@ -1295,6 +1552,10 @@
         function validateText(text) {
             const lines = text.split('\n');
 
+            // 🔥 LEERE ALTE DATEN VOM LETZTEN MAL
+            wartendeAuswahlPaletten = [];
+            aktuelleAuswahlPalette = null;
+
             // Extrahiere Kundeninfo (kommt einmal am Anfang)
             let kundenname = '';
             let kundennummer = '';
@@ -1309,7 +1570,7 @@
 
             for (let line of ersteGruppe) {
                 if (line.startsWith('Kundenname:')) {
-                    kundenname = line.replace('Kundenname:', '').trim();
+                    kundenname = normalisiereName(line.replace('Kundenname:', '').trim());  // 🔥 NORMALISIERE
                 } else if (line.startsWith('Kundennummer:')) {
                     kundennummer = line.replace('Kundennummer:', '').trim();
                 } else if (line.startsWith('Aktion:')) {
@@ -1337,6 +1598,7 @@
 
                     if (!erkennungsResult.gefunden) {
                         // Keine eindeutige Palette erkannt
+                        // 🔥 WICHTIG: NICHT SOFORT ERROR! Sammle alle nicht erkannten Paletten zuerst!
                         if (erkennungsResult.kandidaten && erkennungsResult.kandidaten.length > 0) {
                             // Mehrere Kandidaten -> zeige Auswahl
                             wartendeAuswahlPaletten.push({
@@ -1348,7 +1610,7 @@
                                 aktion
                             });
                         } else {
-                            // Gar keine Kandidaten - SPEICHERE die Daten BEVOR modal angezeigt wird!
+                            // Gar keine Kandidaten - SPEICHERE die Daten
                             const palettenData = {
                                 kundenname,
                                 kundennummer,
@@ -1357,9 +1619,10 @@
                                 aktion
                             };
                             wartendeAuswahlPaletten.push(palettenData);
-                            aktuelleAuswahlPalette = palettenData;  // 🎯 WICHTIG: Speichere für Modal
-                            showPaletteSelectionAllPalettes(palettenartRaw);
-                            throw new Error(`⚠️ Palette nicht erkannt: "${palettenartRaw}" – bitte auswählen`);
+                            // 🔥 SPEICHERE NUR DIE ERSTE nicht erkannte Palette für Modal
+                            if (!aktuelleAuswahlPalette) {
+                                aktuelleAuswahlPalette = palettenData;
+                            }
                         }
                     } else {
                         // Eindeutige Palette erkannt
@@ -1482,12 +1745,14 @@
                 // Fallback nur wenn aktuelleAuswahlPalette nicht vorhanden
                 console.log('✅ Nutze wartendeAuswahlPaletten als Fallback');
                 wartendeAuswahlPaletten[0].palettenart = palette;
-                wartendeAuswahlPaletten.shift();
             } else {
                 console.error('❌ Fehler: Keine Palette-Daten vorhanden!');
                 showError('Fehler bei Palette-Auswahl. Bitte versuche es erneut.');
                 return;
             }
+
+            // 🔥 WICHTIG: LEERE DAS ARRAY DAMIT NUR DIE AUSGEWÄHLTE PALETTE GESPEICHERT WIRD!
+            wartendeAuswahlPaletten = [];
 
             // Fortsetzen mit saveToSupabase
             saveToSupabaseWithSelected();
