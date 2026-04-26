@@ -1047,9 +1047,12 @@ app.post('/api/process-audio', async (req, res) => {
 
         // Verwende fetch mit multipart/form-data für Groq API
         const FormData = require('form-data');
+        const { Readable } = require('stream');
+
         const formData = new FormData();
-        // MediaRecorder gibt Webm/Opus aus - sende als webm
-        formData.append('file', audioBuffer, { filename: 'audio.webm' });
+        // Konvertiere Buffer zu Stream für FormData
+        const audioStream = Readable.from(audioBuffer);
+        formData.append('file', audioStream, { filename: 'audio.webm' });
         formData.append('model', 'whisper-large-v3');
         formData.append('language', 'de');
 
