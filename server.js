@@ -1,5 +1,6 @@
 const express = require('express');
 const { createClient } = require('@supabase/supabase-js');
+const axios = require('axios');
 const path = require('path');
 const fs = require('fs');
 const app = express();
@@ -1049,42 +1050,44 @@ app.post('/api/process-audio', async (req, res) => {
         // 🎯 SCHRITT 1: Whisper Transcription
         console.log('🎤 Transkribiere Audio mit Groq Whisper...');
 
-        // Sende Audio direkt zu Groq mit multipart/form-data
+        // Sende Audio direkt zu Groq mit axios + FormData
         const FormData = require('form-data');
         const formData = new FormData();
 
-        // Append Audio Buffer direkt (nicht als Stream)
         formData.append('file', audioBuffer, 'audio.webm');
         formData.append('model', 'whisper-large-v3');
         formData.append('language', 'de');
 
-        console.log('📤 Sende zu Groq Whisper:', {
+        console.log('📤 Sende zu Groq Whisper mit axios:', {
             audioSize: audioBuffer.length,
             model: 'whisper-large-v3'
         });
 
-        const whisperRes = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", {
-            method: "POST",
-            headers: {
-                "Authorization": "Bearer " + GROQ_API_KEY,
-                ...formData.getHeaders()
-            },
-            body: formData
-        });
-
-        if (!whisperRes.ok) {
-            const errorData = await whisperRes.text();
+        let whisperData;
+        try {
+            const whisperRes = await axios.post(
+                "https://api.groq.com/openai/v1/audio/transcriptions",
+                formData,
+                {
+                    headers: {
+                        "Authorization": "Bearer " + GROQ_API_KEY,
+                        ...formData.getHeaders()
+                    },
+                    maxContentLength: Infinity,
+                    maxBodyLength: Infinity
+                }
+            );
+            whisperData = whisperRes.data;
+        } catch (err) {
             console.error('❌ Whisper Fehler Details:');
-            console.error('   Status:', whisperRes.status);
-            console.error('   Response:', errorData);
+            console.error('   Status:', err.response?.status);
+            console.error('   Message:', err.response?.data?.error?.message);
             console.error('   Audio Buffer Size:', audioBuffer.length);
 
-            return res.status(whisperRes.status).json({
-                error: `Whisper-Fehler: ${whisperRes.status} - ${errorData}`
+            return res.status(err.response?.status || 500).json({
+                error: `Whisper-Fehler: ${err.response?.data?.error?.message || err.message}`
             });
         }
-
-        const whisperData = await whisperRes.json();
         const rohText = whisperData.text || "";
 
         if (!rohText) {
