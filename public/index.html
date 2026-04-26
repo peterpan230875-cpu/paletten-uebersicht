@@ -1239,8 +1239,9 @@
         }
 
         // ============================================
-        // 🛑 ERWEITERTE MICROPHONE-CLEANUP (V1.378)
+        // 🛑 ERWEITERTE MICROPHONE-CLEANUP (V1.378+)
         // ✅ SAUBER: Explizite Nullifizierung, besseres Logging
+        // ✅ CHROME FIX: recognition.stop() IMMER aufrufen (nicht nur wenn isRecording)
         // ============================================
         function stopAllAudio() {
             console.log('🛑 stopAllAudio() aufgerufen');
@@ -1254,10 +1255,15 @@
                     mediaRecorder = null;
                 }
 
-                // 2. Stop Web Speech API (falls vorhanden)
-                if (recognition && isRecording) {
-                    console.log('🎤 Stoppe Web Speech Recognition...');
-                    recognition.stop();
+                // 2. Stop Web Speech API (IMMER aufrufen, nicht nur wenn isRecording!)
+                // ✅ FIX: recognition.stop() muss IMMER aufgerufen werden
+                if (recognition) {
+                    try {
+                        console.log('🎤 Stoppe Web Speech Recognition...');
+                        recognition.stop();
+                    } catch (e) {
+                        console.warn('⚠️ Recognition.stop() Fehler:', e.message);
+                    }
                 }
 
                 // 3. Stop alle Audio Tracks EXPLIZIT
@@ -1318,20 +1324,18 @@
 
         // 📵 Event 1: Wenn Handy gesperrt / App minimiert wird
         document.addEventListener('visibilitychange', () => {
-            if (document.hidden && isRecording) {
-                console.log('📵 App in Hintergrund - stoppe Aufnahme');
-                if (recognition) recognition.stop();
+            if (document.hidden) {
+                console.log('📵 App in Hintergrund - cleanup Audio');
+                // ✅ CHROME FIX: Stoppe IMMER, nicht nur wenn isRecording
                 stopAllAudio();
             }
         });
 
         // 👋 Event 2: Wenn Benutzer Seite verlässt / Browser-Tab schließt
         window.addEventListener('pagehide', () => {
-            if (isRecording) {
-                console.log('👋 Seite wird verlassen - cleanup Microphone');
-                if (recognition) recognition.stop();
-                stopAllAudio();
-            }
+            console.log('👋 Seite wird verlassen - cleanup Microphone');
+            // ✅ CHROME FIX: Stoppe IMMER
+            stopAllAudio();
         });
 
         // 🔄 Event 3: Wenn Browser-Tab aktualisiert wird
@@ -1361,6 +1365,10 @@
         // ============================================
         async function processWithGroq(rohText) {
             console.log('🧹 processWithGroq() aufgerufen mit:', rohText);
+
+            // ✅ CHROME FIX: Gebe Mikrofon SOFORT frei sobald Verarbeitung startet!
+            console.log('🎤 Gebe Mikrofon frei nach Aufnahme...');
+            stopAllAudio();
 
             const status = document.getElementById("status");
             status.textContent = "🧹 Strukturiere mit Backend...";
@@ -1511,6 +1519,10 @@ ${err.message}
         }
 
         function discardAndRestart() {
+            // ✅ WICHTIG: Stoppe Mikrofon SOFORT bevor alles zurückgesetzt wird!
+            stopAllAudio();
+            releaseAudioResources();
+
             recognizedText = "";
             audioChunks = [];
             isRecording = false;
