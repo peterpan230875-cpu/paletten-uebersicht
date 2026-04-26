@@ -1536,7 +1536,8 @@ ${err.message}
                                 menge: parseInt(menge),
                                 aktion
                             };
-                            wartendeAuswahlPaletten.push(palettenData);
+                            // 🛑 NUR zu aktuelleAuswahlPalette, NICHT zu wartendeAuswahlPaletten!
+                            // (wartendeAuswahlPaletten ist für Paletten mit Kandidaten, nicht für nicht erkannte)
                             aktuelleAuswahlPalette = palettenData;  // 🎯 WICHTIG: Speichere für Modal
                             showPaletteSelectionAllPalettes(palettenartRaw);
                             throw new Error(`⚠️ Palette nicht erkannt: "${palettenartRaw}" – bitte auswählen`);
