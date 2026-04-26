@@ -1019,6 +1019,119 @@ app.get('/api/test', async (req, res) => {
 });
 
 // ============================================
+// AUDIO PROCESSING ENDPOINT (Groq Whisper + Llama)
+// ============================================
+app.post('/api/process-audio', async (req, res) => {
+    try {
+        const GROQ_API_KEY = process.env.GROQ_API_KEY;
+
+        if (!GROQ_API_KEY) {
+            return res.status(500).json({
+                error: 'GROQ_API_KEY nicht konfiguriert'
+            });
+        }
+
+        // Hole Audio-Blob vom Frontend
+        const audioBuffer = req.body;
+
+        if (!audioBuffer) {
+            return res.status(400).json({
+                error: 'Kein Audio empfangen'
+            });
+        }
+
+        // Konvertiere Buffer zu Blob für Groq API
+        const audioBlob = new Blob([audioBuffer], { type: 'audio/wav' });
+        const formData = new FormData();
+        formData.append("file", audioBlob, "audio.wav");
+        formData.append("model", "whisper-large-v3");
+
+        // 🎯 SCHRITT 1: Whisper Transcription
+        console.log('🎤 Transkribiere Audio mit Groq Whisper...');
+
+        const whisperRes = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", {
+            method: "POST",
+            headers: { "Authorization": "Bearer " + GROQ_API_KEY },
+            body: formData
+        });
+
+        if (!whisperRes.ok) {
+            const errorData = await whisperRes.text();
+            console.error('❌ Whisper Fehler:', whisperRes.status, errorData);
+            return res.status(whisperRes.status).json({
+                error: `Whisper-Fehler: ${whisperRes.status}`
+            });
+        }
+
+        const whisperData = await whisperRes.json();
+        const rohText = whisperData.text || "";
+
+        if (!rohText) {
+            return res.status(400).json({
+                error: "Keine Sprache erkannt. Bitte versuche es nochmal."
+            });
+        }
+
+        console.log('✅ Transkription erfolgreich:', rohText.substring(0, 50) + '...');
+
+        // 🎯 SCHRITT 2: Llama Strukturierung
+        console.log('🧹 Strukturiere Text mit Groq Llama...');
+
+        const llmaRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + GROQ_API_KEY,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                model: "llama-3.1-8b-instant",
+                messages: [{
+                    role: "system",
+                    content: "Du bist ein Paletten-Tracker. Analysiere den GESPROCHENEN Text und gib EXAKT in diesem Format zurück:\n\nKundenname: Der Name des Kunden\nKundennummer: Die Kundennummer WENN EXPLIZIT genannt - sonst LEER lassen\nAktion: mitgenommen oder erhalten\n\nDann FÜR JEDE Palettenart:\nPalettenart: Art der Palette\nMenge: Die Anzahl als Zahl\n\nTrenne mehrere Palettenarten mit '---' auf einer neuen Zeile!"
+                }, {
+                    role: "user",
+                    content: rohText
+                }],
+                temperature: 0.3,
+                max_tokens: 300
+            })
+        });
+
+        if (!llmaRes.ok) {
+            const errorData = await llmaRes.text();
+            console.error('❌ Llama Fehler:', llmaRes.status, errorData);
+            return res.status(llmaRes.status).json({
+                error: `Llama-Fehler: ${llmaRes.status}`
+            });
+        }
+
+        const llmaData = await llmaRes.json();
+
+        if (!llmaData.choices || !llmaData.choices[0]) {
+            return res.status(400).json({
+                error: "Keine Antwort von Llama"
+            });
+        }
+
+        const structuredText = llmaData.choices[0].message.content;
+        console.log('✅ Strukturierung erfolgreich');
+
+        // Sende Ergebnis zurück an Frontend
+        res.json({
+            success: true,
+            text: structuredText,
+            rawText: rohText
+        });
+
+    } catch (err) {
+        console.error('❌ Audio-Processing Fehler:', err.message);
+        res.status(500).json({
+            error: err.message
+        });
+    }
+});
+
+// ============================================
 // MAIN ROUTE
 // ============================================
 app.get('/', (req, res) => {

@@ -1146,58 +1146,36 @@
 
         async function sendAudioToGroq() {
             const audioBlob = new Blob(audioChunks);
-            const formData = new FormData();
-            formData.append("file", audioBlob, "audio.wav");
-            formData.append("model", "whisper-large-v3");
 
             try {
                 const status = document.getElementById("status");
-                status.textContent = "🎯 Transkribiere Audio...";
+                status.textContent = "📤 Sende Audio zum Server...";
 
-                const whisperRes = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", {
+                // 🔥 NEUER WEG: Audio an Backend senden!
+                const formData = new FormData();
+                formData.append("audio", audioBlob, "audio.wav");
+
+                const res = await fetch("/api/process-audio", {
                     method: "POST",
-                    headers: { "Authorization": "Bearer " + GROQ_API_KEY },
-                    body: formData
+                    body: audioBlob  // Sende Raw Buffer
                 });
 
-                if (!whisperRes.ok) throw new Error(`Whisper-Fehler: ${whisperRes.status}`);
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.error || `Server-Fehler: ${res.status}`);
+                }
 
-                const whisperData = await whisperRes.json();
-                const rohText = whisperData.text || "";
+                const data = await res.json();
 
-                if (!rohText) throw new Error("Keine Sprache erkannt. Bitte versuche es nochmal.");
+                if (!data.success) {
+                    throw new Error(data.error || "Unbekannter Fehler");
+                }
 
-                status.textContent = "🧹 Strukturiere Text...";
-
-                const cleanRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                    method: "POST",
-                    headers: {
-                        "Authorization": "Bearer " + GROQ_API_KEY,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        model: "llama-3.1-8b-instant",
-                        messages: [{
-                            role: "system",
-                            content: "Du bist ein Paletten-Tracker. Analysiere den GESPROCHENEN Text und gib EXAKT in diesem Format zurück:\n\nKundenname: Der Name des Kunden\nKundennummer: Die Kundennummer WENN EXPLIZIT genannt - sonst LEER lassen\nAktion: mitgenommen oder erhalten\n\nDann FÜR JEDE Palettenart:\nPalettenart: Art der Palette\nMenge: Die Anzahl als Zahl\n\nTrenne mehrere Palettenarten mit '---' auf einer neuen Zeile!\n\nBeispiel 1 (eine Palettenart):\nInput: 'Quadriga Bau nimmt 10 Euro-Paletten mit'\nOutput:\nKundenname: Quadriga Bau\nKundennummer: \nAktion: mitgenommen\nPalettenart: Euro-Palette\nMenge: 10\n\nBeispiel 2 (MEHRERE Palettenarten):\nInput: 'Quadriga Bau nimmt eine Europalette und zwei Ziegelpaletten mit'\nOutput:\nKundenname: Quadriga Bau\nKundennummer: \nAktion: mitgenommen\nPalettenart: Europalette\nMenge: 1\n---\nPalettenart: Ziegelpalette\nMenge: 2"
-                        }, {
-                            role: "user",
-                            content: rohText
-                        }],
-                        temperature: 0.3,
-                        max_tokens: 300
-                    })
-                });
-
-                if (!cleanRes.ok) throw new Error(`Llama-Fehler: ${cleanRes.status}`);
-
-                const cleanData = await cleanRes.json();
-                if (!cleanData.choices || !cleanData.choices[0]) throw new Error("Keine Antwort");
-
-                recognizedText = cleanData.choices[0].message.content;
+                recognizedText = data.text;
                 showReviewPhase(recognizedText);
 
             } catch (err) {
+                console.error('❌ Audio-Fehler:', err);
                 showError(err.message);
                 document.getElementById("recordingButton").disabled = false;
             }
