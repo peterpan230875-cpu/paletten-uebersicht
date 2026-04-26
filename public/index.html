@@ -2027,6 +2027,12 @@ ${err.message}
                         aktion: aktuelleAuswahlPalette.aktion
                     });
                     console.log('✅ Verwende aktuelleAuswahlPalette:', aktuelleAuswahlPalette);
+
+                    // 🛑 WICHTIG: Entferne diese Palette aus wartendeAuswahlPaletten um Doppel-Speicherung zu verhindern!
+                    wartendeAuswahlPaletten = wartendeAuswahlPaletten.filter(item =>
+                        item.palettenart !== aktuelleAuswahlPalette.palettenart
+                    );
+                    console.log('🛑 Entferne Palette aus Warteschlange um Duplikat zu vermeiden');
                 }
 
                 // 🎯 WICHTIG: AUCH DIE WARTENDEN PALETTEN SPEICHERN (die bereits korrekt erkannt wurden!)
