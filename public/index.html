@@ -1090,6 +1090,24 @@
         // Login & Mitarbeiter
         let mitarbeiterName = null;
 
+        // ============================================
+        // 📱 DEVICE-DETECTION FÜR MOBILE-KOMPATIBILITÄT
+        // ============================================
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isAndroid = /Android/.test(navigator.userAgent);
+        const isMobile = isIOS || isAndroid;
+        const hasGetUserMedia = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+        const isHTTPS = location.protocol === 'https:';
+
+        // Zeige Device-Info in Console für Debugging
+        console.log('📱 Device-Info:', {
+            device: isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop',
+            isMobile,
+            hasGetUserMedia,
+            isHTTPS,
+            userAgent: navigator.userAgent.substring(0, 80)
+        });
+
         async function toggleRecording() {
             if (!isRecording) startRecording();
             else stopRecording();
@@ -1097,6 +1115,7 @@
 
         async function startRecording() {
             try {
+                // 🛑 Alten Audio-Stream stoppen wenn noch vorhanden
                 if (audioStream) {
                     audioStream.getTracks().forEach(track => track.stop());
                     audioStream = null;
@@ -1104,8 +1123,36 @@
                 mediaRecorder = null;
                 audioChunks = [];
 
-                audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                // 📱 UNTERSCHIEDLICHE CONSTRAINTS JE NACH DEVICE
+                let audioConstraints = { audio: true };
+
+                if (isIOS) {
+                    console.log('🍎 iOS erkannt - spezielle Audio-Constraints');
+                    audioConstraints = {
+                        audio: {
+                            echoCancellation: true,
+                            noiseSuppression: true,
+                            autoGainControl: true,
+                            sampleRate: 16000
+                        }
+                    };
+                } else if (isAndroid) {
+                    console.log('🤖 Android erkannt - spezielle Audio-Constraints');
+                    audioConstraints = {
+                        audio: {
+                            echoCancellation: true,
+                            noiseSuppression: true,
+                            autoGainControl: true
+                        }
+                    };
+                }
+
+                console.log('🎤 Starte Recording mit Constraints:', audioConstraints);
+                audioStream = await navigator.mediaDevices.getUserMedia(audioConstraints);
+
+                // 📝 MediaRecorder erstellen
                 mediaRecorder = new MediaRecorder(audioStream);
+                console.log('📊 MediaRecorder MIME-Type:', mediaRecorder.mimeType);
 
                 mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
                 mediaRecorder.onstop = () => sendAudioToGroq();
@@ -1121,9 +1168,77 @@
                 status.textContent = "Hörst du das Mikrofon? 🎧";
                 status.className = "status-recording";
             } catch (err) {
-                showError("Mikrofon konnte nicht aktiviert werden: " + err.message);
+                // 🔴 BESSERE ERROR-MESSAGES JE NACH DEVICE
+                let userMsg = "Mikrofon konnte nicht aktiviert werden: " + err.message;
+
+                const errorName = err.name || "";
+                const errorMsg = err.message.toLowerCase();
+
+                console.error('🔴 Recording-Error:', { name: errorName, message: err.message, device: isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop' });
+
+                if (errorName === "NotAllowedError" || errorMsg.includes("permission")) {
+                    if (isIOS) {
+                        userMsg = "🔐 iOS: Bitte erteile Mikrophon-Zugriff in Einstellungen > Safari > Mikrophon";
+                    } else if (isAndroid) {
+                        userMsg = "🔐 Android: Bitte erteile Mikrophon-Berechtigung in App-Einstellungen";
+                    } else {
+                        userMsg = "🔐 Mikrophon-Berechtigung benötigt - bitte im Browser erlauben";
+                    }
+                } else if (errorName === "NotFoundError" || errorMsg.includes("notfound")) {
+                    userMsg = "🎙️ Kein Mikrophon erkannt - verbinde ein externes Gerät oder Kopfhörer";
+                } else if (errorName === "NotSupportedError") {
+                    userMsg = "⚠️ Dein Browser unterstützt Sprachaufnahme nicht. Nutze Safari auf iOS oder Chrome auf Android.";
+                } else if (errorMsg.includes("constraint")) {
+                    userMsg = "⚠️ Dein Gerät unterstützt die benötigten Audio-Einstellungen nicht - versuche es trotzdem";
+                }
+
+                showError(userMsg);
             }
         }
+
+        // ============================================
+        // 🛑 MINIMALES MICROPHONE-CLEANUP
+        // ✅ SAUBER: Nur 3 Event-Listener, keine aggressiven Manipulationen
+        // ============================================
+        function stopAllAudio() {
+            try {
+                if (mediaRecorder && isRecording) {
+                    console.log('🛑 Stop Audio (Cleanup)');
+                    mediaRecorder.stop();
+                    isRecording = false;
+                }
+                if (audioStream) {
+                    audioStream.getTracks().forEach(track => {
+                        track.stop();
+                        console.log('🛑 Audio Track gestoppt');
+                    });
+                    audioStream = null;
+                }
+            } catch (e) {
+                console.warn('⚠️ Cleanup Error:', e.message);
+            }
+        }
+
+        // 📵 Event 1: Wenn Handy gesperrt / App minimiert wird
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && isRecording) {
+                console.log('📵 App in Hintergrund - stoppe Aufnahme');
+                stopAllAudio();
+            }
+        });
+
+        // 👋 Event 2: Wenn Benutzer Seite verlässt / Browser-Tab schließt
+        window.addEventListener('pagehide', () => {
+            if (isRecording) {
+                console.log('👋 Seite wird verlassen - cleanup Microphone');
+                stopAllAudio();
+            }
+        });
+
+        // 🔄 Event 3: Wenn Browser-Tab aktualisiert wird
+        window.addEventListener('beforeunload', () => {
+            stopAllAudio();
+        });
 
         function stopRecording() {
             mediaRecorder.stop();
@@ -1140,14 +1255,40 @@
         }
 
         async function sendAudioToGroq() {
-            const audioBlob = new Blob(audioChunks);
+            // 🔧 OPTIMIERTES AUDIO-BLOB-HANDLING FÜR MOBILE
+            const mimeType = mediaRecorder.mimeType || 'audio/webm';
+            const audioBlob = new Blob(audioChunks, { type: mimeType });
+
+            // 📊 DEBUG: Audio-Größe validieren
+            console.log('📊 Audio-Blob Info:', {
+                size: audioBlob.size,
+                type: audioBlob.type,
+                chunks: audioChunks.length,
+                device: isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop'
+            });
+
+            // ✅ VALIDIERUNG: Audio-Blob nicht leer
+            if (audioBlob.size < 1000) {  // Weniger als 1KB
+                showError('❌ Aufnahme zu kurz - bitte länger sprechen (mindestens 1 Sekunde)');
+                document.getElementById("recordingButton").disabled = false;
+                return;
+            }
+
+            if (audioBlob.size > 25 * 1024 * 1024) {  // Größer als 25MB
+                showError('❌ Aufnahme zu lang (max 25MB) - bitte kürzer sprechen');
+                document.getElementById("recordingButton").disabled = false;
+                return;
+            }
+
             const formData = new FormData();
-            formData.append("file", audioBlob, "audio.wav");
+            formData.append("file", audioBlob, "audio.webm");
             formData.append("model", "whisper-large-v3");
 
             try {
                 const status = document.getElementById("status");
                 status.textContent = "🎯 Transkribiere Audio...";
+
+                console.log('📤 Sende Audio zu Groq mit MIME-Type:', mimeType);
 
                 const whisperRes = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", {
                     method: "POST",
@@ -1155,10 +1296,16 @@
                     body: formData
                 });
 
-                if (!whisperRes.ok) throw new Error(`Whisper-Fehler: ${whisperRes.status}`);
+                if (!whisperRes.ok) {
+                    const errorText = await whisperRes.text();
+                    console.error('🔴 Whisper-API Fehler:', whisperRes.status, errorText);
+                    throw new Error(`Whisper-Fehler: ${whisperRes.status} - ${errorText.substring(0, 100)}`);
+                }
 
                 const whisperData = await whisperRes.json();
                 const rohText = whisperData.text || "";
+
+                console.log('✅ Whisper erkannt:', rohText.substring(0, 100));
 
                 if (!rohText) throw new Error("Keine Sprache erkannt. Bitte versuche es nochmal.");
 
