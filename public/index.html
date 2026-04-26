@@ -1088,6 +1088,7 @@
         let selectedPalette = null;
         let recognition = null;  // 🔥 WEB SPEECH API INSTANZ
         let aktuelleAuswahlPalette = null;  // 🎯 SPEICHERE DIE AKTUELLEN DATEN VOR DEM LÖSCHEN
+        let recognitionTimeout = null;  // 🕐 TIMER FÜR 5-SEKUNDEN TIMEOUT
 
         // Kundenbestätigung
         let wartendeKundenZuBestaetigung = null;
@@ -1226,6 +1227,16 @@
                 // Starte Erkennung
                 recognition.start();
 
+                // 🕐 SETZE 5-SEKUNDEN TIMEOUT
+                if (recognitionTimeout) clearTimeout(recognitionTimeout);
+                recognitionTimeout = setTimeout(() => {
+                    console.log('⏰ 5-Sekunden Timeout erreicht - stoppe Recognition');
+                    if (recognition) {
+                        recognition.stop();  // Stoppt sanft, gibt noch Zeit für Text-Verarbeitung
+                    }
+                    recognitionTimeout = null;
+                }, 5000);  // 5 SEKUNDEN
+
             } catch (err) {
                 showError("Fehler bei Spracherkennung: " + err.message);
             }
@@ -1235,6 +1246,12 @@
             // Mit Web Speech API: Stoppt automatisch nach Spracherkennung
             // 🔥 NUR isRecording setzen - nicht abort() da es den Text blockiert!
             isRecording = false;
+
+            // 🕐 LÖSCHE TIMEOUT
+            if (recognitionTimeout) {
+                clearTimeout(recognitionTimeout);
+                recognitionTimeout = null;
+            }
 
             const btn = document.getElementById("recordingButton");
             btn.textContent = "🎤 Aufnahme starten";
@@ -1367,6 +1384,12 @@
             recognizedText = "";
             audioChunks = [];
             isRecording = false;
+
+            // 🕐 LÖSCHE TIMEOUT
+            if (recognitionTimeout) {
+                clearTimeout(recognitionTimeout);
+                recognitionTimeout = null;
+            }
 
             // 🔥 STOPPE WEB SPEECH API FALLS NOCH LÄUFT
             if (recognition) {
