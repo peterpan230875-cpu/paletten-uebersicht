@@ -1229,7 +1229,9 @@
                         console.log('🔴 2 Sekunden vorbei - schalte Mikrofon AUS');
                         try {
                             if (recognition) {
-                                recognition.abort();  // Jetzt erst aggressive Shutdown!
+                                recognition.abort();  // STOP Mikrofon
+                                recognition = null;   // 🔥 LÖSCHE INSTANZ
+                                console.log('✅ Mikrofon freigegeben');
                             }
                         } catch (err) {
                             console.error('Fehler beim Shutdown:', err);
