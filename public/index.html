@@ -1102,101 +1102,123 @@
 
         async function startRecording() {
             try {
-                if (audioStream) {
-                    audioStream.getTracks().forEach(track => track.stop());
-                    audioStream = null;
-                }
-                mediaRecorder = null;
-                audioChunks = [];
+                // 🎤 NEUE METHODE: Web Speech API (funktioniert auf Handy!)
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-                audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-                // Nutze das echte MIME Type, das MediaRecorder unterstützt
-                // Auf mobil ist das oft anders als auf Desktop!
-                let mimeType = 'audio/webm';
-                if (!MediaRecorder.isTypeSupported(mimeType)) {
-                    mimeType = 'audio/mp4';
-                }
-                if (!MediaRecorder.isTypeSupported(mimeType)) {
-                    mimeType = 'audio/ogg';
-                }
-                if (!MediaRecorder.isTypeSupported(mimeType)) {
-                    mimeType = ''; // Browser default
+                if (!SpeechRecognition) {
+                    showError("❌ Spracherkennung wird von deinem Browser nicht unterstützt!");
+                    return;
                 }
 
-                console.log('🎤 MediaRecorder MIME Type:', mimeType || 'default browser format');
-                mediaRecorder = new MediaRecorder(audioStream, mimeType ? { mimeType } : {});
+                const recognition = new SpeechRecognition();
 
-                // Speichere den echten MIME Type für später
-                mediaRecorder.mimeType = mediaRecorder.mimeType || 'audio/webm';
+                // Konfiguration
+                recognition.continuous = false;  // Stoppt nach einer Phrase
+                recognition.interimResults = true;  // Zeige Zwischenergebnisse
+                recognition.lang = 'de-DE';  // Deutsch
 
-                mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
-                mediaRecorder.onstop = () => sendAudioToGroq();
+                console.log('🎤 Web Speech API gestartet - Deutsch');
 
-                mediaRecorder.start();
                 isRecording = true;
-
                 const btn = document.getElementById("recordingButton");
                 btn.textContent = "🔴 Aufnahme läuft - jetzt sprechen!";
                 btn.classList.add("recording");
 
                 const status = document.getElementById("status");
-                status.textContent = "Hörst du das Mikrofon? 🎧";
+                status.textContent = "Höre zu...🎧";
                 status.className = "status-recording";
+
+                let finalTranscript = '';
+
+                recognition.onstart = () => {
+                    console.log('🎤 Spracherkennung gestartet');
+                };
+
+                recognition.onresult = (event) => {
+                    let interimTranscript = '';
+
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const transcript = event.results[i][0].transcript;
+
+                        if (event.results[i].isFinal) {
+                            finalTranscript += transcript + ' ';
+                            console.log('✅ Final:', transcript);
+                        } else {
+                            interimTranscript += transcript;
+                            console.log('⏳ Interim:', transcript);
+                        }
+                    }
+
+                    status.textContent = interimTranscript || finalTranscript || "Höre zu...";
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('❌ Spracherkennung Fehler:', event.error);
+                    showError(`❌ Fehler: ${event.error}`);
+                    isRecording = false;
+                    btn.classList.remove("recording");
+                    btn.textContent = "🎤 Aufnahme starten";
+                };
+
+                recognition.onend = () => {
+                    console.log('🎤 Spracherkennung beendet');
+                    console.log('Erkannter Text:', finalTranscript);
+
+                    isRecording = false;
+                    btn.classList.remove("recording");
+                    btn.textContent = "🎤 Aufnahme starten";
+
+                    if (finalTranscript.trim()) {
+                        // 🔥 SENDE ZU GROQ FÜR STRUKTURIERUNG
+                        sendTextToGroq(finalTranscript.trim());
+                    } else {
+                        showError("⚠️ Keine Sprache erkannt. Versuche es erneut!");
+                    }
+                };
+
+                // Starte Erkennung
+                recognition.start();
+
             } catch (err) {
-                showError("Mikrofon konnte nicht aktiviert werden: " + err.message);
+                showError("Fehler bei Spracherkennung: " + err.message);
             }
         }
 
         function stopRecording() {
-            mediaRecorder.stop();
+            // Mit Web Speech API: Stoppt automatisch nach Spracherkennung
             isRecording = false;
 
             const btn = document.getElementById("recordingButton");
             btn.textContent = "🎤 Aufnahme starten";
             btn.classList.remove("recording");
-            btn.disabled = true;
 
             const status = document.getElementById("status");
             status.textContent = "Wird verarbeitet...";
             status.className = "status-processing";
         }
 
-        async function sendAudioToGroq() {
-            // Nutze den echten MIME Type vom MediaRecorder (kann auf mobil anders sein!)
-            const mimeType = mediaRecorder.mimeType || 'audio/webm';
-            const audioBlob = new Blob(audioChunks, { type: mimeType });
+        async function sendTextToGroq(spokenText) {
+            // 🎤 NEUE METHODE: Sende erkannten Text zu Groq Llama für Strukturierung
+            // (Nicht mehr Audio! Nur Text!)
 
-            if (audioBlob.size === 0) {
-                showError("⚠️ Keine Audio-Daten aufgenommen!");
+            if (!spokenText || spokenText.trim() === '') {
+                showError("⚠️ Keine Sprache erkannt!");
                 return;
             }
 
             try {
                 const status = document.getElementById("status");
-                status.textContent = "📤 Sende Audio zum Server...";
+                status.textContent = "🧹 Strukturiere Text...";
 
-                // Konvertiere Blob zu Base64 für sichere JSON Transmission
-                const arrayBuffer = await audioBlob.arrayBuffer();
-                const uint8Array = new Uint8Array(arrayBuffer);
-                let binaryString = '';
-                for (let i = 0; i < uint8Array.length; i++) {
-                    binaryString += String.fromCharCode(uint8Array[i]);
-                }
-                const base64Audio = btoa(binaryString);
+                console.log('📝 Sende Text zu Groq Llama:', spokenText);
 
-                console.log('🎤 Audio Base64 erstellt:', {
-                    size: audioBlob.size,
-                    base64Length: base64Audio.length
-                });
-
-                // 🔥 Sende Audio als Base64 JSON zum Backend
-                const res = await fetch("/api/process-audio", {
+                // 🔥 Sende Text zum Backend für Llama-Strukturierung
+                const res = await fetch("/api/structure-text", {
                     method: "POST",
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ audio: base64Audio })
+                    body: JSON.stringify({ text: spokenText })
                 });
 
                 if (!res.ok) {
@@ -1210,11 +1232,12 @@
                     throw new Error(data.error || "Unbekannter Fehler");
                 }
 
+                console.log('✅ Strukturierter Text:', data.text);
                 recognizedText = data.text;
                 showReviewPhase(recognizedText);
 
             } catch (err) {
-                console.error('❌ Audio-Fehler:', err);
+                console.error('❌ Text-Fehler:', err);
                 showError(err.message);
                 document.getElementById("recordingButton").disabled = false;
             }

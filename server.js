@@ -1159,6 +1159,87 @@ app.post('/api/process-audio', async (req, res) => {
 });
 
 // ============================================
+// API: STRUCTURE TEXT (für Web Speech API)
+// ============================================
+app.post('/api/structure-text', async (req, res) => {
+    try {
+        const GROQ_API_KEY = process.env.GROQ_API_KEY;
+
+        if (!GROQ_API_KEY) {
+            return res.status(500).json({
+                error: 'GROQ_API_KEY nicht konfiguriert'
+            });
+        }
+
+        // Hole Text vom Frontend (von Web Speech API)
+        const { text } = req.body;
+
+        if (!text || text.trim() === '') {
+            return res.status(400).json({
+                error: 'Kein Text empfangen'
+            });
+        }
+
+        console.log('📝 Text empfangen:', text.substring(0, 100) + '...');
+
+        // 🎯 Strukturiere Text mit Groq Llama
+        console.log('🧹 Strukturiere Text mit Groq Llama...');
+
+        const llmaRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + GROQ_API_KEY,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                model: "llama-3.1-8b-instant",
+                messages: [{
+                    role: "system",
+                    content: "Du bist ein Paletten-Tracker. Analysiere den GESPROCHENEN Text und gib EXAKT in diesem Format zurück:\n\nKundenname: Der Name des Kunden\nKundennummer: Die Kundennummer WENN EXPLIZIT genannt - sonst LEER lassen\nAktion: mitgenommen oder erhalten\n\nDann FÜR JEDE Palettenart:\nPalettenart: Art der Palette\nMenge: Die Anzahl als Zahl\n\nTrenne mehrere Palettenarten mit '---' auf einer neuen Zeile!"
+                }, {
+                    role: "user",
+                    content: text
+                }],
+                temperature: 0.3,
+                max_tokens: 300
+            })
+        });
+
+        if (!llmaRes.ok) {
+            const errorData = await llmaRes.text();
+            console.error('❌ Llama Fehler:', llmaRes.status, errorData);
+            return res.status(llmaRes.status).json({
+                error: `Llama-Fehler: ${llmaRes.status}`
+            });
+        }
+
+        const llmaData = await llmaRes.json();
+
+        if (!llmaData.choices || !llmaData.choices[0]) {
+            return res.status(400).json({
+                error: "Keine Antwort von Llama"
+            });
+        }
+
+        const structuredText = llmaData.choices[0].message.content;
+        console.log('✅ Strukturierung erfolgreich');
+
+        // Sende strukturiertes Text-Ergebnis zurück an Frontend
+        res.json({
+            success: true,
+            text: structuredText,
+            originalText: text
+        });
+
+    } catch (err) {
+        console.error('❌ Structure-Text Fehler:', err.message);
+        res.status(500).json({
+            error: err.message
+        });
+    }
+});
+
+// ============================================
 // MAIN ROUTE
 // ============================================
 app.get('/', (req, res) => {
