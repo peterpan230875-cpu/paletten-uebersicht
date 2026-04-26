@@ -1108,6 +1108,22 @@
             userAgent: navigator.userAgent.substring(0, 80)
         });
 
+        // ============================================
+        // 🎤 WEB SPEECH API INITIALISIERUNG
+        // ============================================
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.lang = 'de-DE';
+            console.log('✅ Web Speech API verfügbar');
+        } else {
+            console.warn('⚠️ Web Speech API nicht verfügbar - Fallback zu MediaRecorder');
+        }
+
         async function toggleRecording() {
             if (!isRecording) startRecording();
             else stopRecording();
@@ -1115,84 +1131,93 @@
 
         async function startRecording() {
             try {
-                // 🛑 Alten Audio-Stream stoppen wenn noch vorhanden
-                if (audioStream) {
-                    audioStream.getTracks().forEach(track => track.stop());
-                    audioStream = null;
-                }
-                mediaRecorder = null;
-                audioChunks = [];
-
-                // 📱 UNTERSCHIEDLICHE CONSTRAINTS JE NACH DEVICE
-                let audioConstraints = { audio: true };
-
-                if (isIOS) {
-                    console.log('🍎 iOS erkannt - spezielle Audio-Constraints');
-                    audioConstraints = {
-                        audio: {
-                            echoCancellation: true,
-                            noiseSuppression: true,
-                            autoGainControl: true,
-                            sampleRate: 16000
-                        }
-                    };
-                } else if (isAndroid) {
-                    console.log('🤖 Android erkannt - spezielle Audio-Constraints');
-                    audioConstraints = {
-                        audio: {
-                            echoCancellation: true,
-                            noiseSuppression: true,
-                            autoGainControl: true
-                        }
-                    };
+                // 🎤 NUTZE WEB SPEECH API (Browser-native, beste Compatibility auf Mobile)
+                if (!recognition) {
+                    showError("⚠️ Spracherkennung wird von deinem Browser nicht unterstützt! Nutze Safari auf iOS oder Chrome auf Android.");
+                    return;
                 }
 
-                console.log('🎤 Starte Recording mit Constraints:', audioConstraints);
-                audioStream = await navigator.mediaDevices.getUserMedia(audioConstraints);
+                console.log('🎤 Starte Web Speech API auf:', isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop');
 
-                // 📝 MediaRecorder erstellen
-                mediaRecorder = new MediaRecorder(audioStream);
-                console.log('📊 MediaRecorder MIME-Type:', mediaRecorder.mimeType);
-
-                mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
-                mediaRecorder.onstop = () => sendAudioToGroq();
-
-                mediaRecorder.start();
                 isRecording = true;
+                let finalTranscript = '';
 
                 const btn = document.getElementById("recordingButton");
                 btn.textContent = "🔴 Aufnahme läuft - jetzt sprechen!";
                 btn.classList.add("recording");
 
                 const status = document.getElementById("status");
-                status.textContent = "Hörst du das Mikrofon? 🎧";
+                status.textContent = "🎧 Höre zu...";
                 status.className = "status-recording";
-            } catch (err) {
-                // 🔴 BESSERE ERROR-MESSAGES JE NACH DEVICE
-                let userMsg = "Mikrofon konnte nicht aktiviert werden: " + err.message;
 
-                const errorName = err.name || "";
-                const errorMsg = err.message.toLowerCase();
+                // 🎤 EVENT: Wenn Spracherkennung startet
+                recognition.onstart = () => {
+                    console.log('✅ Web Speech API aktiviert');
+                };
 
-                console.error('🔴 Recording-Error:', { name: errorName, message: err.message, device: isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop' });
+                // 🎤 EVENT: Text erkannt (inkl. Zwischenergebnisse)
+                recognition.onresult = (event) => {
+                    let interimTranscript = '';
 
-                if (errorName === "NotAllowedError" || errorMsg.includes("permission")) {
-                    if (isIOS) {
-                        userMsg = "🔐 iOS: Bitte erteile Mikrophon-Zugriff in Einstellungen > Safari > Mikrophon";
-                    } else if (isAndroid) {
-                        userMsg = "🔐 Android: Bitte erteile Mikrophon-Berechtigung in App-Einstellungen";
-                    } else {
-                        userMsg = "🔐 Mikrophon-Berechtigung benötigt - bitte im Browser erlauben";
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const transcript = event.results[i][0].transcript;
+
+                        if (event.results[i].isFinal) {
+                            finalTranscript += transcript + ' ';
+                            console.log('✅ Final:', transcript);
+                        } else {
+                            interimTranscript += transcript;
+                            console.log('🔄 Interim:', transcript);
+                        }
                     }
-                } else if (errorName === "NotFoundError" || errorMsg.includes("notfound")) {
-                    userMsg = "🎙️ Kein Mikrophon erkannt - verbinde ein externes Gerät oder Kopfhörer";
-                } else if (errorName === "NotSupportedError") {
-                    userMsg = "⚠️ Dein Browser unterstützt Sprachaufnahme nicht. Nutze Safari auf iOS oder Chrome auf Android.";
-                } else if (errorMsg.includes("constraint")) {
-                    userMsg = "⚠️ Dein Gerät unterstützt die benötigten Audio-Einstellungen nicht - versuche es trotzdem";
-                }
 
-                showError(userMsg);
+                    // Zeige Zwischenergebnis
+                    status.textContent = `🎧 Erkannt: ${interimTranscript || finalTranscript}`;
+                };
+
+                // 🔴 EVENT: Fehler bei Spracherkennung
+                recognition.onerror = (event) => {
+                    console.error('🔴 Speech Recognition Fehler:', event.error);
+                    let errorMsg = `Fehler: ${event.error}`;
+
+                    if (event.error === 'no-speech') {
+                        errorMsg = '❌ Keine Sprache erkannt - bitte laut und deutlich sprechen!';
+                    } else if (event.error === 'audio-capture') {
+                        errorMsg = '🎙️ Mikrophon-Fehler - Berechtigung erteilt? Probiere neu!';
+                    } else if (event.error === 'network') {
+                        errorMsg = '🌐 Netzwerk-Fehler - überprüfe deine Internet-Verbindung';
+                    }
+
+                    showError(errorMsg);
+                    isRecording = false;
+                    btn.textContent = "🎤 Aufnahme starten";
+                    btn.classList.remove("recording");
+                    btn.disabled = false;
+                };
+
+                // ✅ EVENT: Spracherkennung beendet
+                recognition.onend = () => {
+                    console.log('✅ Web Speech API beendet - finalText:', finalTranscript);
+
+                    if (finalTranscript.trim()) {
+                        // Schicke erkannten Text zu Groq für Strukturierung
+                        processWithGroq(finalTranscript.trim());
+                    } else {
+                        showError('❌ Keine Sprache erkannt - versuche es nochmal!');
+                        btn.textContent = "🎤 Aufnahme starten";
+                        btn.classList.remove("recording");
+                        btn.disabled = false;
+                    }
+
+                    isRecording = false;
+                };
+
+                // 🚀 STARTE SPRACHERKENNUNG
+                recognition.start();
+
+            } catch (err) {
+                console.error('🔴 Fehler beim Starten:', err);
+                showError("Fehler: " + err.message);
             }
         }
 
@@ -1241,109 +1266,30 @@
         });
 
         function stopRecording() {
-            mediaRecorder.stop();
-            isRecording = false;
+            if (recognition && isRecording) {
+                recognition.stop();
+                isRecording = false;
 
-            const btn = document.getElementById("recordingButton");
-            btn.textContent = "🎤 Aufnahme starten";
-            btn.classList.remove("recording");
-            btn.disabled = true;
+                const btn = document.getElementById("recordingButton");
+                btn.textContent = "🎤 Aufnahme starten";
+                btn.classList.remove("recording");
+                btn.disabled = true;
 
-            const status = document.getElementById("status");
-            status.textContent = "Wird verarbeitet...";
-            status.className = "status-processing";
+                const status = document.getElementById("status");
+                status.textContent = "Wird verarbeitet...";
+                status.className = "status-processing";
+            }
         }
 
-        async function sendAudioToGroq() {
-            // 🔧 OPTIMIERTES AUDIO-BLOB-HANDLING FÜR MOBILE
-            const mimeType = mediaRecorder.mimeType || 'audio/webm;codecs=opus';
-            const audioBlob = new Blob(audioChunks, { type: mimeType });
-
-            // 📊 DEBUG-INFO (zeige auf Bildschirm UND Console)
-            const debugInfo = {
-                size: audioBlob.size,
-                type: audioBlob.type,
-                chunks: audioChunks.length,
-                device: isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop',
-                mimeType: mimeType,
-                sizeKB: (audioBlob.size / 1024).toFixed(2) + ' KB'
-            };
-
-            console.log('📊 Audio-Blob Info:', debugInfo);
-
-            // ✅ VALIDIERUNG: Audio-Blob nicht leer
-            if (audioBlob.size < 500) {  // Mindestens 500 bytes
-                const errorMsg = `❌ Aufnahme zu kurz (${debugInfo.sizeKB}) - spreche deutlich und länger!`;
-                console.error(errorMsg, debugInfo);
-                showError(errorMsg);
-                document.getElementById("recordingButton").disabled = false;
-                return;
-            }
-
-            if (audioBlob.size > 25 * 1024 * 1024) {  // Größer als 25MB
-                showError('❌ Aufnahme zu lang (max 25MB) - bitte kürzer sprechen');
-                document.getElementById("recordingButton").disabled = false;
-                return;
-            }
-
-            // 📝 Bestimme Dateiendung basierend auf MIME-Type
-            let filename = "audio.webm";
-            if (mimeType.includes('mp4') || mimeType.includes('aac')) {
-                filename = "audio.m4a";
-            } else if (mimeType.includes('ogg')) {
-                filename = "audio.ogg";
-            } else if (mimeType.includes('wav')) {
-                filename = "audio.wav";
-            }
-
-            const formData = new FormData();
-            formData.append("file", audioBlob, filename);
-            formData.append("model", "whisper-large-v3");
+        // ============================================
+        // 🧹 TEXT MIT GROQ STRUKTURIEREN (nicht Audio!)
+        // ============================================
+        async function processWithGroq(rohText) {
+            const status = document.getElementById("status");
+            status.textContent = "🧹 Strukturiere Text...";
 
             try {
-                const status = document.getElementById("status");
-                status.textContent = `🎯 Transkribiere Audio (${debugInfo.sizeKB})...`;
-
-                console.log('📤 Sende Audio zu Groq:', { filename, mimeType, size: debugInfo.sizeKB });
-
-                const whisperRes = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", {
-                    method: "POST",
-                    headers: { "Authorization": "Bearer " + GROQ_API_KEY },
-                    body: formData
-                });
-
-                if (!whisperRes.ok) {
-                    const errorText = await whisperRes.text();
-                    const fullError = `Status ${whisperRes.status}: ${errorText}`;
-                    console.error('🔴 Whisper-API Fehler:', fullError, debugInfo);
-
-                    // 🎯 Bessere Error-Messages
-                    let userMsg = `❌ Groq API Fehler: ${whisperRes.status}`;
-                    if (whisperRes.status === 400) {
-                        userMsg = `❌ Audio-Format nicht erkannt - versuche laut und deutlich zu sprechen`;
-                    } else if (whisperRes.status === 401) {
-                        userMsg = `❌ API-Key Fehler - Administrator muss Key aktualisieren`;
-                    } else if (whisperRes.status === 429) {
-                        userMsg = `❌ Zu viele Anfragen - bitte 30 Sekunden warten`;
-                    }
-
-                    showError(userMsg);
-                    document.getElementById("recordingButton").disabled = false;
-                    return;
-                }
-
-                const whisperData = await whisperRes.json();
-                const rohText = whisperData.text || "";
-
-                console.log('✅ Whisper erkannt Text:', rohText, 'Length:', rohText.length);
-
-                if (!rohText || rohText.trim().length === 0) {
-                    showError("❌ Keine Sprache erkannt - bitte deutlicher sprechen");
-                    document.getElementById("recordingButton").disabled = false;
-                    return;
-                }
-
-                status.textContent = "🧹 Strukturiere Text...";
+                console.log('📤 Sende Text zu Groq:', rohText.substring(0, 100));
 
                 const cleanRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                     method: "POST",
@@ -1365,19 +1311,29 @@
                     })
                 });
 
-                if (!cleanRes.ok) throw new Error(`Llama-Fehler: ${cleanRes.status}`);
+                if (!cleanRes.ok) {
+                    const errorText = await cleanRes.text();
+                    console.error('🔴 Groq API Fehler:', cleanRes.status, errorText);
+                    throw new Error(`Groq-Fehler: ${cleanRes.status}`);
+                }
 
                 const cleanData = await cleanRes.json();
-                if (!cleanData.choices || !cleanData.choices[0]) throw new Error("Keine Antwort");
+                if (!cleanData.choices || !cleanData.choices[0]) {
+                    throw new Error("Keine Antwort von Groq");
+                }
 
                 recognizedText = cleanData.choices[0].message.content;
+                console.log('✅ Groq strukturiert:', recognizedText.substring(0, 100));
+
                 showReviewPhase(recognizedText);
 
             } catch (err) {
-                showError(err.message);
+                console.error('❌ Groq-Fehler:', err);
+                showError("Fehler bei Strukturierung: " + err.message);
                 document.getElementById("recordingButton").disabled = false;
             }
         }
+
 
         function erstelleNormalisierthenText(text) {
             // Erstelle eine Version mit normalisierten Palettennamen
