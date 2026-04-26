@@ -1096,6 +1096,17 @@
         // Login & Mitarbeiter
         let mitarbeiterName = null;
 
+        // ============================================
+        // HILFSFUNKTION: NAMEN NORMALISIEREN
+        // ============================================
+        function normalisiereName(name) {
+            if (!name) return '';
+            // Konvertiere zu Wort-Großbuchstaben: "jens meier" → "Jens Meier"
+            return name.trim().split(/\s+/).map(wort =>
+                wort.charAt(0).toUpperCase() + wort.slice(1).toLowerCase()
+            ).join(' ');
+        }
+
         async function toggleRecording() {
             if (!isRecording) startRecording();
             else stopRecording();
@@ -1261,8 +1272,8 @@
             // Erste Phase: Parse Kundeninfo
             for (let line of lines) {
                 if (line.startsWith('Kundenname:')) {
-                    kundenname = line.replace('Kundenname:', '').trim();
-                    normalisierterText += line + '\n';
+                    kundenname = normalisiereName(line.replace('Kundenname:', '').trim());  // 🔥 NORMALISIERE
+                    normalisierterText += 'Kundenname: ' + kundenname + '\n';
                 } else if (line.startsWith('Kundennummer:')) {
                     kundennummer = line.replace('Kundennummer:', '').trim();
                     normalisierterText += line + '\n';
@@ -1307,7 +1318,7 @@
 
             for (let line of lines) {
                 if (line.startsWith('Kundenname:')) {
-                    kundenname = line.replace('Kundenname:', '').trim();
+                    kundenname = normalisiereName(line.replace('Kundenname:', '').trim());  // 🔥 NORMALISIERE
                 } else if (line.startsWith('Kundennummer:')) {
                     kundennummer = line.replace('Kundennummer:', '').trim();
                 }
@@ -1375,7 +1386,7 @@
 
             for (let line of ersteGruppe) {
                 if (line.startsWith('Kundenname:')) {
-                    kundenname = line.replace('Kundenname:', '').trim();
+                    kundenname = normalisiereName(line.replace('Kundenname:', '').trim());  // 🔥 NORMALISIERE
                 } else if (line.startsWith('Kundennummer:')) {
                     kundennummer = line.replace('Kundennummer:', '').trim();
                 } else if (line.startsWith('Aktion:')) {
