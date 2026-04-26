@@ -1196,6 +1196,12 @@
                 // 🔴 EVENT: Fehler bei Spracherkennung
                 recognition.onerror = (event) => {
                     console.error('🔴 Speech Recognition Fehler:', event.error);
+
+                    // 🔐 iOS FIX: Gebe Mikrofon auch bei Fehler frei!
+                    console.log('🎤 Gebe Mikrofon frei nach Fehler...');
+                    stopAllAudio();
+                    releaseAudioResources();
+
                     let errorMsg = `Fehler: ${event.error}`;
 
                     if (event.error === 'no-speech') {
@@ -1219,6 +1225,12 @@
                     console.log('✅ Recognition onend() aufgerufen');
                     console.log('   finalTranscript =', finalTranscript);
                     console.log('   trimmed =', finalTranscript.trim());
+
+                    // 🔐 iOS FIX: Gebe Mikrofon SOFORT frei wenn Aufnahme endet!
+                    // NICHT WARTEN auf processWithGroq()
+                    console.log('🎤 Gebe Mikrofon SOFORT frei nach Aufnahmeende...');
+                    stopAllAudio();
+                    releaseAudioResources();
 
                     if (finalTranscript.trim() && finalTranscript.trim().length > 0) {
                         console.log('📤 Rufe processWithGroq auf mit:', finalTranscript.trim());
