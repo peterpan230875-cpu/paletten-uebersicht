@@ -1239,36 +1239,15 @@
                 // Starte Erkennung
                 recognition.start();
 
-                // 🕐 SETZE 5-SEKUNDEN TIMEOUT (nur wenn noch kein onend aufgerufen wurde)
-                if (recognitionTimeout) clearTimeout(recognitionTimeout);
-                recognitionTimeout = setTimeout(() => {
-                    // Nur stoppen wenn Recognition noch läuft
-                    if (isRecording && recognition) {
-                        console.log('⏰ 5-Sekunden Timeout erreicht - stoppe Recognition');
-                        try {
-                            recognition.stop();  // Sanft stoppen
-                        } catch (err) {
-                            console.error('Fehler beim Timeout-Stop:', err);
-                        }
-                    }
-                    recognitionTimeout = null;
-                }, 5000);  // 5 SEKUNDEN
-
             } catch (err) {
                 showError("Fehler bei Spracherkennung: " + err.message);
             }
         }
 
         function stopRecording() {
-            // Mit Web Speech API: Stoppt automatisch nach Spracherkennung
-            // 🔥 NUR isRecording setzen - nicht abort() da es den Text blockiert!
+            // Mit Web Speech API: Benutzer drückt Button zum Stoppen
+            // 🔥 MIKROFON LÄUFT NOCH 2 SEKUNDEN FÜR TEXT-ERFASSUNG
             isRecording = false;
-
-            // 🕐 LÖSCHE TIMEOUT
-            if (recognitionTimeout) {
-                clearTimeout(recognitionTimeout);
-                recognitionTimeout = null;
-            }
 
             const btn = document.getElementById("recordingButton");
             btn.textContent = "🎤 Aufnahme starten";
@@ -1277,6 +1256,20 @@
             const status = document.getElementById("status");
             status.textContent = "Wird verarbeitet...";
             status.className = "status-processing";
+
+            // 🕐 SETZE 2-SEKUNDEN TIMER UM MIKROFON AUSZUSCHALTEN
+            if (recognitionTimeout) clearTimeout(recognitionTimeout);
+            recognitionTimeout = setTimeout(() => {
+                console.log('⏰ 2-Sekunden abgelaufen - schalte Mikrofon AUS');
+                if (recognition) {
+                    try {
+                        recognition.abort();  // SOFORT AUS nach 2 Sekunden
+                    } catch (err) {
+                        console.error('Fehler beim Shutdown:', err);
+                    }
+                }
+                recognitionTimeout = null;
+            }, 2000);  // 2 SEKUNDEN
         }
 
         async function sendTextToGroq(spokenText) {
