@@ -18,6 +18,8 @@ const PORT = process.env.PORT || 3000;
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 app.use(express.json());
+app.use(express.raw({ type: 'audio/*', limit: '10mb' }));
+app.use(express.raw({ type: 'application/octet-stream', limit: '10mb' }));
 
 // ============================================
 // STARTUP: MITARBEITER INITIALISIEREN
