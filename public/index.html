@@ -1083,6 +1083,7 @@
         let wartendeAuswahlPaletten = [];
         let selectedPalette = null;
         let aktuelleAuswahlPalette = null;  // 🎯 SPEICHERE DIE AKTUELLEN DATEN VOR DEM LÖSCHEN
+        let erkannteAuswahlPaletten = [];   // 🎯 SPEICHERE BEREITS ERKANNTE PALETTEN aus validateText()
 
         // Kundenbestätigung
         let wartendeKundenZuBestaetigung = null;
@@ -1578,6 +1579,10 @@ ${err.message}
                 }
             }
 
+            // 🎯 SPEICHERE ERKANNTE PALETTEN FÜR SPÄTER!
+            erkannteAuswahlPaletten = palettenListe;
+            console.log('✅ Erkannte Paletten gespeichert:', erkannteAuswahlPaletten);
+
             return palettenListe;  // Array statt einzelnes Objekt!
         }
 
@@ -1684,6 +1689,7 @@ ${err.message}
         function cancelPaletteSelection() {
             document.getElementById('paletteSelectionModal').style.display = 'none';
             wartendeAuswahlPaletten = [];
+            erkannteAuswahlPaletten = [];
             selectedPalette = null;
             discardAndRestart();
         }
@@ -2022,8 +2028,9 @@ ${err.message}
                 const korrigierterKundenname = document.getElementById("editCustomerName").value.trim();
                 const korrigierteKundennummer = document.getElementById("editCustomerNumber").value.trim();
 
-                // Baue die finalen Datensätze mit ausgewählten Paletten
-                const palettenListe = [];
+                // 🎯 STARTE MIT DEN BEREITS ERKANNTEN PALETTEN!
+                // Das verhindert, dass erkannte Paletten ignoriert werden, wenn eine unbekannte Palette auswahl kommt
+                const palettenListe = [...erkannteAuswahlPaletten];
 
                 // 🎯 SPEICHERE AKTUELLE PALETTE (mit Benutzer-Auswahl korrigiert)
                 if (aktuelleAuswahlPalette) {
@@ -2060,6 +2067,7 @@ ${err.message}
                     console.log('📊 Speichere insgesamt', palettenListe.length, 'Paletten');
                     await speichereZeilen(palettenListe);
                     wartendeAuswahlPaletten = [];
+                    erkannteAuswahlPaletten = [];
                     aktuelleAuswahlPalette = null;
                     selectedPalette = null;
                 } else {
