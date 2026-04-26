@@ -1,15 +1,17 @@
 const express = require('express');
 const { createClient } = require('@supabase/supabase-js');
+const axios = require('axios');
 const path = require('path');
 const fs = require('fs');
 const app = express();
 
 // ============================================
-// KONFIGURATION
+// KONFIGURATION - Environment Variables
 // ============================================
-const SUPABASE_URL = "https://hrkwjlrqydgtcsflpwcx.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhya3dqbHJxeWRndGNzZmxwd2N4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NDY2OTEsImV4cCI6MjA5MjUyMjY5MX0._ZmdJa_r9CJNVBxS2FDOk-l7w3a8GkrmNIT_pr57CCU";
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 const TABLE_NAME = "Paletten";
+const PORT = process.env.PORT || 3000;
 
 // ============================================
 // SETUP
@@ -17,6 +19,54 @@ const TABLE_NAME = "Paletten";
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 app.use(express.json());
+app.use(express.raw({ type: 'audio/*', limit: '10mb' }));
+app.use(express.raw({ type: 'application/octet-stream', limit: '10mb' }));
+
+// ============================================
+// STARTUP: MITARBEITER INITIALISIEREN
+// ============================================
+async function initializeMitarbeiter() {
+    try {
+        console.log('🔄 Initialisiere Mitarbeiter-Tabelle...');
+
+        // Versuche die Mitarbeiter-Tabelle zu erstellen (falls nicht vorhanden)
+        const mitarbeiter = ['Marcel', 'Ralf', 'Steffen', 'Sven'];
+
+        for (let name of mitarbeiter) {
+            const { data: existing } = await supabase
+                .from('Mitarbeiter')
+                .select('id')
+                .eq('Name', name)
+                .limit(1);
+
+            if (!existing || existing.length === 0) {
+                // Mitarbeiter existiert nicht, erstelle ihn mit leeren Passwort (muss noch gesetzt werden)
+                const { error } = await supabase
+                    .from('Mitarbeiter')
+                    .insert([{
+                        Name: name,
+                        Passwort: null,  // Kein Passwort bis zur ersten Verwendung
+                        ErstelltAm: new Date().toISOString()
+                    }]);
+
+                if (error) {
+                    console.log(`⚠️ Mitarbeiter ${name} konnte nicht erstellt werden (existiert wahrscheinlich schon): ${error.message}`);
+                } else {
+                    console.log(`✅ Mitarbeiter ${name} erstellt`);
+                }
+            } else {
+                console.log(`ℹ️ Mitarbeiter ${name} existiert bereits`);
+            }
+        }
+    } catch (err) {
+        console.error('❌ Fehler beim Initialisieren der Mitarbeiter:', err.message);
+    }
+}
+
+// Starte Mitarbeiter-Initialisierung
+setTimeout(() => {
+    initializeMitarbeiter();
+}, 1000);
 
 // ============================================
 // HILFSFUNKTION: DEUTSCHE ZEIT (MESZ/MEZ)
@@ -729,6 +779,219 @@ app.post('/api/update-saldo', async (req, res) => {
 });
 
 // ============================================
+// API: LOGIN MIT MITARBEITERNAME
+// ============================================
+app.post('/api/login-mitarbeiter', async (req, res) => {
+    try {
+        const { mitarbeitername, passwort } = req.body;
+
+        if (!mitarbeitername || !passwort) {
+            return res.json({
+                success: false,
+                error: 'Benutzername und Passwort erforderlich'
+            });
+        }
+
+        // Suche Mitarbeiter
+        const { data: mitarbeiterData, error } = await supabase
+            .from('Mitarbeiter')
+            .select('Name, Passwort')
+            .eq('Name', mitarbeitername)
+            .limit(1);
+
+        if (error) {
+            return res.json({
+                success: false,
+                error: error.message
+            });
+        }
+
+        if (!mitarbeiterData || mitarbeiterData.length === 0) {
+            return res.json({
+                success: false,
+                error: 'Mitarbeiter nicht gefunden',
+                firstTime: true  // Signal: Neuer Mitarbeiter?
+            });
+        }
+
+        const mitarbeiter = mitarbeiterData[0];
+
+        // Wenn kein Passwort gesetzt: First-Time Setup
+        if (!mitarbeiter.Passwort) {
+            return res.json({
+                success: false,
+                error: 'Passwort muss noch gesetzt werden',
+                firstTime: true,
+                mitarbeitername: mitarbeitername
+            });
+        }
+
+        // Prüfe Passwort (Simple String-Vergleich für MVP)
+        if (mitarbeiter.Passwort !== passwort) {
+            return res.json({
+                success: false,
+                error: 'Passwort falsch'
+            });
+        }
+
+        // Login erfolgreich
+        res.json({
+            success: true,
+            mitarbeitername: mitarbeitername,
+            message: 'Login erfolgreich'
+        });
+    } catch (err) {
+        console.error('❌ Fehler in login-mitarbeiter:', err);
+        res.json({
+            success: false,
+            error: err.message
+        });
+    }
+});
+
+// ============================================
+// API: PASSWORT SETZEN (First-Time oder Admin)
+// ============================================
+app.post('/api/set-password', async (req, res) => {
+    try {
+        const { mitarbeitername, passwort, adminToken } = req.body;
+
+        if (!mitarbeitername || !passwort) {
+            return res.json({
+                success: false,
+                error: 'Benutzername und Passwort erforderlich'
+            });
+        }
+
+        if (passwort.length < 4) {
+            return res.json({
+                success: false,
+                error: 'Passwort muss mindestens 4 Zeichen lang sein'
+            });
+        }
+
+        // Validierung: Nur Admin oder der Benutzer selbst kann Passwort setzen
+        // (Simplified: Kein echtes Token-System, nur für MVP)
+
+        // Aktualisiere Passwort
+        const { error } = await supabase
+            .from('Mitarbeiter')
+            .update({ Passwort: passwort })
+            .eq('Name', mitarbeitername);
+
+        if (error) {
+            return res.json({
+                success: false,
+                error: error.message
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Passwort erfolgreich gesetzt',
+            mitarbeitername: mitarbeitername
+        });
+    } catch (err) {
+        console.error('❌ Fehler in set-password:', err);
+        res.json({
+            success: false,
+            error: err.message
+        });
+    }
+});
+
+// ============================================
+// API: NEUEN MITARBEITER HINZUFÜGEN (Admin)
+// ============================================
+app.post('/api/add-employee', async (req, res) => {
+    try {
+        const { name, adminPassword } = req.body;
+
+        // Simple Admin-Authentifizierung (sollte verbessert werden)
+        if (adminPassword !== 'admin1234') {
+            return res.json({
+                success: false,
+                error: 'Ungültiges Admin-Passwort'
+            });
+        }
+
+        if (!name || name.trim() === '') {
+            return res.json({
+                success: false,
+                error: 'Name erforderlich'
+            });
+        }
+
+        // Überprüfe ob Mitarbeiter bereits existiert
+        const { data: existing } = await supabase
+            .from('Mitarbeiter')
+            .select('id')
+            .eq('Name', name)
+            .limit(1);
+
+        if (existing && existing.length > 0) {
+            return res.json({
+                success: false,
+                error: 'Mitarbeiter mit diesem Namen existiert bereits'
+            });
+        }
+
+        // Erstelle neuen Mitarbeiter
+        const { error } = await supabase
+            .from('Mitarbeiter')
+            .insert([{
+                Name: name.trim(),
+                Passwort: null,  // Muss beim ersten Login gesetzt werden
+                ErstelltAm: new Date().toISOString()
+            }]);
+
+        if (error) {
+            return res.json({
+                success: false,
+                error: error.message
+            });
+        }
+
+        res.json({
+            success: true,
+            message: `Mitarbeiter "${name}" erstellt. Er kann sich jetzt anmelden.`,
+            name: name
+        });
+    } catch (err) {
+        console.error('❌ Fehler in add-employee:', err);
+        res.json({
+            success: false,
+            error: err.message
+        });
+    }
+});
+
+// ============================================
+// API: ALLE MITARBEITER AUFLISTEN (Admin)
+// ============================================
+app.get('/api/employees', async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from('Mitarbeiter')
+            .select('Name, ErstelltAm')
+            .order('Name', { ascending: true });
+
+        if (error) {
+            return res.json({
+                error: error.message
+            });
+        }
+
+        res.json(data);
+    } catch (err) {
+        console.error('❌ Fehler in employees:', err);
+        res.json({
+            error: err.message
+        });
+    }
+});
+
+// ============================================
 // TEST ENDPOINTS
 // ============================================
 app.get('/api/test', async (req, res) => {
@@ -759,10 +1022,228 @@ app.get('/api/test', async (req, res) => {
 });
 
 // ============================================
+// AUDIO PROCESSING ENDPOINT (Groq Whisper + Llama)
+// ============================================
+app.post('/api/process-audio', async (req, res) => {
+    try {
+        const GROQ_API_KEY = process.env.GROQ_API_KEY;
+
+        if (!GROQ_API_KEY) {
+            return res.status(500).json({
+                error: 'GROQ_API_KEY nicht konfiguriert'
+            });
+        }
+
+        // Hole Base64 Audio vom Frontend
+        const { audio: base64Audio } = req.body;
+
+        if (!base64Audio) {
+            return res.status(400).json({
+                error: 'Kein Audio empfangen'
+            });
+        }
+
+        // Decodiere Base64 zu Buffer
+        const audioBuffer = Buffer.from(base64Audio, 'base64');
+        console.log('📥 Audio empfangen und decodiert:', audioBuffer.length, 'bytes');
+
+        // 🎯 SCHRITT 1: Whisper Transcription
+        console.log('🎤 Transkribiere Audio mit Groq Whisper...');
+
+        // Sende Audio direkt zu Groq mit axios + FormData
+        // Nutze verschiedene Dateiendungen je nach Format
+        const FormData = require('form-data');
+        const formData = new FormData();
+
+        // Versuche verschiedene Formate - Groq akzeptiert alle
+        const audioFilename = 'audio.webm'; // Default, Groq ist flexibel
+        formData.append('file', audioBuffer, audioFilename);
+        formData.append('model', 'whisper-large-v3');
+        formData.append('language', 'de');
+
+        console.log('📤 Sende zu Groq Whisper mit axios:', {
+            audioSize: audioBuffer.length,
+            model: 'whisper-large-v3'
+        });
+
+        let whisperData;
+        try {
+            const whisperRes = await axios.post(
+                "https://api.groq.com/openai/v1/audio/transcriptions",
+                formData,
+                {
+                    headers: {
+                        "Authorization": "Bearer " + GROQ_API_KEY,
+                        ...formData.getHeaders()
+                    },
+                    maxContentLength: Infinity,
+                    maxBodyLength: Infinity
+                }
+            );
+            whisperData = whisperRes.data;
+        } catch (err) {
+            console.error('❌ Whisper Fehler Details:');
+            console.error('   Status:', err.response?.status);
+            console.error('   Message:', err.response?.data?.error?.message);
+            console.error('   Audio Buffer Size:', audioBuffer.length);
+
+            return res.status(err.response?.status || 500).json({
+                error: `Whisper-Fehler: ${err.response?.data?.error?.message || err.message}`
+            });
+        }
+        const rohText = whisperData.text || "";
+
+        if (!rohText) {
+            return res.status(400).json({
+                error: "Keine Sprache erkannt. Bitte versuche es nochmal."
+            });
+        }
+
+        console.log('✅ Transkription erfolgreich:', rohText.substring(0, 50) + '...');
+
+        // 🎯 SCHRITT 2: Llama Strukturierung
+        console.log('🧹 Strukturiere Text mit Groq Llama...');
+
+        const llmaRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + GROQ_API_KEY,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                model: "llama-3.1-8b-instant",
+                messages: [{
+                    role: "system",
+                    content: "Du bist ein Paletten-Tracker. Analysiere den GESPROCHENEN Text und gib EXAKT in diesem Format zurück:\n\nKundenname: Der Name des Kunden\nKundennummer: Die Kundennummer WENN EXPLIZIT genannt - sonst LEER lassen\nAktion: mitgenommen oder erhalten\n\nDann FÜR JEDE Palettenart:\nPalettenart: Art der Palette\nMenge: Die Anzahl als Zahl\n\nTrenne mehrere Palettenarten mit '---' auf einer neuen Zeile!"
+                }, {
+                    role: "user",
+                    content: rohText
+                }],
+                temperature: 0.3,
+                max_tokens: 300
+            })
+        });
+
+        if (!llmaRes.ok) {
+            const errorData = await llmaRes.text();
+            console.error('❌ Llama Fehler:', llmaRes.status, errorData);
+            return res.status(llmaRes.status).json({
+                error: `Llama-Fehler: ${llmaRes.status}`
+            });
+        }
+
+        const llmaData = await llmaRes.json();
+
+        if (!llmaData.choices || !llmaData.choices[0]) {
+            return res.status(400).json({
+                error: "Keine Antwort von Llama"
+            });
+        }
+
+        const structuredText = llmaData.choices[0].message.content;
+        console.log('✅ Strukturierung erfolgreich');
+
+        // Sende Ergebnis zurück an Frontend
+        res.json({
+            success: true,
+            text: structuredText,
+            rawText: rohText
+        });
+
+    } catch (err) {
+        console.error('❌ Audio-Processing Fehler:', err.message);
+        res.status(500).json({
+            error: err.message
+        });
+    }
+});
+
+// ============================================
+// API: STRUCTURE TEXT (für Web Speech API)
+// ============================================
+app.post('/api/structure-text', async (req, res) => {
+    try {
+        const GROQ_API_KEY = process.env.GROQ_API_KEY;
+
+        if (!GROQ_API_KEY) {
+            return res.status(500).json({
+                error: 'GROQ_API_KEY nicht konfiguriert'
+            });
+        }
+
+        // Hole Text vom Frontend (von Web Speech API)
+        const { text } = req.body;
+
+        if (!text || text.trim() === '') {
+            return res.status(400).json({
+                error: 'Kein Text empfangen'
+            });
+        }
+
+        console.log('📝 Text empfangen:', text.substring(0, 100) + '...');
+
+        // 🎯 Strukturiere Text mit Groq Llama
+        console.log('🧹 Strukturiere Text mit Groq Llama...');
+
+        const llmaRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + GROQ_API_KEY,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                model: "llama-3.1-8b-instant",
+                messages: [{
+                    role: "system",
+                    content: "Du bist ein Paletten-Tracker. Analysiere den GESPROCHENEN Text und gib EXAKT in diesem Format zurück:\n\nKundenname: Der Name des Kunden\nKundennummer: Die Kundennummer WENN EXPLIZIT genannt - sonst LEER lassen\nAktion: mitgenommen oder erhalten\n\nDann FÜR JEDE Palettenart:\nPalettenart: Art der Palette\nMenge: Die Anzahl als Zahl\n\nTrenne mehrere Palettenarten mit '---' auf einer neuen Zeile!"
+                }, {
+                    role: "user",
+                    content: text
+                }],
+                temperature: 0.3,
+                max_tokens: 300
+            })
+        });
+
+        if (!llmaRes.ok) {
+            const errorData = await llmaRes.text();
+            console.error('❌ Llama Fehler:', llmaRes.status, errorData);
+            return res.status(llmaRes.status).json({
+                error: `Llama-Fehler: ${llmaRes.status}`
+            });
+        }
+
+        const llmaData = await llmaRes.json();
+
+        if (!llmaData.choices || !llmaData.choices[0]) {
+            return res.status(400).json({
+                error: "Keine Antwort von Llama"
+            });
+        }
+
+        const structuredText = llmaData.choices[0].message.content;
+        console.log('✅ Strukturierung erfolgreich');
+
+        // Sende strukturiertes Text-Ergebnis zurück an Frontend
+        res.json({
+            success: true,
+            text: structuredText,
+            originalText: text
+        });
+
+    } catch (err) {
+        console.error('❌ Structure-Text Fehler:', err.message);
+        res.status(500).json({
+            error: err.message
+        });
+    }
+});
+
+// ============================================
 // MAIN ROUTE
 // ============================================
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'Paletten_V1.37.html'));
+    res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
 // ============================================
@@ -773,7 +1254,6 @@ app.use(express.static(path.join(__dirname)));
 // ============================================
 // SERVER START
 // ============================================
-const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`\n🚀 SERVER LÄUFT`);
     console.log(`📝 URL: http://localhost:${PORT}`);
