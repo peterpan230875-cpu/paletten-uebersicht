@@ -1548,6 +1548,8 @@ ${err.message}
                             aktuelleAuswahlPalette = palettenData;  // 🎯 WICHTIG: Speichere für Modal
 
                             // 🎯 SPEICHERE ERKANNTE PALETTEN JETZT, BEVOR ERROR GEWORFEN WIRD!
+                            console.log('🔍 DEBUG: Speichere erkannteAuswahlPaletten vor Error');
+                            console.log('   palettenListe vor speichern:', palettenListe);
                             erkannteAuswahlPaletten = palettenListe;
                             console.log('✅ Erkannte Paletten vor Error gespeichert:', erkannteAuswahlPaletten);
 
@@ -1569,6 +1571,8 @@ ${err.message}
 
             // 🎯 SPEICHERE ERKANNTE PALETTEN SOFORT, BEVOR ERROR GEWORFEN WIRD!
             // Das ist KRITISCH: Wenn unten eine Error geworfen wird, brauchen wir diese Daten noch
+            console.log('🔍 DEBUG: Speichere erkannteAuswahlPaletten nach Schleife');
+            console.log('   palettenListe vor speichern:', palettenListe);
             erkannteAuswahlPaletten = palettenListe;
             console.log('✅ Erkannte Paletten gespeichert:', erkannteAuswahlPaletten);
 
@@ -2036,6 +2040,11 @@ ${err.message}
         async function saveToSupabaseWithSelected() {
             // Diese Funktion wird nach der Palettenauswahl aufgerufen
             try {
+                console.log('🔍 DEBUG saveToSupabaseWithSelected()');
+                console.log('   erkannteAuswahlPaletten:', erkannteAuswahlPaletten);
+                console.log('   aktuelleAuswahlPalette:', aktuelleAuswahlPalette);
+                console.log('   wartendeAuswahlPaletten:', wartendeAuswahlPaletten);
+
                 // 🎯 ÜBERSCHREIBE MIT KORRIGIERTEN WERTEN VOM USER
                 const korrigierterKundenname = document.getElementById("editCustomerName").value.trim();
                 const korrigierteKundennummer = document.getElementById("editCustomerNumber").value.trim();
@@ -2043,6 +2052,7 @@ ${err.message}
                 // 🎯 STARTE MIT DEN BEREITS ERKANNTEN PALETTEN!
                 // Das verhindert, dass erkannte Paletten ignoriert werden, wenn eine unbekannte Palette auswahl kommt
                 const palettenListe = [...erkannteAuswahlPaletten];
+                console.log('📋 palettenListe nach erkannteAuswahlPaletten:', palettenListe);
 
                 // 🎯 SPEICHERE AKTUELLE PALETTE (mit Benutzer-Auswahl korrigiert)
                 if (aktuelleAuswahlPalette) {
