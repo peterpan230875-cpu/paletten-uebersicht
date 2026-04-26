@@ -545,12 +545,270 @@
             font-size: 16px;
         }
 
-        @media (max-width: 600px) {
-            .container { padding: 20px; }
-            h1 { font-size: 24px; }
-            .button-group { flex-direction: column; }
-            .btn { max-width: 100%; }
-            .kundenliste-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+        /* ========== MOBILE RESPONSIVE (Handy-Optimierung) ========== */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 15px;
+                border-radius: 12px;
+                max-height: 100vh;
+                margin: 0 auto;
+            }
+
+            h1 {
+                font-size: 20px;
+                margin-bottom: 5px;
+            }
+
+            .subtitle {
+                font-size: 12px;
+                margin-bottom: 15px;
+            }
+
+            /* LOGIN & ADMIN PANEL */
+            #loginPhase > div, #adminPanelPhase > div {
+                padding: 20px 15px !important;
+            }
+
+            #loginPhase > div > div, #adminPanelPhase > div > div {
+                padding: 20px !important;
+                border-radius: 15px;
+            }
+
+            /* RECORDING SECTION */
+            .recording-section {
+                padding: 10px;
+            }
+
+            #recordingButton {
+                font-size: 16px;
+                padding: 15px 30px;
+                margin: 15px 0;
+            }
+
+            /* BUTTONS */
+            .button-group {
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 20px;
+            }
+
+            .btn {
+                max-width: 100%;
+                padding: 15px 20px;
+                font-size: 16px;
+            }
+
+            /* KUNDENLISTE */
+            .kundenliste-grid {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+                gap: 8px;
+                padding: 12px;
+            }
+
+            .kundenliste-item {
+                font-size: 12px;
+                padding: 10px;
+                min-height: 50px;
+            }
+
+            /* KUNDENDETAILS */
+            .kundendetail-row {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 12px;
+                gap: 8px;
+            }
+
+            .kundendetail-palettenart {
+                font-size: 14px;
+            }
+
+            .kundendetail-saldo {
+                width: 100%;
+                justify-content: space-between;
+                min-width: auto;
+                font-size: 16px;
+            }
+
+            .saldo-input {
+                width: 60px;
+                font-size: 14px;
+            }
+
+            .saldo-button {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            /* PALETTENHISTORIE */
+            .palettehistorie-item {
+                flex-wrap: wrap;
+                gap: 5px;
+                padding: 10px 12px;
+            }
+
+            .palettehistorie-zeitstempel {
+                font-size: 11px;
+                min-width: 100%;
+                color: #bbb;
+            }
+
+            .palettehistorie-mitarbeiter {
+                font-size: 12px;
+                min-width: auto;
+            }
+
+            .palettehistorie-aktion {
+                font-size: 18px;
+                min-width: 30px;
+            }
+
+            .palettehistorie-menge {
+                font-size: 16px;
+                min-width: 40px;
+            }
+
+            /* HEADER */
+            .kundenliste-header, .kundendetail-header, .palettehistorie-header {
+                flex-wrap: wrap;
+                padding: 12px;
+                gap: 8px;
+            }
+
+            .kundenliste-header h2, .kundendetail-header h2, .palettehistorie-header h2 {
+                font-size: 18px;
+                flex: 1;
+                min-width: 100%;
+            }
+
+            .nav-back-btn {
+                padding: 10px 16px;
+                font-size: 14px;
+                width: 100%;
+            }
+
+            /* INPUT FELDER */
+            input[type="text"], input[type="password"] {
+                font-size: 16px !important;
+                padding: 12px !important;
+            }
+
+            /* MODALS */
+            #customerConfirmModal > div, #paletteSelectionModal > div {
+                max-width: 90% !important;
+                padding: 20px !important;
+                border-radius: 12px;
+            }
+
+            #paletteSelectionModal > div {
+                max-height: 80vh !important;
+            }
+
+            #paletteButtonsContainer {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)) !important;
+                gap: 10px;
+            }
+
+            /* REVIEW SECTION */
+            .review-section {
+                padding: 12px;
+            }
+
+            .text-display {
+                font-size: 14px;
+                padding: 12px;
+                min-height: 80px;
+            }
+
+            /* SUCCESS SECTION */
+            .success-section {
+                padding: 20px 12px;
+            }
+
+            .success-icon {
+                font-size: 48px;
+            }
+
+            .success-message {
+                font-size: 20px;
+            }
+
+            #successSummary {
+                padding: 15px !important;
+                margin: 15px 0 !important;
+            }
+
+            #newRecordingButton {
+                font-size: 14px;
+                padding: 12px 30px;
+            }
+
+            /* LOGOUT BUTTON */
+            #logoutContainer button {
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+
+            /* ERROR & INFO */
+            .error-box {
+                font-size: 13px;
+                padding: 12px;
+            }
+
+            .info-text {
+                font-size: 11px;
+            }
+        }
+
+        /* Extra-Mobile für Geräte unter 480px */
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+                border-radius: 8px;
+            }
+
+            h1 {
+                font-size: 18px;
+            }
+
+            .kundenliste-grid {
+                grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+                gap: 6px;
+                padding: 8px;
+            }
+
+            .kundenliste-item {
+                font-size: 11px;
+                padding: 8px;
+                min-height: 45px;
+            }
+
+            .kundendetail-row {
+                padding: 10px;
+            }
+
+            .palettehistorie-item {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+
+            .palettehistorie-zeitstempel {
+                font-size: 10px;
+            }
+
+            .nav-back-btn {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+
+            #recordingButton {
+                font-size: 14px;
+                padding: 12px 25px;
+            }
         }
     </style>
 </head>
