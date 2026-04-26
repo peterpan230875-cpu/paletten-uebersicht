@@ -1515,6 +1515,7 @@
 
                     if (!erkennungsResult.gefunden) {
                         // Keine eindeutige Palette erkannt
+                        // 🔥 WICHTIG: NICHT SOFORT ERROR! Sammle alle nicht erkannten Paletten zuerst!
                         if (erkennungsResult.kandidaten && erkennungsResult.kandidaten.length > 0) {
                             // Mehrere Kandidaten -> zeige Auswahl
                             wartendeAuswahlPaletten.push({
@@ -1526,7 +1527,7 @@
                                 aktion
                             });
                         } else {
-                            // Gar keine Kandidaten - SPEICHERE die Daten BEVOR modal angezeigt wird!
+                            // Gar keine Kandidaten - SPEICHERE die Daten
                             const palettenData = {
                                 kundenname,
                                 kundennummer,
@@ -1535,9 +1536,10 @@
                                 aktion
                             };
                             wartendeAuswahlPaletten.push(palettenData);
-                            aktuelleAuswahlPalette = palettenData;  // 🎯 WICHTIG: Speichere für Modal
-                            showPaletteSelectionAllPalettes(palettenartRaw);
-                            throw new Error(`⚠️ Palette nicht erkannt: "${palettenartRaw}" – bitte auswählen`);
+                            // 🔥 SPEICHERE NUR DIE ERSTE nicht erkannte Palette für Modal
+                            if (!aktuelleAuswahlPalette) {
+                                aktuelleAuswahlPalette = palettenData;
+                            }
                         }
                     } else {
                         // Eindeutige Palette erkannt
