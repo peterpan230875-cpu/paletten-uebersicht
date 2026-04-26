@@ -1659,6 +1659,13 @@ ${err.message}
             if (aktuelleAuswahlPalette) {
                 console.log('✅ Nutze aktuelleAuswahlPalette');
                 aktuelleAuswahlPalette.palettenart = palette;
+
+                // 🛑 WICHTIG: Entferne diese Palette auch aus wartendeAuswahlPaletten
+                // damit sie nicht doppelt gespeichert wird!
+                wartendeAuswahlPaletten = wartendeAuswahlPaletten.filter(item =>
+                    item.palettenartRaw !== aktuelleAuswahlPalette.palettenartRaw
+                );
+                console.log('🛑 Entferne Palette aus Warteschlange um Duplikat zu vermeiden');
             } else if (wartendeAuswahlPaletten.length > 0) {
                 // Fallback nur wenn aktuelleAuswahlPalette nicht vorhanden
                 console.log('✅ Nutze wartendeAuswahlPaletten als Fallback');
@@ -2030,8 +2037,9 @@ ${err.message}
                     console.log('✅ Verwende aktuelleAuswahlPalette:', aktuelleAuswahlPalette);
 
                     // 🛑 WICHTIG: Entferne diese Palette aus wartendeAuswahlPaletten um Doppel-Speicherung zu verhindern!
+                    // Nutze palettenartRaw zum Vergleichen, da wartendeAuswahlPaletten dieses Feld hat
                     wartendeAuswahlPaletten = wartendeAuswahlPaletten.filter(item =>
-                        item.palettenart !== aktuelleAuswahlPalette.palettenart
+                        item.palettenartRaw !== aktuelleAuswahlPalette.palettenartRaw
                     );
                     console.log('🛑 Entferne Palette aus Warteschlange um Duplikat zu vermeiden');
                 }
