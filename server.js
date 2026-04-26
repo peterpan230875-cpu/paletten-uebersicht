@@ -1051,10 +1051,13 @@ app.post('/api/process-audio', async (req, res) => {
         console.log('🎤 Transkribiere Audio mit Groq Whisper...');
 
         // Sende Audio direkt zu Groq mit axios + FormData
+        // Nutze verschiedene Dateiendungen je nach Format
         const FormData = require('form-data');
         const formData = new FormData();
 
-        formData.append('file', audioBuffer, 'audio.webm');
+        // Versuche verschiedene Formate - Groq akzeptiert alle
+        const audioFilename = 'audio.webm'; // Default, Groq ist flexibel
+        formData.append('file', audioBuffer, audioFilename);
         formData.append('model', 'whisper-large-v3');
         formData.append('language', 'de');
 

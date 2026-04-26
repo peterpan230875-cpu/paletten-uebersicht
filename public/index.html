@@ -1110,7 +1110,25 @@
                 audioChunks = [];
 
                 audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(audioStream);
+
+                // Nutze das echte MIME Type, das MediaRecorder unterstützt
+                // Auf mobil ist das oft anders als auf Desktop!
+                let mimeType = 'audio/webm';
+                if (!MediaRecorder.isTypeSupported(mimeType)) {
+                    mimeType = 'audio/mp4';
+                }
+                if (!MediaRecorder.isTypeSupported(mimeType)) {
+                    mimeType = 'audio/ogg';
+                }
+                if (!MediaRecorder.isTypeSupported(mimeType)) {
+                    mimeType = ''; // Browser default
+                }
+
+                console.log('🎤 MediaRecorder MIME Type:', mimeType || 'default browser format');
+                mediaRecorder = new MediaRecorder(audioStream, mimeType ? { mimeType } : {});
+
+                // Speichere den echten MIME Type für später
+                mediaRecorder.mimeType = mediaRecorder.mimeType || 'audio/webm';
 
                 mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
                 mediaRecorder.onstop = () => sendAudioToGroq();
@@ -1145,8 +1163,9 @@
         }
 
         async function sendAudioToGroq() {
-            // MediaRecorder gibt Webm/Opus aus
-            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            // Nutze den echten MIME Type vom MediaRecorder (kann auf mobil anders sein!)
+            const mimeType = mediaRecorder.mimeType || 'audio/webm';
+            const audioBlob = new Blob(audioChunks, { type: mimeType });
 
             if (audioBlob.size === 0) {
                 showError("⚠️ Keine Audio-Daten aufgenommen!");
