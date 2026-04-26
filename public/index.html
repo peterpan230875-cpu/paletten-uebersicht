@@ -1256,20 +1256,26 @@
 
         async function sendAudioToGroq() {
             // 🔧 OPTIMIERTES AUDIO-BLOB-HANDLING FÜR MOBILE
-            const mimeType = mediaRecorder.mimeType || 'audio/webm';
+            const mimeType = mediaRecorder.mimeType || 'audio/webm;codecs=opus';
             const audioBlob = new Blob(audioChunks, { type: mimeType });
 
-            // 📊 DEBUG: Audio-Größe validieren
-            console.log('📊 Audio-Blob Info:', {
+            // 📊 DEBUG-INFO (zeige auf Bildschirm UND Console)
+            const debugInfo = {
                 size: audioBlob.size,
                 type: audioBlob.type,
                 chunks: audioChunks.length,
-                device: isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop'
-            });
+                device: isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop',
+                mimeType: mimeType,
+                sizeKB: (audioBlob.size / 1024).toFixed(2) + ' KB'
+            };
+
+            console.log('📊 Audio-Blob Info:', debugInfo);
 
             // ✅ VALIDIERUNG: Audio-Blob nicht leer
-            if (audioBlob.size < 1000) {  // Weniger als 1KB
-                showError('❌ Aufnahme zu kurz - bitte länger sprechen (mindestens 1 Sekunde)');
+            if (audioBlob.size < 500) {  // Mindestens 500 bytes
+                const errorMsg = `❌ Aufnahme zu kurz (${debugInfo.sizeKB}) - spreche deutlich und länger!`;
+                console.error(errorMsg, debugInfo);
+                showError(errorMsg);
                 document.getElementById("recordingButton").disabled = false;
                 return;
             }
@@ -1280,15 +1286,25 @@
                 return;
             }
 
+            // 📝 Bestimme Dateiendung basierend auf MIME-Type
+            let filename = "audio.webm";
+            if (mimeType.includes('mp4') || mimeType.includes('aac')) {
+                filename = "audio.m4a";
+            } else if (mimeType.includes('ogg')) {
+                filename = "audio.ogg";
+            } else if (mimeType.includes('wav')) {
+                filename = "audio.wav";
+            }
+
             const formData = new FormData();
-            formData.append("file", audioBlob, "audio.webm");
+            formData.append("file", audioBlob, filename);
             formData.append("model", "whisper-large-v3");
 
             try {
                 const status = document.getElementById("status");
-                status.textContent = "🎯 Transkribiere Audio...";
+                status.textContent = `🎯 Transkribiere Audio (${debugInfo.sizeKB})...`;
 
-                console.log('📤 Sende Audio zu Groq mit MIME-Type:', mimeType);
+                console.log('📤 Sende Audio zu Groq:', { filename, mimeType, size: debugInfo.sizeKB });
 
                 const whisperRes = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", {
                     method: "POST",
@@ -1298,16 +1314,34 @@
 
                 if (!whisperRes.ok) {
                     const errorText = await whisperRes.text();
-                    console.error('🔴 Whisper-API Fehler:', whisperRes.status, errorText);
-                    throw new Error(`Whisper-Fehler: ${whisperRes.status} - ${errorText.substring(0, 100)}`);
+                    const fullError = `Status ${whisperRes.status}: ${errorText}`;
+                    console.error('🔴 Whisper-API Fehler:', fullError, debugInfo);
+
+                    // 🎯 Bessere Error-Messages
+                    let userMsg = `❌ Groq API Fehler: ${whisperRes.status}`;
+                    if (whisperRes.status === 400) {
+                        userMsg = `❌ Audio-Format nicht erkannt - versuche laut und deutlich zu sprechen`;
+                    } else if (whisperRes.status === 401) {
+                        userMsg = `❌ API-Key Fehler - Administrator muss Key aktualisieren`;
+                    } else if (whisperRes.status === 429) {
+                        userMsg = `❌ Zu viele Anfragen - bitte 30 Sekunden warten`;
+                    }
+
+                    showError(userMsg);
+                    document.getElementById("recordingButton").disabled = false;
+                    return;
                 }
 
                 const whisperData = await whisperRes.json();
                 const rohText = whisperData.text || "";
 
-                console.log('✅ Whisper erkannt:', rohText.substring(0, 100));
+                console.log('✅ Whisper erkannt Text:', rohText, 'Length:', rohText.length);
 
-                if (!rohText) throw new Error("Keine Sprache erkannt. Bitte versuche es nochmal.");
+                if (!rohText || rohText.trim().length === 0) {
+                    showError("❌ Keine Sprache erkannt - bitte deutlicher sprechen");
+                    document.getElementById("recordingButton").disabled = false;
+                    return;
+                }
 
                 status.textContent = "🧹 Strukturiere Text...";
 
