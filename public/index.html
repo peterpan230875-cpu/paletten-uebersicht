@@ -1357,6 +1357,10 @@
         function validateText(text) {
             const lines = text.split('\n');
 
+            // 🔥 LEERE ALTE DATEN VOM LETZTEN MAL
+            wartendeAuswahlPaletten = [];
+            aktuelleAuswahlPalette = null;
+
             // Extrahiere Kundeninfo (kommt einmal am Anfang)
             let kundenname = '';
             let kundennummer = '';
