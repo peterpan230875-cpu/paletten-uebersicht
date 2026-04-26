@@ -1249,7 +1249,7 @@ app.get('/', (req, res) => {
 // ============================================
 // STATISCHE DATEIEN (nach allen API-Routen!)
 // ============================================
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // ============================================
 // SERVER START
