@@ -1117,11 +1117,35 @@
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let recognition = null;
 
+        // 🔧 iOS FIX: Funktion zum Neu-Initialisieren der Recognition
+        function initializeRecognition() {
+            console.log('🔧 Initialisiere Recognition-Objekt neu...');
+            try {
+                // Stoppe alte Recognition falls noch aktiv
+                if (recognition) {
+                    try {
+                        recognition.stop();
+                        recognition.abort();
+                    } catch (e) {}
+                }
+
+                // Erstelle neues Recognition-Objekt
+                if (SpeechRecognition) {
+                    recognition = new SpeechRecognition();
+                    recognition.continuous = false;
+                    recognition.interimResults = true;
+                    recognition.lang = 'de-DE';
+                    console.log('✅ Neues Recognition-Objekt erstellt');
+                } else {
+                    console.warn('⚠️ SpeechRecognition nicht verfügbar');
+                }
+            } catch (err) {
+                console.error('🔴 Fehler beim Initialisieren von Recognition:', err);
+            }
+        }
+
         if (SpeechRecognition) {
-            recognition = new SpeechRecognition();
-            recognition.continuous = false;
-            recognition.interimResults = true;
-            recognition.lang = 'de-DE';
+            initializeRecognition();
             console.log('✅ Web Speech API verfügbar');
         } else {
             console.warn('⚠️ Web Speech API nicht verfügbar - Fallback zu MediaRecorder');
@@ -1333,7 +1357,12 @@
                 mediaRecorder = null;
                 audioStream = null;
                 audioChunks = [];
+
+                // 🔐 iOS FIX: Nullifiziere Recognition und erstelle neues Objekt
+                // Das hilft iOS das Mikrofon komplett freizugeben
                 recognition = null;
+                console.log('🔧 Re-initialisiere Recognition für iOS-Kompatibilität...');
+                initializeRecognition();
 
                 console.log('✅ Alle Audio-Ressourcen freigegeben');
             } catch (err) {
