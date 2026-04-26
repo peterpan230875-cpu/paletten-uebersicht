@@ -928,8 +928,8 @@
                 <!-- Übersicht-Button unten mittig -->
                 <button onclick="showOverview()" style="margin-top: 15px; margin-bottom: 30px; padding: 15px 40px; background: #51cf66; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; max-width: 300px;">📊 Übersicht</button>
 
-                <!-- V1.377 schwarz, fett, unten in der mitte UNTER Übersicht Button -->
-                <span style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); font-size: 14px; color: #000; font-weight: bold;">V1.377</span>
+                <!-- V1.378 schwarz, fett, unten in der mitte UNTER Übersicht Button -->
+                <span style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); font-size: 14px; color: #000; font-weight: bold;">V1.378</span>
             </div>
         </div>
 
@@ -1274,25 +1274,80 @@
         }
 
         // ============================================
-        // 🛑 MINIMALES MICROPHONE-CLEANUP
-        // ✅ SAUBER: Nur 3 Event-Listener, keine aggressiven Manipulationen
+        // 🛑 ERWEITERTE MICROPHONE-CLEANUP (V1.378)
+        // ✅ SAUBER: Explizite Nullifizierung, besseres Logging
         // ============================================
         function stopAllAudio() {
+            console.log('🛑 stopAllAudio() aufgerufen');
             try {
-                if (mediaRecorder && isRecording) {
-                    console.log('🛑 Stop Audio (Cleanup)');
-                    mediaRecorder.stop();
-                    isRecording = false;
+                // 1. Stop MediaRecorder (falls vorhanden)
+                if (mediaRecorder) {
+                    console.log('⏹️ Stoppe MediaRecorder...');
+                    if (mediaRecorder.state !== 'inactive') {
+                        mediaRecorder.stop();
+                    }
+                    mediaRecorder = null;
                 }
+
+                // 2. Stop Web Speech API (falls vorhanden)
+                if (recognition && isRecording) {
+                    console.log('🎤 Stoppe Web Speech Recognition...');
+                    recognition.stop();
+                }
+
+                // 3. Stop alle Audio Tracks EXPLIZIT
                 if (audioStream) {
+                    console.log('🎧 Stoppe Audio Stream Tracks...');
                     audioStream.getTracks().forEach(track => {
-                        track.stop();
-                        console.log('🛑 Audio Track gestoppt');
+                        console.log(`   - ${track.kind} track: stopped`);
+                        try {
+                            track.stop();
+                        } catch (trackError) {
+                            console.warn(`   ⚠️ Fehler beim Stoppen: ${trackError.message}`);
+                        }
                     });
-                    audioStream = null;
+                    audioStream = null;  // 🎯 WICHTIG: Stream-Referenz nullifizieren
+                    console.log('✅ Alle Audio Tracks gestoppt und freigegeben');
                 }
-            } catch (e) {
-                console.warn('⚠️ Cleanup Error:', e.message);
+
+                isRecording = false;
+
+            } catch (err) {
+                console.error('🔴 Fehler beim Audio-Cleanup:', err.message);
+            }
+        }
+
+        // ============================================
+        // 🧹 HELPER: Gebe ALLE Audio-Ressourcen frei
+        // ============================================
+        function releaseAudioResources() {
+            console.log('🔄 Gebe alle Audio-Ressourcen frei...');
+            try {
+                // Entferne Event-Listener für Audio-Tracks
+                if (audioStream && audioStream.getTracks) {
+                    audioStream.getTracks().forEach(track => {
+                        try {
+                            if (track.onended) track.onended = null;
+                            if (track.onmute) track.onmute = null;
+                            if (track.onunmute) track.onunmute = null;
+                        } catch (e) {
+                            // Ignore cleanup errors
+                        }
+                    });
+                }
+
+                // Stoppe und nullifiziere alle Ressourcen
+                stopAllAudio();
+
+                // Explizite Nullifizierung aller Media-Variablen
+                mediaRecorder = null;
+                audioStream = null;
+                audioChunks = [];
+                recognition = null;
+
+                console.log('✅ Alle Audio-Ressourcen freigegeben');
+            } catch (err) {
+                console.error('⚠️ Fehler beim Freigeben von Ressourcen:', err);
             }
         }
 
@@ -1300,6 +1355,7 @@
         document.addEventListener('visibilitychange', () => {
             if (document.hidden && isRecording) {
                 console.log('📵 App in Hintergrund - stoppe Aufnahme');
+                if (recognition) recognition.stop();
                 stopAllAudio();
             }
         });
@@ -1308,12 +1364,14 @@
         window.addEventListener('pagehide', () => {
             if (isRecording) {
                 console.log('👋 Seite wird verlassen - cleanup Microphone');
+                if (recognition) recognition.stop();
                 stopAllAudio();
             }
         });
 
         // 🔄 Event 3: Wenn Browser-Tab aktualisiert wird
         window.addEventListener('beforeunload', () => {
+            if (recognition) recognition.stop();
             stopAllAudio();
         });
 
