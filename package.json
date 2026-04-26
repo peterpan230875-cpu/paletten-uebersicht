@@ -1,0 +1,26 @@
+{
+  "name": "paletten-uebersicht",
+  "version": "1.37.0",
+  "description": "Sprachgesteuerte Palettenverwaltungs-App mit Echtzeit-Tracking",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "palette",
+    "inventory",
+    "voice-control",
+    "tracking",
+    "supabase"
+  ],
+  "author": "",
+  "license": "PRIVATE",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.104.1",
+    "express": "^5.2.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

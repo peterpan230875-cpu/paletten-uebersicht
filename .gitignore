@@ -1,0 +1,12 @@
+node_modules/
+.env
+.env.local
+*.log
+*.backup.html
+/backups/
+/backup_*/
+test.json
+.DS_Store
+dist/
+.vercel/
+.next/
