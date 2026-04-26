@@ -754,12 +754,15 @@
                 padding: 8px 12px;
             }
 
-            /* BEENDEN BUTTON - Oben rechts, immer sichtbar */
+            /* BEENDEN BUTTON - Im Container oben rechts */
+            #beendenContainer {
+                position: absolute;
+                top: 40px;
+                right: 40px;
+            }
+
             #beendenBtn {
-                position: fixed;
-                top: 15px;
-                right: 15px;
-                padding: 10px 16px;
+                padding: 8px 14px;
                 background: #e74c3c;
                 color: white;
                 border: none;
@@ -767,16 +770,15 @@
                 font-size: 12px;
                 font-weight: bold;
                 cursor: pointer;
-                z-index: 9999;
                 white-space: nowrap;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
                 transition: all 0.3s ease;
             }
 
             #beendenBtn:hover {
                 background: #c0392b;
                 transform: scale(1.05);
-                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
             }
 
             #beendenBtn:active {
@@ -843,10 +845,12 @@
     </style>
 </head>
 <body>
-    <!-- BEENDEN BUTTON - Oben rechts, immer sichtbar -->
-    <button id="beendenBtn" onclick="beendenApp()" title="App komplett beenden und neu laden">🛑 Beenden</button>
+    <div class="container" style="position: relative;">
+        <!-- BEENDEN BUTTON - Oben rechts im Container -->
+        <div id="beendenContainer" style="display: block;">
+            <button id="beendenBtn" onclick="beendenApp()" title="App komplett beenden und neu laden">🛑 Beenden</button>
+        </div>
 
-    <div class="container">
         <!-- Logout Button oben -->
         <div id="logoutContainer" style="display: none; text-align: right; margin-bottom: 15px;">
             <button onclick="logoutUser()" style="padding: 10px 16px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap;">👋 Logout (<span id="mitarbeiterDisplay">Marcel</span>)</button>
