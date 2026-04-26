@@ -1110,6 +1110,37 @@
             else stopRecording();
         }
 
+        // ============================================
+        // 🔐 DATENSCHUTZ: STOPPE MIKROFON BEI BROWSER IM HINTERGRUND
+        // ============================================
+        window.addEventListener('blur', () => {
+            console.log('⚠️ Browser im Hintergrund - stoppe Spracherkennung');
+            if (recognition && isRecording) {
+                recognition.abort();
+                isRecording = false;
+                const btn = document.getElementById("recordingButton");
+                if (btn) {
+                    btn.textContent = "🎤 Aufnahme starten";
+                    btn.classList.remove("recording");
+                }
+                const status = document.getElementById("status");
+                if (status) {
+                    status.textContent = "⚠️ Browser im Hintergrund - Aufnahme gestoppt";
+                    status.className = "status-error";
+                }
+            }
+        });
+
+        window.addEventListener('focus', () => {
+            console.log('✅ Browser wieder aktiv');
+            // Optional: Zeige dass Browser wieder aktiv ist
+            const status = document.getElementById("status");
+            if (status && status.textContent.includes('Hintergrund')) {
+                status.textContent = "";
+                status.className = "";
+            }
+        });
+
         async function startRecording() {
             try {
                 // 🎤 NEUE METHODE: Web Speech API (funktioniert auf Handy!)
