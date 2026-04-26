@@ -1969,12 +1969,6 @@ ${err.message}
             saveBtn.textContent = "⏳ Wird gespeichert...";
 
             try {
-                // 🛑 RESET alte Daten BEVOR neue Aufnahme validiert wird!
-                // Das verhindert, dass Daten aus der VORHERIGEN Aufnahme in die AKTUELLE Aufnahme rutschen
-                erkannteAuswahlPaletten = [];
-                wartendeAuswahlPaletten = [];
-                aktuelleAuswahlPalette = null;
-
                 const palettenListe = validateText(recognizedText);
                 console.log('📋 Erkannte Palettengruppen:', palettenListe.length);
 
