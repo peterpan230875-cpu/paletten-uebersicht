@@ -1134,6 +1134,13 @@
 
         async function startRecording() {
             try {
+                // 📱 iOS FIX: Stoppe Watchdog wenn Aufnahme startet
+                if (microphoneTimeoutId) {
+                    clearTimeout(microphoneTimeoutId);
+                    microphoneTimeoutId = null;
+                    console.log('⏰ Watchdog gestoppt - Aufnahme startet');
+                }
+
                 // 🎤 NUTZE WEB SPEECH API (Browser-native, beste Compatibility auf Mobile)
                 if (!recognition) {
                     showError("⚠️ Spracherkennung wird von deinem Browser nicht unterstützt! Nutze Safari auf iOS oder Chrome auf Android.");
@@ -1322,12 +1329,32 @@
             }
         }
 
+        // 🔐 iOS SPEZIFISCH: Timeout-Cleanup für wenn Device gesperrt wird
+        // iOS sendet visibilitychange nicht zuverlässig beim Sperren
+        let microphoneTimeoutId = null;
+        function startMicrophoneWatchdog() {
+            // Stoppe alten Timeout falls vorhanden
+            if (microphoneTimeoutId) {
+                clearTimeout(microphoneTimeoutId);
+            }
+
+            // Starte neuen Timeout: Nach 5 Sekunden Inaktivität → Cleanup
+            microphoneTimeoutId = setTimeout(() => {
+                console.log('⏰ iOS Watchdog: Stoppe Mikrofon nach Inaktivität');
+                stopAllAudio();
+            }, 5000);
+        }
+
         // 📵 Event 1: Wenn Handy gesperrt / App minimiert wird
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 console.log('📵 App in Hintergrund - cleanup Audio');
                 // ✅ CHROME FIX: Stoppe IMMER, nicht nur wenn isRecording
                 stopAllAudio();
+            } else {
+                // App kommt zurück: Starte Watchdog
+                console.log('👁️ App zurück - starte Mikrofon-Watchdog');
+                startMicrophoneWatchdog();
             }
         });
 
@@ -1342,6 +1369,20 @@
         window.addEventListener('beforeunload', () => {
             if (recognition) recognition.stop();
             stopAllAudio();
+        });
+
+        // 📱 Event 4: iOS-spezifisch - beim Fokus verlieren
+        window.addEventListener('blur', () => {
+            console.log('💤 Window blur - iOS Watchdog startet');
+            startMicrophoneWatchdog();
+        });
+
+        window.addEventListener('focus', () => {
+            console.log('👁️ Window focus - iOS Watchdog gestoppt');
+            if (microphoneTimeoutId) {
+                clearTimeout(microphoneTimeoutId);
+                microphoneTimeoutId = null;
+            }
         });
 
         function stopRecording() {
@@ -1522,6 +1563,10 @@ ${err.message}
             // ✅ WICHTIG: Stoppe Mikrofon SOFORT bevor alles zurückgesetzt wird!
             stopAllAudio();
             releaseAudioResources();
+
+            // 📱 iOS FIX: Starte Watchdog für Hintergrund-Cleanup
+            console.log('⏰ Watchdog wird nach Verwerfen gestartet');
+            startMicrophoneWatchdog();
 
             recognizedText = "";
             audioChunks = [];
