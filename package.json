@@ -1,6 +1,6 @@
 {
   "name": "paletten-uebersicht",
-  "version": "1.37.0",
+  "version": "1.371.0",
   "description": "Sprachgesteuerte Palettenverwaltungs-App mit Echtzeit-Tracking",
   "main": "server.js",
   "scripts": {
