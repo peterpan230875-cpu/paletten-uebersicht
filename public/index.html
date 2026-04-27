@@ -2594,15 +2594,18 @@ ${err.message}
             });
 
             try {
-                // Speichere zu Supabase
+                // Erstelle text_content für den API-Endpoint
+                const textContent = `${customerName} hat ${finalQuantity > 0 ? finalQuantity : Math.abs(finalQuantity)} ${paletteType} ${finalQuantity > 0 ? 'mitgenommen' : 'zurückgebracht'}${customerNumber ? ' (' + customerNumber + ')' : ''}`;
+
+                // Speichere zu Supabase - Backend erwartet EINZELNE Werte, nicht Arrays!
                 const payload = {
+                    text_content: textContent,  // ERFORDERLICH!
                     kundenname: customerName,
                     kundennummer: customerNumber || null,
-                    palettenarten: [paletteType],
-                    menge: [finalQuantity],
-                    aktion: manualAction === 'add' ? 'mitgenommen' : 'zurückgebracht',
-                    mitarbeiter: mitarbeiter,
-                    timestamp: new Date().toISOString()
+                    palettenart: paletteType,   // Einzelner Wert, nicht Array!
+                    menge: finalQuantity,       // Einzelner Wert, nicht Array!
+                    aktion: finalQuantity > 0 ? 'mitgenommen' : 'zurückgebracht',
+                    mitarbeiter: mitarbeiter
                 };
 
                 console.log('📤 Sende Payload zum Backend:', payload);
