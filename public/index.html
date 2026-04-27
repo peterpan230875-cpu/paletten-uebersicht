@@ -2426,8 +2426,9 @@ ${err.message}
         // ============================================
         let manualAction = null;  // 'add' oder 'remove'
 
-        // 📦 Alle Palettenarten (als Fallback und lokale Liste)
+        // 📦 Alle Palettenarten (Neue + Bestehende aus PALETTENLISTE)
         const ALLE_PALETTENARTEN = [
+            // Neue Palettenarten
             'Grafepalette',
             'Steinzeug Gitterbox',
             'Steinzeugpalette klein',
@@ -2435,8 +2436,22 @@ ${err.message}
             'Europalette zwei',
             'Europalette drei',
             'Spezialpalette',
-            'Velux-Palette'
-        ];
+            'Velux-Palette',
+            // Bestehende Palettenarten aus PALETTENLISTE
+            'Europalette',
+            'Ziegelpalette',
+            'Gipskartonpalette',
+            'Fermacellpalette',
+            'Gitterbox',
+            'MUHR-Palette',
+            'Steinzeugpalette',
+            'EHL-Palette',
+            'Eder-Palette',
+            'Limex-Palette',
+            'KS-Palette',
+            'Porenbetonpalette',
+            'KB-Palette'
+        ].sort();  // Alphabetisch sortiert
 
         async function openManualInput() {
             console.log('🔓 Öffne manuelle Eingabe...');
