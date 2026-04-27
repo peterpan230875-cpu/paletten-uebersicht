@@ -907,8 +907,8 @@
                 <!-- Übersicht-Button unten mittig -->
                 <button onclick="showOverview()" style="margin-top: 15px; margin-bottom: 30px; padding: 15px 40px; background: #51cf66; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; max-width: 300px;">📊 Übersicht</button>
 
-                <!-- V1.381 schwarz, fett, unten in der mitte UNTER Übersicht Button -->
-                <span style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); font-size: 14px; color: #000; font-weight: bold;">V1.381</span>
+                <!-- V1.379 schwarz, fett, unten in der mitte UNTER Übersicht Button -->
+                <span style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); font-size: 14px; color: #000; font-weight: bold;">V1.379</span>
             </div>
         </div>
 
@@ -1224,6 +1224,31 @@
             console.warn('⚠️ Web Speech API nicht verfügbar - Fallback zu MediaRecorder');
         }
 
+        // 🔐 OPTIONAL: Microphone-Berechtigung pre-check für iOS
+        async function ensureMicrophonePermission() {
+            if (!hasGetUserMedia) {
+                console.warn('⚠️ getUserMedia nicht verfügbar');
+                return false;
+            }
+
+            try {
+                console.log('🔐 Prüfe Mikrophon-Berechtigung...');
+                const testStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+                // Sofort alle Tracks stoppen - wir brauchen nur die Permission
+                testStream.getTracks().forEach(track => {
+                    console.log('✅ Track gestoppt:', track.kind);
+                    track.stop();
+                });
+
+                console.log('✅ Mikrophon-Berechtigung erteilt');
+                return true;
+            } catch (err) {
+                console.warn('⚠️ Mikrophon-Berechtigung verweigert:', err.message);
+                return false;
+            }
+        }
+
         async function toggleRecording() {
             if (!isRecording) startRecording();
             else stopRecording();
@@ -1231,6 +1256,15 @@
 
         async function startRecording() {
             try {
+                // 📱 DEBUG: Zeige Device-Info für Debugging
+                console.log('🎤 Starte Aufnahme mit folgenden Bedingungen:', {
+                    device: isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop',
+                    browser: /Safari/.test(navigator.userAgent) ? 'Safari' : /Chrome/.test(navigator.userAgent) ? 'Chrome' : 'Andere',
+                    isHTTPS: location.protocol === 'https:',
+                    hasGetUserMedia: hasGetUserMedia,
+                    recognitionAvailable: !!recognition
+                });
+
                 // 📱 iOS FIX: Stoppe Watchdog wenn Aufnahme startet
                 if (microphoneTimeoutId) {
                     clearTimeout(microphoneTimeoutId);
@@ -1293,6 +1327,7 @@
                 // 🔴 EVENT: Fehler bei Spracherkennung
                 recognition.onerror = (event) => {
                     console.error('🔴 Speech Recognition Fehler:', event.error);
+                    console.error('   Device:', isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop');
 
                     // 🔐 iOS FIX: Gebe Mikrofon auch bei Fehler frei!
                     console.log('🎤 Gebe Mikrofon frei nach Fehler...');
@@ -1304,9 +1339,20 @@
                     if (event.error === 'no-speech') {
                         errorMsg = '❌ Keine Sprache erkannt - bitte laut und deutlich sprechen!';
                     } else if (event.error === 'audio-capture') {
-                        errorMsg = '🎙️ Mikrophon-Fehler - Berechtigung erteilt? Probiere neu!';
+                        // 🎙️ Device-spezifische Hinweise für audio-capture Fehler
+                        if (isIOS) {
+                            errorMsg = '🎙️ iOS Mikrofon-Fehler: Probiere die Aufnahme neu oder nutze eine andere App.';
+                        } else if (isAndroid) {
+                            errorMsg = '🎙️ Android Mikrofon-Fehler: Überprüfe die App-Berechtigung in den Einstellungen.';
+                        } else {
+                            errorMsg = '🎙️ Mikrophon-Fehler - Berechtigung erteilt? Probiere neu!';
+                        }
                     } else if (event.error === 'network') {
                         errorMsg = '🌐 Netzwerk-Fehler - überprüfe deine Internet-Verbindung';
+                    } else if (event.error === 'bad-grammar') {
+                        errorMsg = '🎤 Sprache nicht verstanden - bitte deutlich sprechen';
+                    } else if (event.error === 'service-not-allowed') {
+                        errorMsg = '⚠️ Speech Recognition ist nicht verfügbar - bitte später erneut versuchen';
                     }
 
                     console.error('🔴 Zeige Error:', errorMsg);
@@ -1349,8 +1395,35 @@
                 recognition.start();
 
             } catch (err) {
-                console.error('🔴 Fehler beim Starten:', err);
-                showError("Fehler: " + err.message);
+                console.error('🔴 Fehler beim Starten der Aufnahme:', err);
+                console.error('   Error name:', err.name);
+                console.error('   Device:', isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop');
+
+                let userMsg = "Mikrofon konnte nicht aktiviert werden: " + err.message;
+
+                const errorName = err.name || "";
+                const errorMsg = err.message ? err.message.toLowerCase() : "";
+
+                // 🔐 Bessere Fehlerbehandlung für verschiedene Geräte
+                if (errorName === "NotAllowedError" || errorMsg.includes("permission")) {
+                    if (isIOS) {
+                        userMsg = "🔐 iOS: Bitte erteile Mikrophon-Zugriff in Einstellungen > Safari > Mikrophon";
+                    } else if (isAndroid) {
+                        userMsg = "🔐 Android: Bitte erteile Mikrophon-Berechtigung in App-Einstellungen";
+                    } else {
+                        userMsg = "🔐 Mikrophon-Berechtigung benötigt - bitte im Berechtigungsdialog 'Erlauben' klicken";
+                    }
+                } else if (errorName === "NotFoundError" || errorMsg.includes("notfound")) {
+                    userMsg = "🎙️ Kein Mikrophon erkannt - bitte verbinde ein externes Gerät";
+                } else if (errorName === "NotSupportedError") {
+                    userMsg = "⚠️ Dein Browser unterstützt Sprachaufnahme nicht (nutze Safari auf iOS oder Chrome auf Android)";
+                } else if (errorName === "SecurityError") {
+                    userMsg = "🔒 Sicherheitsfehler - HTTPS ist erforderlich";
+                }
+
+                console.error('🔴 Zeige Error:', userMsg);
+                showError(userMsg);
+                isRecording = false;
             }
         }
 
@@ -1674,13 +1747,29 @@ ${err.message}
         }
 
         function discardAndRestart() {
-            // ✅ WICHTIG: Stoppe Mikrofon SOFORT bevor alles zurückgesetzt wird!
-            stopAllAudio();
-            releaseAudioResources();
+            console.log('🔄 discardAndRestart() gestartet');
 
-            // 📱 iOS FIX: Starte Watchdog für Hintergrund-Cleanup
-            console.log('⏰ Watchdog wird nach Verwerfen gestartet');
-            startMicrophoneWatchdog();
+            try {
+                // ✅ WICHTIG: Stoppe Mikrofon SOFORT bevor alles zurückgesetzt wird!
+                stopAllAudio();
+                releaseAudioResources();
+
+                // 📱 iOS FIX: Starte Watchdog für Hintergrund-Cleanup
+                console.log('⏰ Watchdog wird nach Verwerfen gestartet');
+                try {
+                    if (typeof startMicrophoneWatchdog === 'function') {
+                        startMicrophoneWatchdog();
+                    } else {
+                        console.warn('⚠️ startMicrophoneWatchdog ist keine Funktion');
+                    }
+                } catch (watchdogErr) {
+                    console.warn('⚠️ Fehler beim Starten des Watchdog:', watchdogErr.message);
+                    // Nicht kritisch - weiter gehts
+                }
+            } catch (cleanupErr) {
+                console.error('⚠️ Fehler beim Cleanup:', cleanupErr.message);
+                // Weiter gehts trotz Fehler
+            }
 
             recognizedText = "";
             audioChunks = [];
@@ -1692,17 +1781,38 @@ ${err.message}
             aktuelleAuswahlPalette = null;
             selectedPalette = null;
 
-            document.querySelectorAll(".phase").forEach(p => p.classList.remove("active"));
-            document.getElementById("recordingPhase").classList.add("active");
-
             const btn = document.getElementById("recordingButton");
-            btn.textContent = "🎤 Aufnahme starten";
-            btn.disabled = false;
-            btn.classList.remove("recording");
+            if (btn) {
+                btn.textContent = "🎤 Aufnahme starten";
+                btn.disabled = false;
+                btn.classList.remove("recording");
+            }
 
             const status = document.getElementById("status");
-            status.textContent = "";
-            status.className = "";
+            if (status) {
+                status.textContent = "";
+                status.className = "";
+            }
+
+            // ✅ WICHTIG: Nutze setPhase() um Logout-Button zu zeigen!
+            console.log('🔄 Kehre zur recordingPhase zurück mit setPhase()');
+            try {
+                setPhase('recordingPhase');
+                console.log('✅ setPhase("recordingPhase") erfolgreich aufgerufen');
+            } catch (phaseErr) {
+                console.error('❌ Fehler beim Setzen der Phase:', phaseErr.message);
+                // Fallback: Zeige Phase manuell an
+                console.log('🔧 Fallback: Zeige Phase manuell an');
+                document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
+                const recordingPhase = document.getElementById('recordingPhase');
+                if (recordingPhase) {
+                    recordingPhase.classList.add('active');
+                }
+                const logoutContainer = document.getElementById('logoutContainer');
+                if (logoutContainer) {
+                    logoutContainer.style.display = 'block';
+                }
+            }
         }
 
         // ============================================
