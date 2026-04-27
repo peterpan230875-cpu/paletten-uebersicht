@@ -901,11 +901,14 @@
                 <button id="recordingButton" onclick="toggleRecording()">🎤 Aufnahme starten</button>
                 <p id="status"></p>
 
+                <!-- Manuelle Eingabe Button -->
+                <button onclick="openManualInput()" style="margin-top: 15px; padding: 15px 40px; background: #ff9800; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; max-width: 300px;">✏️ Manuell eingeben</button>
+
                 <!-- Übersicht-Button unten mittig -->
                 <button onclick="showOverview()" style="margin-top: 15px; margin-bottom: 30px; padding: 15px 40px; background: #51cf66; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; max-width: 300px;">📊 Übersicht</button>
 
-                <!-- V1.378 schwarz, fett, unten in der mitte UNTER Übersicht Button -->
-                <span style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); font-size: 14px; color: #000; font-weight: bold;">V1.378</span>
+                <!-- V1.379 schwarz, fett, unten in der mitte UNTER Übersicht Button -->
+                <span style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); font-size: 14px; color: #000; font-weight: bold;">V1.379</span>
             </div>
         </div>
 
@@ -989,6 +992,55 @@
                 </div>
                 <div id="paletteHistorieContainer" class="palettehistorie-list">
                     <!-- wird dynamisch gefüllt -->
+                </div>
+            </div>
+        </div>
+
+        <!-- MANUELLE EINGABE PHASE -->
+        <div id="manualInputPhase" class="phase">
+            <div class="recording-section">
+                <h2>✏️ Manuelle Eingabe</h2>
+                <p style="color: #666; font-size: 14px; margin-bottom: 20px;">Geben Sie die Palettenart und Anzahl ein</p>
+
+                <!-- PALETTENART DROPDOWN -->
+                <div style="margin-bottom: 25px;">
+                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">📦 Palettenart:</label>
+                    <select id="manualPaletteType" style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box; background: white; cursor: pointer;">
+                        <option value="">-- Palettenart auswählen --</option>
+                    </select>
+                </div>
+
+                <!-- KUNDENNAME -->
+                <div style="margin-bottom: 25px;">
+                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">👤 Kundenname:</label>
+                    <input type="text" id="manualCustomerName" placeholder="Kundenname eingeben..." style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
+                </div>
+
+                <!-- KUNDENNUMMER (OPTIONAL) -->
+                <div style="margin-bottom: 25px;">
+                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">🔢 Kundennummer (optional):</label>
+                    <input type="text" id="manualCustomerNumber" placeholder="Kundennummer eingeben..." style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
+                </div>
+
+                <!-- AKTION (Zu-/Abgang) -->
+                <div style="margin-bottom: 25px;">
+                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">⚡ Aktion:</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button id="manualActionAdd" onclick="setManualAction('add')" style="padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; background: white; color: #667eea; transition: all 0.3s;">➕ Zugang</button>
+                        <button id="manualActionRemove" onclick="setManualAction('remove')" style="padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; background: white; color: #667eea; transition: all 0.3s;">➖ Abgang</button>
+                    </div>
+                </div>
+
+                <!-- ANZAHL -->
+                <div style="margin-bottom: 30px;">
+                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">📊 Anzahl:</label>
+                    <input type="number" id="manualQuantity" placeholder="z.B. 5" min="1" style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
+                </div>
+
+                <!-- BUTTONS -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 30px;">
+                    <button onclick="saveManualInput()" style="padding: 15px; background: #51cf66; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s;">✅ Speichern</button>
+                    <button onclick="cancelManualInput()" style="padding: 15px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s;">❌ Abbrechen</button>
                 </div>
             </div>
         </div>
@@ -2366,6 +2418,157 @@ ${err.message}
                 logoutContainer.style.display = 'block';
             } else {
                 logoutContainer.style.display = 'none';
+            }
+        }
+
+        // ============================================
+        // MANUELLE EINGABE FUNKTIONEN
+        // ============================================
+        let manualAction = null;  // 'add' oder 'remove'
+
+        async function openManualInput() {
+            console.log('🔓 Öffne manuelle Eingabe...');
+
+            // Lade Palettenarten vom Backend
+            try {
+                const response = await fetch('/api/get-palettenarten');
+                const palettenarten = await response.json();
+
+                const select = document.getElementById('manualPaletteType');
+                select.innerHTML = '<option value="">-- Palettenart auswählen --</option>';
+
+                palettenarten.forEach(art => {
+                    const option = document.createElement('option');
+                    option.value = art;
+                    option.textContent = art;
+                    select.appendChild(option);
+                });
+
+                console.log('✅ Palettenarten geladen:', palettenarten.length);
+            } catch (err) {
+                console.error('❌ Fehler beim Laden von Palettenarten:', err);
+                showError('Fehler beim Laden der Palettenarten');
+                return;
+            }
+
+            // Reset Felder
+            document.getElementById('manualPaletteType').value = '';
+            document.getElementById('manualCustomerName').value = '';
+            document.getElementById('manualCustomerNumber').value = '';
+            document.getElementById('manualQuantity').value = '1';
+            manualAction = null;
+
+            // Reset Action Buttons
+            document.getElementById('manualActionAdd').style.background = 'white';
+            document.getElementById('manualActionAdd').style.color = '#667eea';
+            document.getElementById('manualActionRemove').style.background = 'white';
+            document.getElementById('manualActionRemove').style.color = '#667eea';
+
+            setPhase('manualInputPhase');
+        }
+
+        function setManualAction(action) {
+            manualAction = action;
+            console.log('⚡ Setze Aktion:', action);
+
+            const addBtn = document.getElementById('manualActionAdd');
+            const removeBtn = document.getElementById('manualActionRemove');
+
+            if (action === 'add') {
+                addBtn.style.background = '#51cf66';
+                addBtn.style.color = 'white';
+                removeBtn.style.background = 'white';
+                removeBtn.style.color = '#667eea';
+            } else {
+                removeBtn.style.background = '#ff6b6b';
+                removeBtn.style.color = 'white';
+                addBtn.style.background = 'white';
+                addBtn.style.color = '#667eea';
+            }
+        }
+
+        function cancelManualInput() {
+            console.log('❌ Abbrechen - Zurück zur Aufnahme');
+            manualAction = null;
+            setPhase('recordingPhase');
+        }
+
+        async function saveManualInput() {
+            console.log('💾 Speichere manuelle Eingabe...');
+
+            const paletteType = document.getElementById('manualPaletteType').value;
+            const customerName = document.getElementById('manualCustomerName').value.trim();
+            const customerNumber = document.getElementById('manualCustomerNumber').value.trim();
+            const quantity = parseInt(document.getElementById('manualQuantity').value) || 1;
+
+            // Validierung
+            if (!paletteType) {
+                showError('❌ Bitte Palettenart wählen!');
+                return;
+            }
+
+            if (!customerName) {
+                showError('❌ Bitte Kundenname eingeben!');
+                return;
+            }
+
+            if (!manualAction) {
+                showError('❌ Bitte Aktion (Zugang/Abgang) wählen!');
+                return;
+            }
+
+            if (quantity <= 0) {
+                showError('❌ Anzahl muss größer als 0 sein!');
+                return;
+            }
+
+            // Bestimme Menge basierend auf Aktion
+            const finalQuantity = manualAction === 'add' ? quantity : -quantity;
+
+            console.log('📊 Manuelle Eingabe:', {
+                paletteType,
+                customerName,
+                customerNumber,
+                action: manualAction,
+                quantity: finalQuantity
+            });
+
+            try {
+                // Speichere zu Supabase
+                const response = await fetch('/api/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        kundenname: customerName,
+                        kundennummer: customerNumber || null,
+                        palettenarten: [paletteType],
+                        menge: [finalQuantity],
+                        aktion: manualAction === 'add' ? 'mitgenommen' : 'zurückgebracht',
+                        mitarbeiter: currentMitarbeiter || 'Unbekannt',
+                        timestamp: new Date().toISOString()
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Fehler beim Speichern');
+                }
+
+                const result = await response.json();
+                console.log('✅ Manuelle Eingabe gespeichert:', result);
+
+                // Zeige Erfolgsseite
+                setPhase('successPhase');
+
+                // Zurück zur Aufnahme nach 2 Sekunden
+                setTimeout(() => {
+                    setPhase('recordingPhase');
+                }, 2000);
+
+            } catch (err) {
+                console.error('❌ Fehler beim Speichern:', err);
+                showError('❌ Fehler beim Speichern: ' + err.message);
             }
         }
 
