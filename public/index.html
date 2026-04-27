@@ -2436,6 +2436,23 @@ ${err.message}
         // ============================================
         let manualAction = null;  // 'add' oder 'remove'
 
+        // ============================================
+        // HILFSFUNKTION: NAMEN KAPITALISIEREN
+        // ============================================
+        function kapitalisiereName(text) {
+            if (!text) return text;
+
+            // Teile den Text in Wörter und kapitalisiere jeden ersten Buchstaben
+            return text
+                .toLowerCase()  // Alles zuerst klein
+                .split(' ')     // Teile in Wörter
+                .map(word => {
+                    // Ersten Buchstabe großschreiben, Rest klein
+                    return word.charAt(0).toUpperCase() + word.slice(1);
+                })
+                .join(' ');     // Zusammensetzen
+        }
+
         // 📦 Alle Palettenarten (Neue + Bestehende aus PALETTENLISTE)
         const ALLE_PALETTENARTEN = [
             // Neue Palettenarten
@@ -2541,7 +2558,8 @@ ${err.message}
             console.log('💾 Speichere manuelle Eingabe...');
 
             const paletteType = document.getElementById('manualPaletteType').value;
-            const customerName = document.getElementById('manualCustomerName').value.trim();
+            // ✅ KAPITALISIERE Namen: "jens meier" → "Jens Meier"
+            const customerName = kapitalisiereName(document.getElementById('manualCustomerName').value.trim());
             const customerNumber = document.getElementById('manualCustomerNumber').value.trim();
             const quantityInput = document.getElementById('manualQuantity').value;
             const quantity = quantityInput ? parseInt(quantityInput) : 1;
@@ -2674,12 +2692,8 @@ ${err.message}
                 document.getElementById('successSummary').innerHTML = summaryHtml;
 
                 // Zeige Erfolgsseite
+                // ✅ WICHTIG: BLEIBT BESTEHEN - Benutzer muss manuell "Zurück" klicken
                 setPhase('successPhase');
-
-                // Zurück zur Aufnahme nach 3 Sekunden
-                setTimeout(() => {
-                    setPhase('recordingPhase');
-                }, 3000);
 
             } catch (err) {
                 console.error('🔴 Fehler beim Speichern:', err);
