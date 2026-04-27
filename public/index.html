@@ -2547,56 +2547,70 @@ ${err.message}
 
             // Validierung
             if (!paletteType) {
+                console.warn('⚠️ Palettenart nicht gewählt');
                 showError('❌ Bitte Palettenart wählen!');
                 return;
             }
 
             if (!customerName) {
+                console.warn('⚠️ Kundenname nicht eingegeben');
                 showError('❌ Bitte Kundenname eingeben!');
                 return;
             }
 
             if (!manualAction) {
+                console.warn('⚠️ Aktion nicht gewählt');
                 showError('❌ Bitte Aktion (Zugang/Abgang) wählen!');
                 return;
             }
 
             if (quantity <= 0) {
+                console.warn('⚠️ Anzahl ungültig:', quantity);
                 showError('❌ Anzahl muss größer als 0 sein!');
                 return;
             }
 
             // Bestimme Menge basierend auf Aktion
             const finalQuantity = manualAction === 'add' ? quantity : -quantity;
+            const mitarbeiter = mitarbeiterName || 'System';
 
-            console.log('📊 Manuelle Eingabe:', {
+            console.log('📊 Manuelle Eingabe validiert:', {
                 paletteType,
                 customerName,
                 customerNumber,
                 action: manualAction,
-                quantity: finalQuantity
+                quantity: finalQuantity,
+                mitarbeiter
             });
 
             try {
                 // Speichere zu Supabase
+                const payload = {
+                    kundenname: customerName,
+                    kundennummer: customerNumber || null,
+                    palettenarten: [paletteType],
+                    menge: [finalQuantity],
+                    aktion: manualAction === 'add' ? 'mitgenommen' : 'zurückgebracht',
+                    mitarbeiter: mitarbeiter,
+                    timestamp: new Date().toISOString()
+                };
+
+                console.log('📤 Sende Payload zum Backend:', payload);
+
                 const response = await fetch('/api/save', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        kundenname: customerName,
-                        kundennummer: customerNumber || null,
-                        palettenarten: [paletteType],
-                        menge: [finalQuantity],
-                        aktion: manualAction === 'add' ? 'mitgenommen' : 'zurückgebracht',
-                        mitarbeiter: currentMitarbeiter || 'Unbekannt',
-                        timestamp: new Date().toISOString()
-                    })
+                    body: JSON.stringify(payload)
                 });
 
+                console.log('📨 Response Status:', response.status, response.statusText);
+
                 if (!response.ok) {
-                    throw new Error('Fehler beim Speichern');
+                    const errorText = await response.text();
+                    console.error('🔴 Backend Fehler:', errorText);
+                    throw new Error(`Server Fehler (${response.status}): ${errorText}`);
                 }
 
                 const result = await response.json();
@@ -2611,7 +2625,9 @@ ${err.message}
                 }, 2000);
 
             } catch (err) {
-                console.error('❌ Fehler beim Speichern:', err);
+                console.error('🔴 Fehler beim Speichern:', err);
+                console.error('   Message:', err.message);
+                console.error('   Stack:', err.stack);
                 showError('❌ Fehler beim Speichern: ' + err.message);
             }
         }
