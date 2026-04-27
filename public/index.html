@@ -2629,13 +2629,57 @@ ${err.message}
                 const result = await response.json();
                 console.log('✅ Manuelle Eingabe gespeichert:', result);
 
+                // Zeige Zusammenfassung in der Erfolgsseite
+                const summaryHtml = `
+                    <div style="margin: 20px 0;">
+                        <h3 style="color: #333; margin-top: 0;">📋 Gespeicherte Daten:</h3>
+
+                        <div style="background: white; border-left: 4px solid #51cf66; padding: 15px; margin: 10px 0; border-radius: 8px;">
+                            <div style="display: flex; justify-content: space-between; margin: 8px 0;">
+                                <span style="font-weight: bold; color: #666;">👤 Kundenname:</span>
+                                <span style="color: #333; font-size: 16px; font-weight: 600;">${escapeHtml(customerName)}</span>
+                            </div>
+                            ${customerNumber ? `
+                            <div style="display: flex; justify-content: space-between; margin: 8px 0;">
+                                <span style="font-weight: bold; color: #666;">🔢 Kundennummer:</span>
+                                <span style="color: #333; font-size: 16px; font-weight: 600;">${escapeHtml(customerNumber)}</span>
+                            </div>
+                            ` : ''}
+                        </div>
+
+                        <div style="background: white; border-left: 4px solid #667eea; padding: 15px; margin: 10px 0; border-radius: 8px;">
+                            <div style="display: flex; justify-content: space-between; margin: 8px 0;">
+                                <span style="font-weight: bold; color: #666;">📦 Palettenart:</span>
+                                <span style="color: #333; font-size: 16px; font-weight: 600;">${escapeHtml(paletteType)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin: 8px 0;">
+                                <span style="font-weight: bold; color: #666;">📊 Menge:</span>
+                                <span style="color: #333; font-size: 16px; font-weight: 600;">${Math.abs(finalQuantity)}x</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin: 8px 0;">
+                                <span style="font-weight: bold; color: #666;">⚡ Aktion:</span>
+                                <span style="color: #333; font-size: 16px; font-weight: 600;">${finalQuantity > 0 ? '➕ Zugang' : '➖ Abgang'}</span>
+                            </div>
+                        </div>
+
+                        <div style="background: white; border-left: 4px solid #ff9800; padding: 15px; margin: 10px 0; border-radius: 8px;">
+                            <div style="display: flex; justify-content: space-between; margin: 8px 0;">
+                                <span style="font-weight: bold; color: #666;">👤 Mitarbeiter:</span>
+                                <span style="color: #333; font-size: 16px; font-weight: 600;">${escapeHtml(mitarbeiter)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('successSummary').innerHTML = summaryHtml;
+
                 // Zeige Erfolgsseite
                 setPhase('successPhase');
 
-                // Zurück zur Aufnahme nach 2 Sekunden
+                // Zurück zur Aufnahme nach 3 Sekunden
                 setTimeout(() => {
                     setPhase('recordingPhase');
-                }, 2000);
+                }, 3000);
 
             } catch (err) {
                 console.error('🔴 Fehler beim Speichern:', err);
