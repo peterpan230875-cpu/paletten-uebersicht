@@ -74,8 +74,8 @@ async function initializePalettenarten() {
             'Steinzeug Gitterbox',
             'Steinzeugpalette klein',
             'Steinzeugpalette groß',
-            'Europalette zwei',
-            'Europalette drei',
+            'Europalette 2',
+            'Europalette 3',
             'Spezialpalette',
             'Velux-Palette'
         ];

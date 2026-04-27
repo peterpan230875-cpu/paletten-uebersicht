@@ -1085,8 +1085,8 @@
             'Steinzeug Gitterbox': ['steinzeug gitterbox', 'steinzeug-gitterbox', 'stg gitterbox'],
             'Steinzeugpalette klein': ['steinzeugpalette klein', 'steinzeug klein', 'stg klein'],
             'Steinzeugpalette groß': ['steinzeugpalette groß', 'steinzeug groß', 'stg groß'],
-            'Europalette zwei': ['europalette zwei', 'euro zwei', 'europalette 2'],
-            'Europalette drei': ['europalette drei', 'euro drei', 'europalette 3'],
+            'Europalette 2': ['europalette zwei', 'euro zwei', 'europalette 2'],
+            'Europalette 3': ['europalette drei', 'euro drei', 'europalette 3'],
             'Spezialpalette': ['spezial', 'spezialpalette', 'spezial-palette'],
             'Velux-Palette': ['velux', 'velux-palette', 'veluxpalette'],
             // Bestehende Palettenarten
@@ -2424,10 +2424,16 @@ ${err.message}
 
             // Zeige Logout-Button nur in recordingPhase
             const logoutContainer = document.getElementById('logoutContainer');
-            if (phaseName === 'recordingPhase') {
-                logoutContainer.style.display = 'block';
+            if (logoutContainer) {  // ✅ Sicherer Null-Check
+                if (phaseName === 'recordingPhase') {
+                    logoutContainer.style.display = 'block';
+                    console.log('✅ Logout-Button angezeigt (recordingPhase)');
+                } else {
+                    logoutContainer.style.display = 'none';
+                    console.log('❌ Logout-Button versteckt (nicht recordingPhase)');
+                }
             } else {
-                logoutContainer.style.display = 'none';
+                console.warn('⚠️ logoutContainer nicht gefunden!');
             }
         }
 
@@ -2460,8 +2466,8 @@ ${err.message}
             'Steinzeug Gitterbox',
             'Steinzeugpalette klein',
             'Steinzeugpalette groß',
-            'Europalette zwei',
-            'Europalette drei',
+            'Europalette 2',
+            'Europalette 3',
             'Spezialpalette',
             'Velux-Palette',
             // Bestehende Palettenarten aus PALETTENLISTE
