@@ -474,13 +474,13 @@
             overflow-y: auto;
             overflow-x: hidden;
             flex: 1;
-            padding: 20px;
-            gap: 12px;
+            padding: 30px;
+            gap: 20px;
             box-sizing: border-box;
         }
 
         .palettehistorie-list::-webkit-scrollbar {
-            width: 10px;
+            width: 12px;
         }
 
         .palettehistorie-list::-webkit-scrollbar-track {
@@ -498,45 +498,51 @@
             justify-content: space-between;
             align-items: center;
             background: white;
-            border-left: 4px solid #667eea;
-            border-radius: 8px;
-            padding: 16px 18px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border-left: 6px solid #667eea;
+            border-radius: 12px;
+            padding: 28px 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             transition: all 0.3s ease;
+            min-height: 90px;
+            gap: 30px;
         }
 
         .palettehistorie-item:hover {
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
-            transform: translateX(5px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
+            transform: translateX(8px);
+            background: #f8f9ff;
         }
 
         .palettehistorie-zeitstempel {
             font-family: 'Courier New', monospace;
-            font-size: 13px;
-            color: #999;
+            font-size: 16px;
+            color: #555;
             font-weight: 600;
-            min-width: 180px;
+            min-width: 220px;
+            letter-spacing: 0.5px;
         }
 
         .palettehistorie-mitarbeiter {
-            font-size: 14px;
-            color: #666;
-            font-weight: 600;
-            min-width: 120px;
+            font-size: 17px;
+            color: #333;
+            font-weight: 700;
+            min-width: 150px;
         }
 
         .palettehistorie-aktion {
-            font-size: 24px;
-            min-width: 40px;
+            font-size: 36px;
+            min-width: 60px;
             text-align: center;
+            flex-shrink: 0;
         }
 
         .palettehistorie-menge {
-            font-size: 18px;
+            font-size: 28px;
             font-weight: bold;
             color: #667eea;
-            min-width: 60px;
+            min-width: 80px;
             text-align: right;
+            flex-shrink: 0;
         }
 
         .palettehistorie-empty {
@@ -648,29 +654,34 @@
             /* PALETTENHISTORIE */
             .palettehistorie-item {
                 flex-wrap: wrap;
-                gap: 5px;
-                padding: 10px 12px;
+                gap: 12px;
+                padding: 18px 16px;
+                min-height: 120px;
             }
 
             .palettehistorie-zeitstempel {
-                font-size: 11px;
+                font-size: 14px;
                 min-width: 100%;
-                color: #bbb;
+                color: #777;
+                font-weight: 600;
             }
 
             .palettehistorie-mitarbeiter {
-                font-size: 12px;
+                font-size: 15px;
                 min-width: auto;
+                font-weight: 700;
+                color: #333;
             }
 
             .palettehistorie-aktion {
-                font-size: 18px;
-                min-width: 30px;
+                font-size: 28px;
+                min-width: 50px;
             }
 
             .palettehistorie-menge {
-                font-size: 16px;
-                min-width: 40px;
+                font-size: 22px;
+                min-width: 60px;
+                font-weight: bold;
             }
 
             /* HEADER */
