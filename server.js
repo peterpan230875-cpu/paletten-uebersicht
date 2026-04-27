@@ -61,9 +61,59 @@ async function initializeMitarbeiter() {
     }
 }
 
+// ============================================
+// STARTUP: PALETTENARTEN INITIALISIEREN
+// ============================================
+async function initializePalettenarten() {
+    try {
+        console.log('🔄 Initialisiere Palettenarten-Tabelle...');
+
+        // Definiere die Palettenarten
+        const palettenarten = [
+            'Grafepalette',
+            'Steinzeug Gitterbox',
+            'Steinzeugpalette klein',
+            'Steinzeugpalette groß',
+            'Europalette zwei',
+            'Europalette drei',
+            'Spezialpalette',
+            'Velux-Palette'
+        ];
+
+        for (let art of palettenarten) {
+            const { data: existing } = await supabase
+                .from('Palettenarten')
+                .select('id')
+                .eq('Name', art)
+                .limit(1);
+
+            if (!existing || existing.length === 0) {
+                // Palettenart existiert nicht, erstelle sie
+                const { error } = await supabase
+                    .from('Palettenarten')
+                    .insert([{
+                        Name: art,
+                        ErstelltAm: new Date().toISOString()
+                    }]);
+
+                if (error) {
+                    console.log(`⚠️ Palettenart "${art}" konnte nicht erstellt werden: ${error.message}`);
+                } else {
+                    console.log(`✅ Palettenart "${art}" erstellt`);
+                }
+            } else {
+                console.log(`ℹ️ Palettenart "${art}" existiert bereits`);
+            }
+        }
+    } catch (err) {
+        console.error('❌ Fehler beim Initialisieren der Palettenarten:', err.message);
+    }
+}
+
 // Starte Mitarbeiter-Initialisierung
 setTimeout(() => {
     initializeMitarbeiter();
+    initializePalettenarten();
 }, 1000);
 
 // ============================================
@@ -159,6 +209,31 @@ app.get('/api/get-all-customers', async (req, res) => {
         res.json(uniqueNames);
 
     } catch (err) {
+        res.json([]);
+    }
+});
+
+// ============================================
+// API: ALLE PALETTENARTEN LADEN
+// ============================================
+app.get('/api/get-palettenarten', async (req, res) => {
+    try {
+        const { data: palettenarten, error } = await supabase
+            .from('Palettenarten')
+            .select('Name')
+            .order('Name', { ascending: true });
+
+        if (error) {
+            console.error('❌ Fehler beim Laden der Palettenarten:', error.message);
+            return res.json([]);
+        }
+
+        // Extrahiere nur die Namen
+        const namen = palettenarten.map(p => p.Name);
+        res.json(namen);
+
+    } catch (err) {
+        console.error('❌ Fehler beim Laden der Palettenarten:', err.message);
         res.json([]);
     }
 });
