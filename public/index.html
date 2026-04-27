@@ -2426,30 +2426,49 @@ ${err.message}
         // ============================================
         let manualAction = null;  // 'add' oder 'remove'
 
+        // 📦 Alle Palettenarten (als Fallback und lokale Liste)
+        const ALLE_PALETTENARTEN = [
+            'Grafepalette',
+            'Steinzeug Gitterbox',
+            'Steinzeugpalette klein',
+            'Steinzeugpalette groß',
+            'Europalette zwei',
+            'Europalette drei',
+            'Spezialpalette',
+            'Velux-Palette'
+        ];
+
         async function openManualInput() {
             console.log('🔓 Öffne manuelle Eingabe...');
 
-            // Lade Palettenarten vom Backend
+            let palettenarten = [...ALLE_PALETTENARTEN];  // Standard-Liste verwenden
+
+            // Versuche vom Backend zu laden (optional)
             try {
                 const response = await fetch('/api/get-palettenarten');
-                const palettenarten = await response.json();
-
-                const select = document.getElementById('manualPaletteType');
-                select.innerHTML = '<option value="">-- Palettenart auswählen --</option>';
-
-                palettenarten.forEach(art => {
-                    const option = document.createElement('option');
-                    option.value = art;
-                    option.textContent = art;
-                    select.appendChild(option);
-                });
-
-                console.log('✅ Palettenarten geladen:', palettenarten.length);
+                if (response.ok) {
+                    const dbPalettenarten = await response.json();
+                    if (dbPalettenarten && dbPalettenarten.length > 0) {
+                        palettenarten = dbPalettenarten;
+                        console.log('✅ Palettenarten vom Backend geladen:', palettenarten.length);
+                    }
+                }
             } catch (err) {
-                console.error('❌ Fehler beim Laden von Palettenarten:', err);
-                showError('Fehler beim Laden der Palettenarten');
-                return;
+                console.warn('⚠️ Backend nicht verfügbar, verwende lokale Liste:', err.message);
             }
+
+            // Fülle Dropdown mit Palettenarten
+            const select = document.getElementById('manualPaletteType');
+            select.innerHTML = '<option value="">-- Palettenart auswählen --</option>';
+
+            palettenarten.forEach(art => {
+                const option = document.createElement('option');
+                option.value = art;
+                option.textContent = art;
+                select.appendChild(option);
+            });
+
+            console.log('📦 Palettenarten verfügbar:', palettenarten.length);
 
             // Reset Felder
             document.getElementById('manualPaletteType').value = '';
