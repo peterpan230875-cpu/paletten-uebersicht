@@ -5,528 +5,1790 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Paletten Übersicht</title>
     <style>
+        /* ===== CSS CUSTOM PROPERTIES (Light Mode Default) ===== */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --border-color: #e5e7eb;
+            --primary-color: #2563eb;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --warning-color: #f97316;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        body.dark-mode {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-tertiary: #94a3b8;
+            --border-color: #334155;
+            --primary-color: #06b6d4;
+            --success-color: #10b981;
+            --error-color: #f87171;
+            --warning-color: #fb923c;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-        }
-
-        html, body {
-            width: 100%;
-            height: 100%;
-            -webkit-user-select: none;
-            user-select: none;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
-            background: linear-gradient(135deg, #1a2a3a 0%, #0f1820 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 0;
-            overflow: hidden;
+            padding: 20px;
+            color: var(--text-primary);
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
         }
 
         .container {
-            background: linear-gradient(135deg, #1a2a3a 0%, #0f1820 100%);
-            width: 100%;
-            height: 100vh;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.12);
+            padding: 24px;
             max-width: 600px;
+            width: 100%;
+            max-height: 95vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
-            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
 
-        /* ===== TOP GRADIENT BAR ===== */
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 6px;
-            background: linear-gradient(90deg, #FF6B4A 0%, #FF8C42 50%, #FFD700 100%);
-            z-index: 10;
-        }
-
-        /* ===== HEADER CARD ===== */
-        .header-card {
-            background: rgba(30, 50, 70, 0.4);
-            backdrop-filter: blur(10px);
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            flex-shrink: 0;
-            margin: 12px;
-            border-radius: 12px;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .header-icon {
-            width: 44px;
-            height: 44px;
-            background: linear-gradient(135deg, #FF6B4A 0%, #FF8C42 100%);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 26px;
-            box-shadow: 0 4px 12px rgba(255, 107, 74, 0.3);
-            border: 2px solid rgba(255, 255, 255, 0.15);
-        }
-
-        .header-text h1 {
-            font-size: 18px;
-            font-weight: 700;
-            margin: 0;
-            letter-spacing: -0.3px;
-        }
-
-        .header-text p {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.6);
-            margin: 2px 0 0 0;
-        }
-
-        .logout-btn {
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-
-        .logout-btn:active {
-            background: rgba(255, 255, 255, 0.25);
-        }
-
-        /* ===== CONTENT AREA ===== */
-        .content {
+        .phase {
+            display: none;
             flex: 1;
             overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            padding: 20px 16px;
-            padding-bottom: max(20px, env(safe-area-inset-bottom));
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-        }
-
-        .content::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .content::-webkit-scrollbar-thumb {
-            background: rgba(255, 107, 74, 0.3);
-            border-radius: 3px;
-        }
-
-        /* ===== CARD CONTAINER ===== */
-        .card {
-            background: white;
-            border-radius: 16px;
-            padding: 32px 24px;
-            max-width: 500px;
+            overflow-x: hidden;
             width: 100%;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .phase.active {
             display: flex;
             flex-direction: column;
-            align-items: center;
+            width: 100%;
+            height: 100%;
+            animation: fadeIn 0.3s ease;
         }
 
-        /* ===== TITLE & SUBTITLE ===== */
-        h2 {
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-primary);
+            margin-bottom: 8px;
             font-size: 28px;
             font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 8px;
-            text-align: center;
-            letter-spacing: -0.3px;
+            letter-spacing: -0.5px;
         }
 
         .subtitle {
-            font-size: 14px;
-            color: #666;
             text-align: center;
+            color: var(--text-secondary);
             margin-bottom: 24px;
-            line-height: 1.5;
-        }
-
-        /* ===== FORM INPUTS ===== */
-        input[type="text"],
-        input[type="password"],
-        input[type="number"],
-        select,
-        textarea {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 15px;
-            font-family: inherit;
-            background: #f8f8f8;
-            color: #1a1a1a;
-            transition: all 0.2s;
-            margin-bottom: 12px;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #FF6B4A;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(255, 107, 74, 0.1);
-        }
-
-        .form-label {
-            font-size: 11px;
-            font-weight: 700;
-            color: #333;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 6px;
-            display: block;
-        }
-
-        /* ===== ERROR & SUCCESS BOXES ===== */
-        .error-box {
-            background: #ffe0e0;
-            border: 2px solid #ff6b6b;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 16px;
-            color: #c92a2a;
-            font-size: 13px;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .success-box {
-            background: #e6ffed;
-            border: 2px solid #51cf66;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 16px;
-            color: #2f9e44;
-            font-size: 13px;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        /* ===== BUTTONS ===== */
-        button {
-            -webkit-appearance: none;
-            appearance: none;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-            font-family: inherit;
-        }
-
-        /* Main Buttons */
-        button[onclick*="handleLogin"],
-        button[onclick*="addNewEmployee"],
-        button[onclick*="toggleRecording"],
-        button[onclick*="saveReviewData"],
-        button[onclick*="saveManualInput"],
-        #newRecordingButton {
-            width: 100%;
-            padding: 14px 20px;
-            background: linear-gradient(135deg, #FF6B4A 0%, #FF8C42 100%);
-            color: white;
-            border-radius: 10px;
-            font-size: 16px;
-            box-shadow: 0 6px 18px rgba(255, 107, 74, 0.3);
-            min-height: 50px;
-            margin-bottom: 12px;
-            letter-spacing: 0.3px;
-        }
-
-        button[onclick*="handleLogin"]:active,
-        button[onclick*="addNewEmployee"]:active,
-        button[onclick*="toggleRecording"]:active,
-        button[onclick*="saveReviewData"]:active,
-        button[onclick*="saveManualInput"]:active,
-        #newRecordingButton:active {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(255, 107, 74, 0.4);
-        }
-
-        /* Secondary Buttons */
-        button[onclick*="showAdminPanel"],
-        button[onclick*="backToLogin"],
-        button[onclick*="openManualInput"],
-        button[onclick*="showOverview"],
-        button[onclick*="backTo"],
-        .nav-back-btn {
-            background: white;
-            color: #1a1a1a;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 12px 20px;
-            width: 100%;
-            font-size: 15px;
-            margin-bottom: 12px;
-            min-height: 48px;
-        }
-
-        button[onclick*="showAdminPanel"]:active,
-        button[onclick*="backToLogin"]:active,
-        button[onclick*="openManualInput"]:active,
-        button[onclick*="showOverview"]:active,
-        button[onclick*="backTo"]:active,
-        .nav-back-btn:active {
-            background: #f8f8f8;
-            border-color: #d0d0d0;
-        }
-
-        /* Admin/Text Buttons */
-        button[style*="background: #ff9500"],
-        button[style*="background: #FF9500"],
-        .admin-link {
-            background: transparent;
-            color: #FF6B4A;
-            border: none;
-            text-decoration: underline;
-            padding: 8px 0;
-            font-size: 13px;
-            cursor: pointer;
-            margin-bottom: 0;
-        }
-
-        /* Discard/Delete Buttons */
-        button[style*="background: #ff6b6b"],
-        button[style*="#ff5252"],
-        button[onclick*="Discard"] {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
-        }
-
-        button[style*="background: #ff6b6b"]:active,
-        button[style*="#ff5252"]:active,
-        button[onclick*="Discard"]:active {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(255, 107, 107, 0.4);
-        }
-
-        /* ===== MIC CIRCLE ===== */
-        .microphone-visual {
-            width: 120px;
-            height: 120px;
-            background: linear-gradient(135deg, #f5d7d2 0%, #f8d4ce 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 60px;
-            margin: 24px 0;
-            box-shadow: 0 8px 24px rgba(245, 215, 210, 0.4);
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-12px); }
-        }
-
-        .recording-section.active .microphone-visual {
-            animation: pulse-mic 1.5s ease-in-out infinite;
-        }
-
-        @keyframes pulse-mic {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.08); }
-        }
-
-        /* ===== RECORDING BUTTON ===== */
-        #recordingButton {
-            width: 100%;
-            padding: 14px 20px;
-            background: linear-gradient(135deg, #FF6B4A 0%, #FF8C42 100%);
-            color: white;
-            border-radius: 10px;
-            font-size: 16px;
-            box-shadow: 0 6px 18px rgba(255, 107, 74, 0.3);
-            margin: 20px 0;
-            min-height: 50px;
-        }
-
-        #recordingButton:active:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(255, 107, 74, 0.4);
-        }
-
-        #recordingButton.recording {
-            animation: pulse-btn 1.5s ease-in-out infinite;
-        }
-
-        @keyframes pulse-btn {
-            0%, 100% { box-shadow: 0 6px 18px rgba(255, 107, 74, 0.3); }
-            50% { box-shadow: 0 6px 28px rgba(255, 107, 74, 0.5); }
-        }
-
-        /* ===== STATUS TEXT ===== */
-        #status {
-            font-size: 13px;
-            color: #999;
-            text-align: center;
-            margin: 12px 0;
+            font-size: 14px;
             font-weight: 500;
         }
 
-        /* ===== SUCCESS SECTION ===== */
-        .success-section {
+        .recording-section {
             text-align: center;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             flex: 1;
+            position: relative;
         }
 
-        .success-icon {
-            font-size: 60px;
-            margin: 20px 0;
-            animation: bounce 0.6s ease;
-        }
-
-        @keyframes bounce {
-            0% { transform: scale(0) rotateX(90deg); opacity: 0; }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .success-message {
-            font-size: 22px;
-            color: #51cf66;
-            font-weight: 700;
-            margin-bottom: 16px;
-        }
-
-        #successSummary {
-            background: #f0f9ff;
-            border: 2px solid #51cf66;
+        #recordingButton {
+            font-size: 18px;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
             border-radius: 10px;
-            padding: 16px;
-            margin: 16px 0;
-            text-align: left;
-            width: 100%;
-        }
-
-        #successSummary strong {
-            color: #333;
-            display: block;
-            margin-top: 12px;
-            font-size: 14px;
-        }
-
-        #successSummary div {
-            color: #555;
-            font-size: 14px;
-            line-height: 1.5;
-            margin-left: 12px;
-        }
-
-        /* ===== GRID & LISTS ===== */
-        .kundenliste-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-            gap: 10px;
-            padding: 16px 0;
-            width: 100%;
-        }
-
-        .kundenliste-item {
-            background: linear-gradient(135deg, #f8f9fa 0%, #f0f4ff 100%);
-            border: 2px solid #e0e6ff;
-            border-radius: 10px;
-            padding: 12px;
-            text-align: center;
             cursor: pointer;
-            font-size: 13px;
             font-weight: 600;
-            color: #FF6B4A;
-            min-height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
+            margin: 20px 0;
+            box-shadow: var(--shadow-md);
         }
 
-        .kundenliste-item:active {
-            background: #e0e6ff;
-            border-color: #FF6B4A;
-            box-shadow: 0 0 0 3px rgba(255, 107, 74, 0.1);
+        #recordingButton:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
         }
 
-        /* ===== TEXT DISPLAY ===== */
+        #recordingButton:active:not(:disabled) {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+        }
+
+        #recordingButton:disabled {
+            background: var(--border-color);
+            color: var(--text-tertiary);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        #recordingButton.recording {
+            background: linear-gradient(135deg, var(--error-color) 0%, #dc2626 100%);
+            animation: recordingPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes recordingPulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+            }
+            50% {
+                transform: scale(1.02);
+                box-shadow: 0 8px 24px rgba(239, 68, 68, 0.5);
+            }
+        }
+
+        #status {
+            font-size: 16px;
+            margin: 16px 0;
+            font-weight: 500;
+            min-height: 24px;
+            color: var(--text-primary);
+            padding: 12px 16px;
+            border-radius: 6px;
+            border-left: 4px solid;
+        }
+
+        .status-recording {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error-color);
+            border-left-color: var(--error-color);
+        }
+
+        .status-processing {
+            background: rgba(249, 115, 22, 0.1);
+            color: var(--warning-color);
+            border-left-color: var(--warning-color);
+        }
+
+        .status-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error-color);
+            border-left-color: var(--error-color);
+        }
+
+        .review-section {
+            padding: 20px;
+        }
+
         .text-display {
-            background: #f8f8f8;
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            padding: 14px;
-            margin: 12px 0;
-            min-height: 80px;
-            font-size: 14px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 20px 0;
+            min-height: 100px;
+            font-size: 16px;
             line-height: 1.6;
             white-space: pre-wrap;
             word-wrap: break-word;
-            color: #333;
+            color: var(--text-primary);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
         }
 
-        /* ===== RESPONSIVE ===== */
+        .text-display:hover {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.02);
+        }
+
+        .review-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            justify-content: center;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            max-width: 250px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-save:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-discard {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+            box-shadow: none;
+        }
+
+        .btn-discard:hover:not(:disabled) {
+            background: var(--border-color);
+            border-color: var(--text-secondary);
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background: var(--border-color);
+            color: var(--text-tertiary);
+            cursor: not-allowed;
+            opacity: 0.6;
+            box-shadow: none;
+        }
+
+        .success-section {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .success-icon {
+            font-size: 72px;
+            margin-bottom: 20px;
+            animation: successBounce 0.6s ease-out;
+        }
+
+        @keyframes successBounce {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .success-message {
+            font-size: 24px;
+            color: var(--success-color);
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        #successSummary {
+            background: rgba(16, 185, 129, 0.05);
+            border: 2px solid var(--success-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        #successSummary strong {
+            color: var(--text-primary);
+            display: block;
+            margin-top: 12px;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        #successSummary div {
+            margin-left: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        #newRecordingButton {
+            font-size: 16px;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-md);
+        }
+
+        #newRecordingButton:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .error-box {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid var(--error-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 20px 0;
+            color: var(--error-color);
+            font-size: 14px;
+            font-weight: 600;
+            animation: errorShake 0.4s ease;
+        }
+
+        @keyframes errorShake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .info-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 20px;
+            font-style: italic;
+        }
+
+        /* ========== DREISTUFIGE ÜBERSICHT STYLES ========== */
+
+        .kundenliste-section, .kundendetail-section, .palettehistorie-section {
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .kundenliste-header, .kundendetail-header, .palettehistorie-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0;
+            padding: 16px;
+            gap: 12px;
+            flex-shrink: 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .kundenliste-header h2, .kundendetail-header h2, .palettehistorie-header h2 {
+            color: var(--text-primary);
+            font-size: 20px;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .nav-back-btn {
+            padding: 10px 16px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            box-shadow: var(--shadow-md);
+        }
+
+        .nav-back-btn:hover {
+            background: #1d4ed8;
+            transform: translateX(-2px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+        }
+
+        /* ========== EBENE 1: KUNDENLISTE ========== */
+        .kundenliste-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            width: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            flex: 1;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        .kundenliste-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .kundenliste-grid::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        .kundenliste-grid::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        .kundenliste-item {
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 14px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .kundenliste-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.2);
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.02);
+        }
+
+        /* ========== EBENE 2: KUNDENDETAILS ========== */
+        .kundendetail-list {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            flex: 1;
+            padding: 16px;
+            gap: 12px;
+            box-sizing: border-box;
+        }
+
+        .kundendetail-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .kundendetail-list::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        .kundendetail-list::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        .kundendetail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .kundendetail-row:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.2);
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.02);
+        }
+
+        .kundendetail-palettenart {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            flex: 1;
+        }
+
+        .kundendetail-saldo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-color);
+            min-width: 80px;
+            justify-content: flex-end;
+        }
+
+        .saldo-input {
+            width: 80px;
+            padding: 8px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .saldo-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .saldo-button {
+            padding: 8px 16px;
+            background: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .saldo-button:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        /* ========== EBENE 3: PALETTENHISTORIE ========== */
+        .palettehistorie-list {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            flex: 1;
+            padding: 16px;
+            gap: 12px;
+            box-sizing: border-box;
+        }
+
+        .palettehistorie-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .palettehistorie-list::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        .palettehistorie-list::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        .palettehistorie-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-primary);
+            border-left: 4px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+            gap: 12px;
+            min-height: 80px;
+        }
+
+        .palettehistorie-item:hover {
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.2);
+            transform: translateX(4px);
+            background: rgba(37, 99, 235, 0.02);
+        }
+
+        .palettehistorie-zeitstempel {
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 700;
+            min-width: 140px;
+            letter-spacing: 0.3px;
+        }
+
+        .palettehistorie-mitarbeiter {
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 600;
+            min-width: 100px;
+        }
+
+        .palettehistorie-aktion {
+            font-size: 32px;
+            min-width: 50px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .palettehistorie-menge {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-color);
+            min-width: 60px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .palettehistorie-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        /* ========== MOBILE RESPONSIVE ========== */
         @media (max-width: 640px) {
-            .card {
-                padding: 24px 16px;
+            body {
+                padding: 8px;
             }
 
-            h2 {
+            .container {
+                border-radius: 0;
+                padding: 16px;
+                max-height: 100vh;
+                margin: 0 auto;
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            @supports (padding: env(safe-area-inset-bottom)) {
+                .container {
+                    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+                }
+            }
+
+            h1 {
                 font-size: 22px;
             }
 
-            button {
+            .subtitle {
+                font-size: 13px;
+                margin-bottom: 20px;
+            }
+
+            .recording-section {
+                padding: 16px;
+            }
+
+            #recordingButton {
+                font-size: 16px;
+                padding: 12px 24px;
+                margin: 16px 0;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 20px;
+            }
+
+            .btn {
+                max-width: 100%;
+                width: 100%;
+                padding: 12px 20px;
+                font-size: 16px;
+            }
+
+            input[type="text"], input[type="password"], select, textarea {
+                font-size: 16px !important;
+                padding: 12px !important;
+            }
+
+            .text-display {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .review-section {
+                padding: 16px;
+            }
+
+            /* KUNDENLISTE */
+            .kundenliste-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 10px;
+                padding: 12px;
+            }
+
+            .kundenliste-item {
+                font-size: 12px;
+                padding: 12px;
+                min-height: 90px;
+            }
+
+            /* KUNDENDETAILS */
+            .kundendetail-row {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 12px;
+                gap: 8px;
+            }
+
+            .kundendetail-palettenart {
+                font-size: 14px;
+                width: 100%;
+            }
+
+            .kundendetail-saldo {
+                width: 100%;
+                justify-content: space-between;
+                min-width: auto;
+                font-size: 16px;
+            }
+
+            .saldo-input {
+                width: 70px;
                 font-size: 14px;
             }
-        }
 
-        @media (max-height: 700px) {
-            .card {
-                padding: 20px 16px;
+            .saldo-button {
+                padding: 8px 12px;
+                font-size: 12px;
             }
 
-            h2 {
+            /* PALETTENHISTORIE */
+            .palettehistorie-item {
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 12px;
+                min-height: auto;
+            }
+
+            .palettehistorie-zeitstempel {
+                font-size: 11px;
+                min-width: 100%;
+                order: -1;
+            }
+
+            .palettehistorie-mitarbeiter {
+                font-size: 13px;
+                min-width: auto;
+            }
+
+            .palettehistorie-aktion {
+                font-size: 24px;
+                min-width: 40px;
+            }
+
+            .palettehistorie-menge {
+                font-size: 18px;
+                min-width: 50px;
+            }
+
+            /* HEADER */
+            .kundenliste-header, .kundendetail-header, .palettehistorie-header {
+                flex-wrap: wrap;
+                padding: 12px;
+                gap: 8px;
+            }
+
+            .kundenliste-header h2, .kundendetail-header h2, .palettehistorie-header h2 {
+                font-size: 18px;
+                width: 100%;
+            }
+
+            .nav-back-btn {
+                width: 100%;
+                padding: 10px;
+            }
+
+            .success-section {
+                padding: 24px 16px;
+            }
+
+            .success-icon {
+                font-size: 56px;
+            }
+
+            .success-message {
                 font-size: 20px;
             }
 
-            .microphone-visual {
-                width: 100px;
-                height: 100px;
-                font-size: 48px;
+            #successSummary {
+                padding: 12px !important;
+                margin: 16px 0 !important;
+            }
+
+            .error-box {
+                font-size: 13px;
+                padding: 12px;
             }
         }
-    </style>            document.getElementById("textDisplay").textContent = normalisierterText;
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 12px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .kundenliste-grid {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+                gap: 8px;
+                padding: 10px;
+            }
+
+            .kundenliste-item {
+                font-size: 11px;
+                padding: 10px;
+                min-height: 80px;
+            }
+
+            .palettehistorie-zeitstempel {
+                font-size: 10px;
+            }
+
+            #recordingButton {
+                font-size: 14px;
+                padding: 10px 20px;
+            }
+
+            .nav-back-btn {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="position: relative;">
+        <!-- Logout Button oben -->
+        <div id="logoutContainer" style="display: none; text-align: right; margin-bottom: 15px;">
+            <button onclick="logoutUser()" style="padding: 10px 16px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap;">👋 Logout (<span id="mitarbeiterDisplay">Marcel</span>)</button>
+        </div>
+
+        <!-- <h1>Paletten Übersicht</h1>
+        <p class="subtitle">Spracherkennung mit Saldo-Tracking</p> -->
+
+        <!-- LOGIN PHASE -->
+        <!-- LOGIN PHASE: Mitarbeitername + Passwort -->
+        <div id="loginPhase" class="phase">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 40px 20px;">
+                <div style="background: white; border-radius: 20px; padding: 40px; max-width: 400px; width: 100%; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);">
+                    <h2 style="text-align: center; color: #333; margin-bottom: 30px; font-size: 24px;">🔐 Anmeldung</h2>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">👤 Mitarbeitername</label>
+                        <input type="text" id="loginMitarbeiter" placeholder="z.B. Vorname" style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
+                    </div>
+
+                    <div style="margin-bottom: 25px;">
+                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">🔑 Passwort</label>
+                        <input type="password" id="loginPassword" placeholder="Passwort eingeben..." style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
+                    </div>
+
+                    <div id="loginErrorBox" style="display: none; background: #ffe0e0; border: 2px solid #ff6b6b; border-radius: 10px; padding: 15px; margin-bottom: 20px; color: #c92a2a; font-size: 14px; font-weight: bold; text-align: center;">
+                        <span id="loginErrorMessage"></span>
+                    </div>
+
+                    <button onclick="handleLoginNew()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; margin-bottom: 12px;">Anmelden</button>
+
+                    <button onclick="showAdminPanel()" style="width: 100%; padding: 12px; background: #ff9500; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">⚙️ Mitarbeiter hinzufügen</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADMIN PANEL: Neue Mitarbeiter -->
+        <div id="adminPanelPhase" class="phase">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 40px 20px;">
+                <div style="background: white; border-radius: 20px; padding: 40px; max-width: 400px; width: 100%; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);">
+                    <h2 style="text-align: center; color: #333; margin-bottom: 30px; font-size: 24px;">⚙️ Mitarbeiter hinzufügen</h2>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">📝 Mitarbeitername</label>
+                        <input type="text" id="adminMitarbeitername" placeholder="z.B. Klaus" style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
+                    </div>
+
+                    <div style="margin-bottom: 25px;">
+                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">🔑 Admin-Passwort</label>
+                        <input type="password" id="adminPassword" placeholder="Admin-Passwort..." style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
+                    </div>
+
+                    <div id="adminErrorBox" style="display: none; background: #ffe0e0; border: 2px solid #ff6b6b; border-radius: 10px; padding: 15px; margin-bottom: 20px; color: #c92a2a; font-size: 14px; font-weight: bold; text-align: center;">
+                        <span id="adminErrorMessage"></span>
+                    </div>
+
+                    <div id="adminSuccessBox" style="display: none; background: #e6ffed; border: 2px solid #51cf66; border-radius: 10px; padding: 15px; margin-bottom: 20px; color: #2f9e44; font-size: 14px; font-weight: bold; text-align: center;">
+                        <span id="adminSuccessMessage"></span>
+                    </div>
+
+                    <button onclick="addNewEmployee()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; margin-bottom: 12px;">✅ Mitarbeiter erstellen</button>
+
+                    <button onclick="backToLogin()" style="width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">← Zurück</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="recordingPhase" class="phase">
+            <div class="recording-section" style="position: relative;">
+                <!-- Hauptinhalt mittig -->
+                <p>Klicke auf den Button und sprich die Palette ein</p>
+                <button id="recordingButton" onclick="toggleRecording()">🎤 Aufnahme starten</button>
+                <p id="status"></p>
+
+                <!-- Manuelle Eingabe Button -->
+                <button onclick="openManualInput()" style="margin-top: 15px; padding: 15px 40px; background: #ff9800; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; max-width: 300px;">✏️ Manuell eingeben</button>
+
+                <!-- Übersicht-Button unten mittig -->
+                <button onclick="showOverview()" style="margin-top: 15px; margin-bottom: 30px; padding: 15px 40px; background: #51cf66; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; max-width: 300px;">📊 Übersicht</button>
+
+                <!-- V1.382 schwarz, fett, unten in der mitte UNTER Übersicht Button -->
+                <span style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); font-size: 14px; color: #000; font-weight: bold;">V1.382</span>
+            </div>
+        </div>
+
+        <div id="reviewPhase" class="phase">
+            <div class="review-section">
+                <p class="review-label">📝 Erkannter Text - Bitte überprüfen und korrigieren:</p>
+
+                <!-- EDITIERBARE KUNDENINFORMATIONEN -->
+                <div style="background: #f0f4ff; border: 2px solid #667eea; border-radius: 12px; padding: 20px; margin: 20px 0;">
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 8px;">👤 Kundenname:</label>
+                        <input type="text" id="editCustomerName" placeholder="Kundenname eingeben..." style="width: 100%; padding: 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                    </div>
+
+                    <div>
+                        <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 8px;">🔢 Kundennummer (optional):</label>
+                        <input type="text" id="editCustomerNumber" placeholder="Kundennummer eingeben..." style="width: 100%; padding: 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                    </div>
+                </div>
+
+                <p class="review-label" style="margin-top: 20px;">📋 Erkannter Volltext:</p>
+                <div id="textDisplay" class="text-display"></div>
+
+                <div id="errorBox" style="display: none;" class="error-box">
+                    <span id="errorMessage"></span>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-save" onclick="saveToSupabase()" id="saveBtn">✅ Speichern</button>
+                    <button class="btn btn-discard" onclick="discardAndRestart()">❌ Verwerfen</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="successPhase" class="phase">
+            <div class="success-section">
+                <div class="success-icon">✅</div>
+                <p class="success-message">Erfolgreich gespeichert!</p>
+
+                <!-- ZUSAMMENFASSUNG -->
+                <div id="successSummary" style="background: #f0f9ff; border: 2px solid #51cf66; border-radius: 12px; padding: 20px; margin: 20px 0; text-align: left;">
+                    <!-- wird dynamisch gefüllt -->
+                </div>
+
+                <button id="newRecordingButton" onclick="restartRecording()">← Zurück</button>
+            </div>
+        </div>
+
+        <!-- EBENE 1: KUNDENLISTE (Kompakte Liste) -->
+        <div id="kundenlistePhase" class="phase">
+            <div class="kundenliste-section">
+                <div class="kundenliste-header">
+                    <h2>📊 Kundenliste</h2>
+                    <button class="nav-back-btn" onclick="backToRecording()">← Zurück</button>
+                </div>
+                <div id="kundenlisteContainer" class="kundenliste-grid">
+                    <!-- wird dynamisch gefüllt -->
+                </div>
+            </div>
+        </div>
+
+        <!-- EBENE 2: KUNDENDETAILS (Bearbeitbare Paletten) -->
+        <div id="kundendetailPhase" class="phase">
+            <div class="kundendetail-section">
+                <div class="kundendetail-header">
+                    <h2 id="detailCustomerTitle">📦 Kundendetails</h2>
+                    <button class="nav-back-btn" onclick="backToCustomerList()">← Zurück</button>
+                </div>
+                <div id="kundendetailContainer" class="kundendetail-list">
+                    <!-- wird dynamisch gefüllt -->
+                </div>
+            </div>
+        </div>
+
+        <!-- EBENE 3: PALETTENHISTORIE (Transaktionszeitleiste) -->
+        <div id="paletteHistoriePhase" class="phase">
+            <div class="palettehistorie-section">
+                <div class="palettehistorie-header">
+                    <h2 id="historieTitle">⏱️ Palettenhistorie</h2>
+                    <button class="nav-back-btn" onclick="backToCustomerDetail()">← Zurück</button>
+                </div>
+                <div id="paletteHistorieContainer" class="palettehistorie-list">
+                    <!-- wird dynamisch gefüllt -->
+                </div>
+            </div>
+        </div>
+
+        <!-- MANUELLE EINGABE PHASE -->
+        <div id="manualInputPhase" class="phase">
+            <div class="recording-section">
+                <h2>✏️ Manuelle Eingabe</h2>
+                <p style="color: #666; font-size: 14px; margin-bottom: 20px;">Geben Sie die Palettenart und Anzahl ein</p>
+
+                <!-- PALETTENART DROPDOWN -->
+                <div style="margin-bottom: 25px;">
+                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">📦 Palettenart:</label>
+                    <select id="manualPaletteType" style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box; background: white; cursor: pointer;">
+                        <option value="">-- Palettenart auswählen --</option>
+                    </select>
+                </div>
+
+                <!-- KUNDENNAME -->
+                <div style="margin-bottom: 25px;">
+                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">👤 Kundenname:</label>
+                    <input type="text" id="manualCustomerName" placeholder="Kundenname eingeben..." style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
+                </div>
+
+                <!-- KUNDENNUMMER (OPTIONAL) -->
+                <div style="margin-bottom: 25px;">
+                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">🔢 Kundennummer (optional):</label>
+                    <input type="text" id="manualCustomerNumber" placeholder="Kundennummer eingeben..." style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
+                </div>
+
+                <!-- AKTION (Zu-/Abgang) -->
+                <div style="margin-bottom: 25px;">
+                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">⚡ Aktion:</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button id="manualActionAdd" onclick="setManualAction('add')" style="padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; background: white; color: #667eea; transition: all 0.3s;">➕ Zugang</button>
+                        <button id="manualActionRemove" onclick="setManualAction('remove')" style="padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; background: white; color: #667eea; transition: all 0.3s;">➖ Abgang</button>
+                    </div>
+                </div>
+
+                <!-- ANZAHL -->
+                <div style="margin-bottom: 30px;">
+                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">📊 Anzahl:</label>
+                    <input type="number" id="manualQuantity" placeholder="z.B. 5" min="1" value="1" style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
+                </div>
+
+                <!-- BUTTONS -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 30px;">
+                    <button onclick="saveManualInput()" style="padding: 15px; background: #51cf66; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s;">✅ Speichern</button>
+                    <button onclick="cancelManualInput()" style="padding: 15px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s;">❌ Abbrechen</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- KUNDE BESTÄTIGUNG MODAL -->
+        <div id="customerConfirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
+            <div style="background: white; border-radius: 20px; padding: 30px; max-width: 500px; text-align: center;">
+                <h2 style="margin-bottom: 20px; color: #333;">👤 Ist das der gleiche Kunde?</h2>
+                <p id="customerConfirmQuestion" style="font-size: 18px; color: #666; margin-bottom: 30px;"></p>
+
+                <div style="display: flex; gap: 15px; justify-content: center;">
+                    <button onclick="confirmSameCustomer()" style="flex: 1; padding: 15px; background: #51cf66; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">✅ Ja, gleicher Kunde</button>
+                    <button onclick="rejectSameCustomer()" style="flex: 1; padding: 15px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">❌ Nein, neuer Kunde</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PALETTE AUSWAHL MODAL -->
+        <div id="paletteSelectionModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
+            <div style="background: white; border-radius: 20px; padding: 30px; max-width: 90%; max-height: 90vh; overflow-y: auto;">
+                <h2 style="text-align: center; margin-bottom: 20px; color: #333;">🎯 Bitte wähle die Palettenart:</h2>
+                <div id="paletteButtonsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                    <!-- Buttons werden dynamisch generiert -->
+                </div>
+                <button onclick="cancelPaletteSelection()" style="width: 100%; padding: 15px; margin-top: 20px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">❌ Verwerfen</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // GROQ API Key wird von Backend bereitgestellt (sicherer als hardcodiert!)
+        // 🔐 GROQ API wird jetzt über Backend-Proxy aufgerufen (sicherer!)
+        // const GROQ_API_KEY wird NICHT mehr im Frontend genutzt
+
+        // ============================================
+        // PALETTENLISTE MIT SYNONYMEN
+        // ============================================
+        const PALETTENLISTE = {
+            // Neue Palettenarten
+            'Grafepalette': ['grafe', 'grafe-palette', 'grafepalette'],
+            'Steinzeug Gitterbox': ['steinzeug gitterbox', 'steinzeug-gitterbox', 'stg gitterbox'],
+            'Steinzeugpalette klein': ['steinzeugpalette klein', 'steinzeug klein', 'stg klein'],
+            'Steinzeugpalette groß': ['steinzeugpalette groß', 'steinzeug groß', 'stg groß'],
+            'Europalette 2': ['europalette zwei', 'euro zwei', 'europalette 2'],
+            'Europalette 3': ['europalette drei', 'euro drei', 'europalette 3'],
+            'Spezialpalette': ['spezial', 'spezialpalette', 'spezial-palette'],
+            'Velux-Palette': ['velux', 'velux-palette', 'veluxpalette'],
+            // Bestehende Palettenarten
+            'Europalette': ['euro', 'euro-palette', 'epal', 'eur', 'europool', 'flachpalette', 'fp'],
+            'Ziegelpalette': ['ziegel', 'ziegel-palette'],
+            'Gipskartonpalette': ['gipskarton', 'gipskarton-palette', 'gkb', 'gkb-palette'],
+            'Fermacellpalette': ['fermacell', 'fels', 'felspalette', 'fels-palette'],
+            'Gitterbox': ['gitterboxpalette', 'gkr-palette', 'gitterbox', 'gitter-box', 'gkr', 'pvc gitterbox'],
+            'MUHR-Palette': ['muhr'],
+            'Steinzeugpalette': ['steinzeug', 'steinzeug-palette', 'stg', 'stg box', 'stg gitterbox'],
+            'EHL-Palette': ['ehl'],
+            'Eder-Palette': ['eder'],
+            'Limex-Palette': ['limex'],
+            'KS-Palette': ['ks', 'kalksandstein', 'kalk-sandstein'],
+            'Porenbetonpalette': ['porenbeton', 'gasbeton', 'ytong', 'h+h', 'torenbeton'],
+            'KB-Palette': ['kb', 'klinker', 'klinkerpalette']
+        };
+
+        // ============================================
+        // PALETTEN-ERKENNUNGSFUNKTION
+        // ============================================
+        function normalisierePalette(text) {
+            if (!text) return null;
+
+            const normalized = text.toLowerCase().trim();
+
+            // Exakte Treffer zuerst
+            for (let [standard, synonyme] of Object.entries(PALETTENLISTE)) {
+                if (synonyme.includes(normalized)) {
+                    return { gefunden: true, palette: standard, kandidaten: null };
+                }
+            }
+
+            // Teilstring-Treffer (wenn Wort in Text vorkommt)
+            const kandidaten = [];
+            for (let [standard, synonyme] of Object.entries(PALETTENLISTE)) {
+                for (let synonym of synonyme) {
+                    // Prüfe ob Synonym als ganzes Wort im Text vorkommt
+                    if (normalized.includes(synonym)) {
+                        if (!kandidaten.find(k => k === standard)) {
+                            kandidaten.push(standard);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            if (kandidaten.length === 1) {
+                return { gefunden: true, palette: kandidaten[0], kandidaten: null };
+            }
+
+            if (kandidaten.length > 1) {
+                return { gefunden: false, palette: null, kandidaten: kandidaten };
+            }
+
+            // Nichts gefunden
+            return { gefunden: false, palette: null, kandidaten: null };
+        }
+
+        // ============================================
+        // VARIABLEN
+        // ============================================
+        let isRecording = false;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let recognizedText = "";
+        let audioStream = null;
+        let wartendeAuswahlPaletten = [];
+        let selectedPalette = null;
+        let aktuelleAuswahlPalette = null;  // 🎯 SPEICHERE DIE AKTUELLEN DATEN VOR DEM LÖSCHEN
+        let erkannteAuswahlPaletten = [];   // 🎯 SPEICHERE BEREITS ERKANNTE PALETTEN aus validateText()
+
+        // Kundenbestätigung
+        let wartendeKundenZuBestaetigung = null;
+        let selectedCustomerName = null;
+
+        // Login & Mitarbeiter
+        let mitarbeiterName = null;
+
+        // ============================================
+        // 📱 DEVICE-DETECTION FÜR MOBILE-KOMPATIBILITÄT
+        // ============================================
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isAndroid = /Android/.test(navigator.userAgent);
+        const isMobile = isIOS || isAndroid;
+        const hasGetUserMedia = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+        const isHTTPS = location.protocol === 'https:';
+
+        // Zeige Device-Info in Console für Debugging
+        console.log('📱 Device-Info:', {
+            device: isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop',
+            isMobile,
+            hasGetUserMedia,
+            isHTTPS,
+            userAgent: navigator.userAgent.substring(0, 80)
+        });
+
+        // ============================================
+        // 🎤 WEB SPEECH API INITIALISIERUNG
+        // ============================================
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+
+        // 🔧 iOS FIX: Funktion zum Neu-Initialisieren der Recognition
+        function initializeRecognition() {
+            console.log('🔧 Initialisiere Recognition-Objekt neu...');
+            try {
+                // Stoppe alte Recognition falls noch aktiv
+                if (recognition) {
+                    try {
+                        recognition.stop();
+                        recognition.abort();
+                    } catch (e) {}
+                }
+
+                // Erstelle neues Recognition-Objekt
+                if (SpeechRecognition) {
+                    recognition = new SpeechRecognition();
+                    recognition.continuous = false;
+                    recognition.interimResults = true;
+                    recognition.lang = 'de-DE';
+                    console.log('✅ Neues Recognition-Objekt erstellt');
+                } else {
+                    console.warn('⚠️ SpeechRecognition nicht verfügbar');
+                }
+            } catch (err) {
+                console.error('🔴 Fehler beim Initialisieren von Recognition:', err);
+            }
+        }
+
+        if (SpeechRecognition) {
+            initializeRecognition();
+            console.log('✅ Web Speech API verfügbar');
+        } else {
+            console.warn('⚠️ Web Speech API nicht verfügbar - Fallback zu MediaRecorder');
+        }
+
+        // 🔐 OPTIONAL: Microphone-Berechtigung pre-check für iOS
+        async function ensureMicrophonePermission() {
+            if (!hasGetUserMedia) {
+                console.warn('⚠️ getUserMedia nicht verfügbar');
+                return false;
+            }
+
+            try {
+                console.log('🔐 Prüfe Mikrophon-Berechtigung...');
+                const testStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+                // Sofort alle Tracks stoppen - wir brauchen nur die Permission
+                testStream.getTracks().forEach(track => {
+                    console.log('✅ Track gestoppt:', track.kind);
+                    track.stop();
+                });
+
+                console.log('✅ Mikrophon-Berechtigung erteilt');
+                return true;
+            } catch (err) {
+                console.warn('⚠️ Mikrophon-Berechtigung verweigert:', err.message);
+                return false;
+            }
+        }
+
+        async function toggleRecording() {
+            if (!isRecording) startRecording();
+            else stopRecording();
+        }
+
+        async function startRecording() {
+            try {
+                // 📱 DEBUG: Zeige Device-Info für Debugging
+                console.log('🎤 Starte Aufnahme mit folgenden Bedingungen:', {
+                    device: isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop',
+                    browser: /Safari/.test(navigator.userAgent) ? 'Safari' : /Chrome/.test(navigator.userAgent) ? 'Chrome' : 'Andere',
+                    isHTTPS: location.protocol === 'https:',
+                    hasGetUserMedia: hasGetUserMedia,
+                    recognitionAvailable: !!recognition
+                });
+
+                // 📱 iOS FIX: Stoppe Watchdog wenn Aufnahme startet
+                if (microphoneTimeoutId) {
+                    clearTimeout(microphoneTimeoutId);
+                    microphoneTimeoutId = null;
+                    console.log('⏰ Watchdog gestoppt - Aufnahme startet');
+                }
+
+                // 🎤 NUTZE WEB SPEECH API (Browser-native, beste Compatibility auf Mobile)
+                if (!recognition) {
+                    showError("⚠️ Spracherkennung wird von deinem Browser nicht unterstützt! Nutze Safari auf iOS oder Chrome auf Android.");
+                    return;
+                }
+
+                // 🛑 Stoppe evtl. alte Recognition bevor neue startet
+                try {
+                    recognition.stop();
+                } catch (e) {}
+
+                console.log('🎤 Starte Web Speech API auf:', isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop');
+
+                isRecording = true;
+                let finalTranscript = '';
+
+                const btn = document.getElementById("recordingButton");
+                btn.textContent = "🔴 Aufnahme läuft - jetzt sprechen!";
+                btn.classList.add("recording");
+
+                const status = document.getElementById("status");
+                status.textContent = "🎧 Höre zu...";
+                status.className = "status-recording";
+
+                // 🎤 EVENT: Wenn Spracherkennung startet
+                recognition.onstart = () => {
+                    console.log('✅ Web Speech API aktiviert');
+                    status.textContent = "🎧 Höre zu...";
+                };
+
+                // 🎤 EVENT: Text erkannt (inkl. Zwischenergebnisse)
+                recognition.onresult = (event) => {
+                    let interimTranscript = '';
+
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const transcript = event.results[i][0].transcript;
+
+                        if (event.results[i].isFinal) {
+                            finalTranscript += transcript + ' ';
+                            console.log('✅ Final Text:', transcript);
+                        } else {
+                            interimTranscript += transcript;
+                            console.log('🔄 Interim Text:', transcript);
+                        }
+                    }
+
+                    // Zeige Zwischenergebnis + Final
+                    const displayText = interimTranscript || finalTranscript;
+                    console.log('📝 Zeige:', displayText);
+                    status.textContent = `🎧 Erkannt: ${displayText}`;
+                };
+
+                // 🔴 EVENT: Fehler bei Spracherkennung
+                recognition.onerror = (event) => {
+                    console.error('🔴 Speech Recognition Fehler:', event.error);
+                    console.error('   Device:', isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop');
+
+                    // 🔐 iOS FIX: Gebe Mikrofon auch bei Fehler frei!
+                    console.log('🎤 Gebe Mikrofon frei nach Fehler...');
+                    stopAllAudio();
+                    releaseAudioResources();
+
+                    let errorMsg = `Fehler: ${event.error}`;
+
+                    if (event.error === 'no-speech') {
+                        errorMsg = '❌ Keine Sprache erkannt - bitte laut und deutlich sprechen!';
+                    } else if (event.error === 'audio-capture') {
+                        // 🎙️ Device-spezifische Hinweise für audio-capture Fehler
+                        if (isIOS) {
+                            errorMsg = '🎙️ iOS Mikrofon-Fehler: Probiere die Aufnahme neu oder nutze eine andere App.';
+                        } else if (isAndroid) {
+                            errorMsg = '🎙️ Android Mikrofon-Fehler: Überprüfe die App-Berechtigung in den Einstellungen.';
+                        } else {
+                            errorMsg = '🎙️ Mikrophon-Fehler - Berechtigung erteilt? Probiere neu!';
+                        }
+                    } else if (event.error === 'network') {
+                        errorMsg = '🌐 Netzwerk-Fehler - überprüfe deine Internet-Verbindung';
+                    } else if (event.error === 'bad-grammar') {
+                        errorMsg = '🎤 Sprache nicht verstanden - bitte deutlich sprechen';
+                    } else if (event.error === 'service-not-allowed') {
+                        errorMsg = '⚠️ Speech Recognition ist nicht verfügbar - bitte später erneut versuchen';
+                    }
+
+                    console.error('🔴 Zeige Error:', errorMsg);
+                    showError(errorMsg);
+                    isRecording = false;
+                    btn.textContent = "🎤 Aufnahme starten";
+                    btn.classList.remove("recording");
+                    btn.disabled = false;
+                };
+
+                // ✅ EVENT: Spracherkennung beendet - WICHTIG!
+                recognition.onend = () => {
+                    console.log('✅ Recognition onend() aufgerufen');
+                    console.log('   finalTranscript =', finalTranscript);
+                    console.log('   trimmed =', finalTranscript.trim());
+
+                    // 🔐 iOS FIX: Gebe Mikrofon SOFORT frei wenn Aufnahme endet!
+                    // NICHT WARTEN auf processWithGroq()
+                    console.log('🎤 Gebe Mikrofon SOFORT frei nach Aufnahmeende...');
+                    stopAllAudio();
+                    releaseAudioResources();
+
+                    if (finalTranscript.trim() && finalTranscript.trim().length > 0) {
+                        console.log('📤 Rufe processWithGroq auf mit:', finalTranscript.trim());
+                        // Schicke erkannten Text zu Groq für Strukturierung
+                        processWithGroq(finalTranscript.trim());
+                    } else {
+                        console.warn('⚠️ Kein Text erkannt - finalTranscript ist leer');
+                        showError('❌ Keine Sprache erkannt - versuche es nochmal!');
+                        btn.textContent = "🎤 Aufnahme starten";
+                        btn.classList.remove("recording");
+                        btn.disabled = false;
+                    }
+
+                    isRecording = false;
+                };
+
+                // 🚀 STARTE SPRACHERKENNUNG
+                console.log('🚀 Starte recognition.start()');
+                recognition.start();
+
+            } catch (err) {
+                console.error('🔴 Fehler beim Starten der Aufnahme:', err);
+                console.error('   Error name:', err.name);
+                console.error('   Device:', isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop');
+
+                let userMsg = "Mikrofon konnte nicht aktiviert werden: " + err.message;
+
+                const errorName = err.name || "";
+                const errorMsg = err.message ? err.message.toLowerCase() : "";
+
+                // 🔐 Bessere Fehlerbehandlung für verschiedene Geräte
+                if (errorName === "NotAllowedError" || errorMsg.includes("permission")) {
+                    if (isIOS) {
+                        userMsg = "🔐 iOS: Bitte erteile Mikrophon-Zugriff in Einstellungen > Safari > Mikrophon";
+                    } else if (isAndroid) {
+                        userMsg = "🔐 Android: Bitte erteile Mikrophon-Berechtigung in App-Einstellungen";
+                    } else {
+                        userMsg = "🔐 Mikrophon-Berechtigung benötigt - bitte im Berechtigungsdialog 'Erlauben' klicken";
+                    }
+                } else if (errorName === "NotFoundError" || errorMsg.includes("notfound")) {
+                    userMsg = "🎙️ Kein Mikrophon erkannt - bitte verbinde ein externes Gerät";
+                } else if (errorName === "NotSupportedError") {
+                    userMsg = "⚠️ Dein Browser unterstützt Sprachaufnahme nicht (nutze Safari auf iOS oder Chrome auf Android)";
+                } else if (errorName === "SecurityError") {
+                    userMsg = "🔒 Sicherheitsfehler - HTTPS ist erforderlich";
+                }
+
+                console.error('🔴 Zeige Error:', userMsg);
+                showError(userMsg);
+                isRecording = false;
+            }
+        }
+
+        // ============================================
+        // 🛑 ERWEITERTE MICROPHONE-CLEANUP (V1.378+)
+        // ✅ SAUBER: Explizite Nullifizierung, besseres Logging
+        // ✅ CHROME FIX: recognition.stop() IMMER aufrufen (nicht nur wenn isRecording)
+        // ============================================
+        function stopAllAudio() {
+            console.log('🛑 stopAllAudio() aufgerufen');
+            try {
+                // 1. Stop MediaRecorder (falls vorhanden)
+                if (mediaRecorder) {
+                    console.log('⏹️ Stoppe MediaRecorder...');
+                    if (mediaRecorder.state !== 'inactive') {
+                        mediaRecorder.stop();
+                    }
+                    mediaRecorder = null;
+                }
+
+                // 2. Stop Web Speech API (IMMER aufrufen, nicht nur wenn isRecording!)
+                // ✅ FIX: recognition.stop() muss IMMER aufgerufen werden
+                if (recognition) {
+                    try {
+                        console.log('🎤 Stoppe Web Speech Recognition...');
+                        recognition.stop();
+                    } catch (e) {
+                        console.warn('⚠️ Recognition.stop() Fehler:', e.message);
+                    }
+                }
+
+                // 3. Stop alle Audio Tracks EXPLIZIT
+                if (audioStream) {
+                    console.log('🎧 Stoppe Audio Stream Tracks...');
+                    audioStream.getTracks().forEach(track => {
+                        console.log(`   - ${track.kind} track: stopped`);
+                        try {
+                            track.stop();
+                        } catch (trackError) {
+                            console.warn(`   ⚠️ Fehler beim Stoppen: ${trackError.message}`);
+                        }
+                    });
+                    audioStream = null;  // 🎯 WICHTIG: Stream-Referenz nullifizieren
+                    console.log('✅ Alle Audio Tracks gestoppt und freigegeben');
+                }
+
+                isRecording = false;
+
+            } catch (err) {
+                console.error('🔴 Fehler beim Audio-Cleanup:', err.message);
+            }
+        }
+
+        // ============================================
+        // 🧹 HELPER: Gebe ALLE Audio-Ressourcen frei
+        // ============================================
+        function releaseAudioResources() {
+            console.log('🔄 Gebe alle Audio-Ressourcen frei...');
+            try {
+                // Entferne Event-Listener für Audio-Tracks
+                if (audioStream && audioStream.getTracks) {
+                    audioStream.getTracks().forEach(track => {
+                        try {
+                            if (track.onended) track.onended = null;
+                            if (track.onmute) track.onmute = null;
+                            if (track.onunmute) track.onunmute = null;
+                        } catch (e) {
+                            // Ignore cleanup errors
+                        }
+                    });
+                }
+
+                // Stoppe und nullifiziere alle Ressourcen
+                stopAllAudio();
+
+                // Explizite Nullifizierung aller Media-Variablen
+                mediaRecorder = null;
+                audioStream = null;
+                audioChunks = [];
+
+                // 🔐 iOS FIX: Nullifiziere Recognition und erstelle neues Objekt
+                // Das hilft iOS das Mikrofon komplett freizugeben
+                recognition = null;
+                console.log('🔧 Re-initialisiere Recognition für iOS-Kompatibilität...');
+                initializeRecognition();
+
+                console.log('✅ Alle Audio-Ressourcen freigegeben');
+            } catch (err) {
+                console.error('⚠️ Fehler beim Freigeben von Ressourcen:', err);
+            }
+        }
+
+        // 🔐 iOS SPEZIFISCH: Timeout-Cleanup für wenn Device gesperrt wird
+        // iOS sendet visibilitychange nicht zuverlässig beim Sperren
+        let microphoneTimeoutId = null;
+        function startMicrophoneWatchdog() {
+            // Stoppe alten Timeout falls vorhanden
+            if (microphoneTimeoutId) {
+                clearTimeout(microphoneTimeoutId);
+            }
+
+            // Starte neuen Timeout: Nach 5 Sekunden Inaktivität → Cleanup
+            microphoneTimeoutId = setTimeout(() => {
+                console.log('⏰ iOS Watchdog: Stoppe Mikrofon nach Inaktivität');
+                stopAllAudio();
+            }, 5000);
+        }
+
+        // 📵 Event 1: Wenn Handy gesperrt / App minimiert wird
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                console.log('📵 App in Hintergrund - cleanup Audio');
+                // ✅ CHROME FIX: Stoppe IMMER, nicht nur wenn isRecording
+                stopAllAudio();
+            } else {
+                // App kommt zurück: Starte Watchdog
+                console.log('👁️ App zurück - starte Mikrofon-Watchdog');
+                startMicrophoneWatchdog();
+            }
+        });
+
+        // 👋 Event 2: Wenn Benutzer Seite verlässt / Browser-Tab schließt
+        window.addEventListener('pagehide', () => {
+            console.log('👋 Seite wird verlassen - cleanup Microphone');
+            // ✅ CHROME FIX: Stoppe IMMER
+            stopAllAudio();
+        });
+
+        // 🔄 Event 3: Wenn Browser-Tab aktualisiert wird
+        window.addEventListener('beforeunload', () => {
+            if (recognition) recognition.stop();
+            stopAllAudio();
+        });
+
+        // 📱 Event 4: iOS-spezifisch - beim Fokus verlieren
+        window.addEventListener('blur', () => {
+            console.log('💤 Window blur - iOS Watchdog startet');
+            startMicrophoneWatchdog();
+        });
+
+        window.addEventListener('focus', () => {
+            console.log('👁️ Window focus - iOS Watchdog gestoppt');
+            if (microphoneTimeoutId) {
+                clearTimeout(microphoneTimeoutId);
+                microphoneTimeoutId = null;
+            }
+        });
+
+        function stopRecording() {
+            if (recognition && isRecording) {
+                recognition.stop();
+                isRecording = false;
+
+                const btn = document.getElementById("recordingButton");
+                btn.textContent = "🎤 Aufnahme starten";
+                btn.classList.remove("recording");
+                btn.disabled = true;
+
+                const status = document.getElementById("status");
+                status.textContent = "Wird verarbeitet...";
+                status.className = "status-processing";
+            }
+        }
+
+        // ============================================
+        // 🧹 TEXT MIT GROQ STRUKTURIEREN (nicht Audio!)
+        // ============================================
+        async function processWithGroq(rohText) {
+            console.log('🧹 processWithGroq() aufgerufen mit:', rohText);
+
+            // ✅ CHROME FIX: Gebe Mikrofon SOFORT frei sobald Verarbeitung startet!
+            console.log('🎤 Gebe Mikrofon frei nach Aufnahme...');
+            stopAllAudio();
+
+            const status = document.getElementById("status");
+            status.textContent = "🧹 Strukturiere mit Backend...";
+
+            try {
+                console.log('📤 Sende Text zum Backend-Proxy: ' + rohText.substring(0, 100));
+
+                // 🔐 NUTZE BACKEND-PROXY STATT DIREKTER GROQ-AUFRUF (sicherer!)
+                const backendRes = await fetch("/api/structure-text", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        text: rohText
+                    })
+                });
+
+                console.log('📨 Backend Response Status:', backendRes.status);
+
+                const backendData = await backendRes.json();
+                console.log('📨 Backend Response:', backendData);
+
+                if (!backendRes.ok || !backendData.success) {
+                    const errorMsg = backendData.error || 'Unbekannter Fehler';
+                    console.error('🔴 Backend Fehler:', errorMsg);
+                    throw new Error(errorMsg);
+                }
+
+                recognizedText = backendData.text;
+                console.log('✅ Backend strukturiert:', recognizedText.substring(0, 150));
+
+                // Zeige Review-Phase
+                console.log('📋 Rufe showReviewPhase auf');
+                showReviewPhase(recognizedText);
+
+            } catch (err) {
+                console.error('❌ processWithGroq Fehler:', err);
+                console.error('   Message:', err.message);
+                console.error('   Stack:', err.stack);
+
+                // 🔴 ZEIGE FEHLER DIREKT AUF BILDSCHIRM FÜR DEBUGGING
+                const errorMsg = `
+❌ GROQ FEHLER:
+
+${err.message}
+
+📝 Erkannter Text war:
+"${rohText}"
+
+💡 Mögliche Lösung:
+- Refresh die Seite (F5)
+- Versuche es nochmal
+- Sprich langsamer/deutlicher
+                `;
+
+                status.textContent = errorMsg;
+                status.style.whiteSpace = "pre-wrap";
+                status.style.textAlign = "left";
+                status.style.fontSize = "12px";
+                status.style.color = "#d32f2f";
+                status.style.background = "#ffebee";
+                status.style.padding = "10px";
+                status.style.borderRadius = "5px";
+
+                showError("Groq API Fehler: " + err.message);
+
+                const btn = document.getElementById("recordingButton");
+                if (btn) {
+                    btn.textContent = "🎤 Aufnahme starten";
+                    btn.disabled = false;
+                    btn.classList.remove("recording");
+                }
+            }
+        }
+
+
+        function erstelleNormalisierthenText(text) {
+            // Erstelle eine Version mit normalisierten Palettennamen
+            const lines = text.split('\n');
+            let normalisierterText = '';
+            let kundenname = '';
+            let kundennummer = '';
+            let aktion = '';
+
+            // Erste Phase: Parse Kundeninfo
+            for (let line of lines) {
+                if (line.startsWith('Kundenname:')) {
+                    kundenname = line.replace('Kundenname:', '').trim();
+                    normalisierterText += line + '\n';
+                } else if (line.startsWith('Kundennummer:')) {
+                    kundennummer = line.replace('Kundennummer:', '').trim();
+                    normalisierterText += line + '\n';
+                } else if (line.startsWith('Aktion:')) {
+                    aktion = line.replace('Aktion:', '').trim();
+                    normalisierterText += line + '\n';
+                } else if (line.startsWith('Palettenart:')) {
+                    // 🎯 NORMALISIERE PALETTENART
+                    const palettenartRaw = line.replace('Palettenart:', '').trim();
+                    const erkennungsResult = normalisierePalette(palettenartRaw);
+
+                    if (erkennungsResult.gefunden) {
+                        // Zeige normalisierte Version
+                        normalisierterText += `Palettenart: ${erkennungsResult.palette}\n`;
+                    } else {
+                        // Falls nicht normalisiert, zeige Original
+                        normalisierterText += line + '\n';
+                    }
+                } else if (line.startsWith('Menge:') || line.startsWith('---')) {
+                    normalisierterText += line + '\n';
+                } else if (line.trim() !== '') {
+                    normalisierterText += line + '\n';
+                }
+            }
+
+            return normalisierterText;
+        }
+
+        function showReviewPhase(text) {
+            document.querySelectorAll(".phase").forEach(p => p.classList.remove("active"));
+            document.getElementById("reviewPhase").classList.add("active");
+
+            // 🎯 ZEIGE NORMALISIERTEN TEXT MIT KORREKTEN PALETTENNAMEN
+            const normalisierterText = erstelleNormalisierthenText(text);
+            document.getElementById("textDisplay").textContent = normalisierterText;
             document.getElementById("errorBox").style.display = "none";
 
             // Parse Kundenname und Kundennummer aus dem ORIGINAL-Text
