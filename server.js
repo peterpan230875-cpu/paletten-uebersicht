@@ -1225,6 +1225,11 @@ app.get('/modern', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index-modern.html'));
 });
 
+// Route für V2 - Complete Redesign
+app.get('/v2', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/index-v2.html'));
+});
+
 // ============================================
 // SERVER START
 // ============================================
