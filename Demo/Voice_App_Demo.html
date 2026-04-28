@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voice Assistant - App Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0F0F0F;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ============================================
+       HEADER (Fest oben, überall gleich)
+       ============================================ */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: #1a1a1a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 100;
+      border-bottom: 1px solid #333;
+    }
+
+    .header-left {
+      width: 32px;
+      height: 32px;
+    }
+
+    .palette-icon {
+      width: 32px;
+      height: 32px;
+      color: #00D4FF;
+      stroke-width: 2;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .palette-icon:hover {
+      color: #00E6FF;
+    }
+
+    .header-center {
+      flex: 1;
+      text-align: center;
+      color: #FFFFFF;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .username {
+      color: #CCCCCC;
+      font-size: 14px;
+      max-width: 150px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .logout-btn {
+      padding: 8px 16px;
+      background: #4A90E2;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+
+    .logout-btn:hover {
+      background: #2E5C99;
+    }
+
+    .logout-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* ============================================
+       CONTENT-BOX (Weiß, zentriert)
+       ============================================ */
+    .content-box {
+      width: 90%;
+      max-width: 500px;
+      margin: 100px auto 20px;
+      padding: 30px 20px;
+      background: #FFFFFF;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .page {
+      width: 100%;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .page.active {
+      display: flex;
+    }
+
+    /* ============================================
+       SEITE 1: AUFNAHME-ANIMATION
+       ============================================ */
+    .recording-page {
+      justify-content: center;
+      gap: 30px;
+    }
+
+    .pulse-container {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pulse-circle {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4A90E2, #00D4FF);
+      animation: pulse 1.5s ease-out infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        width: 120px;
+        height: 120px;
+        opacity: 1;
+      }
+      40% {
+        width: 180px;
+        height: 180px;
+        opacity: 0.7;
+      }
+      100% {
+        width: 240px;
+        height: 240px;
+        opacity: 0;
+      }
+    }
+
+    .microphone {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      z-index: 10;
+      color: white;
+      stroke: white;
+      fill: none;
+    }
+
+    .status-text {
+      color: #666666;
+      font-size: 14px;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .stop-btn {
+      width: 100%;
+      max-width: 300px;
+      padding: 12px 24px;
+      background: #E74C3C;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 20px;
+    }
+
+    .stop-btn:hover {
+      background: #C0392B;
+    }
+
+    .stop-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* ============================================
+       SEITE 2: MANUELLER INPUT
+       ============================================ */
+    .input-page {
+      width: 100%;
+      gap: 15px;
+    }
+
+    .input-page h3 {
+      color: #333333;
+      font-size: 18px;
+      margin-bottom: 10px;
+      width: 100%;
+    }
+
+    .text-input {
+      width: 100%;
+      min-height: 60px;
+      padding: 12px 16px;
+      border: 2px solid #CCCCCC;
+      border-radius: 4px;
+      font-size: 16px;
+      font-family: inherit;
+      color: #333333;
+      resize: none;
+      transition: border-color 0.2s;
+    }
+
+    .text-input:focus {
+      outline: none;
+      border-color: #4A90E2;
+      box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    }
+
+    .text-input::placeholder {
+      color: #999999;
+    }
+
+    .send-btn {
+      width: 100%;
+      padding: 12px 24px;
+      background: #4A90E2;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      min-height: 48px;
+    }
+
+    .send-btn:hover {
+      background: #2E5C99;
+    }
+
+    .send-btn:active {
+      transform: scale(0.98);
+    }
+
+    .back-btn {
+      width: 100%;
+      max-width: 300px;
+      padding: 10px 20px;
+      background: #F5F5F5;
+      color: #333333;
+      border: 2px solid #CCCCCC;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      min-height: 40px;
+    }
+
+    .back-btn:hover {
+      background: #E8E8E8;
+    }
+
+    /* ============================================
+       SEITE 3: START-SCREEN
+       ============================================ */
+    .start-page {
+      gap: 30px;
+      justify-content: center;
+    }
+
+    .button-primary {
+      width: 100%;
+      max-width: 300px;
+      padding: 20px 40px;
+      background: linear-gradient(135deg, #4A90E2, #00D4FF);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 20px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.1s;
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+    }
+
+    .button-primary:hover {
+      box-shadow: 0 6px 20px rgba(74, 144, 226, 0.6);
+    }
+
+    .button-primary:active {
+      transform: scale(0.98);
+    }
+
+    .button-secondary {
+      width: 100%;
+      max-width: 250px;
+      padding: 12px 24px;
+      background: #F5F5F5;
+      color: #333333;
+      border: 2px solid #CCCCCC;
+      border-radius: 4px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .button-secondary:hover {
+      background: #E8E8E8;
+    }
+
+    /* ============================================
+       NAVIGATION (zum Umschalten der Seiten)
+       ============================================ */
+    .nav-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      padding: 10px 16px;
+      background: #333333;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .nav-btn.active {
+      background: #4A90E2;
+    }
+
+    .nav-btn:hover {
+      background: #4A90E2;
+    }
+
+    /* ============================================
+       RESPONSIVE
+       ============================================ */
+    @media (max-width: 600px) {
+      .header {
+        height: 60px;
+        padding: 0 15px;
+      }
+
+      .header-left, .palette-icon {
+        width: 28px;
+        height: 28px;
+      }
+
+      .header-center {
+        font-size: 14px;
+      }
+
+      .username {
+        display: none;
+      }
+
+      .logout-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+
+      .content-box {
+        width: 95%;
+        margin-top: 80px;
+        padding: 20px 15px;
+        min-height: 350px;
+      }
+
+      .pulse-circle {
+        width: 100px;
+        height: 100px;
+      }
+
+      @keyframes pulse {
+        0% {
+          width: 100px;
+          height: 100px;
+          opacity: 1;
+        }
+        40% {
+          width: 160px;
+          height: 160px;
+          opacity: 0.7;
+        }
+        100% {
+          width: 220px;
+          height: 220px;
+          opacity: 0;
+        }
+      }
+
+      .microphone {
+        width: 32px;
+        height: 32px;
+      }
+
+      .button-primary {
+        font-size: 18px;
+        min-height: 60px;
+        max-width: 100%;
+      }
+
+      .button-secondary {
+        max-width: 100%;
+        font-size: 14px;
+        min-height: 45px;
+      }
+
+      .stop-btn {
+        min-height: 45px;
+        font-size: 15px;
+      }
+    }
+
+    @media (max-height: 800px) {
+      .content-box {
+        min-height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- HEADER (überall gleich) -->
+  <header class="header">
+    <div class="header-left">
+      <svg class="palette-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="1"/>
+        <path d="M4.5 8.5c0 1.657 1.343 3 3 3s3-1.343 3-3-1.343-3-3-3-3 1.343-3 3z"/>
+        <path d="M2.5 20s.5-1 2.5-1 3 1 5 1 3-1 5-1 3 1 5 1 2 1 2 1"/>
+      </svg>
+    </div>
+    <div class="header-center">Voice Assistant</div>
+    <div class="header-right">
+      <span class="username">Max Mustermann</span>
+      <button class="logout-btn">Logout</button>
+    </div>
+  </header>
+
+  <!-- Seiten-Umschalter (zum Testen) -->
+  <div class="nav-buttons">
+    <button class="nav-btn active" onclick="showPage('recording')">Seite 1: Aufnahme</button>
+    <button class="nav-btn" onclick="showPage('input')">Seite 2: Input</button>
+    <button class="nav-btn" onclick="showPage('start')">Seite 3: Start</button>
+  </div>
+
+  <!-- CONTENT-BOX (wechselt je nach Seite) -->
+  <div class="content-box">
+
+    <!-- SEITE 1: AUFNAHME-ANIMATION -->
+    <div class="page recording-page active" id="recording">
+      <div class="pulse-container">
+        <div class="pulse-circle"></div>
+        <svg class="microphone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 1a3 3 0 0 0-3 3v12a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/>
+          <line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+      </div>
+      <p class="status-text">Aufnahme läuft...</p>
+      <button class="stop-btn">Stopp</button>
+    </div>
+
+    <!-- SEITE 2: MANUELLER INPUT -->
+    <div class="page input-page" id="input">
+      <h3>Text eingeben</h3>
+      <textarea class="text-input" placeholder="Hier tippen..."></textarea>
+      <button class="send-btn">Senden</button>
+      <button class="back-btn">← Zurück</button>
+    </div>
+
+    <!-- SEITE 3: START-SCREEN -->
+    <div class="page start-page" id="start">
+      <button class="button-primary">🎤 Aufnahme starten</button>
+      <button class="button-secondary">⌨️ Manuell eingeben</button>
+    </div>
+
+  </div>
+
+  <script>
+    function showPage(pageId) {
+      // Verstecke alle Seiten
+      document.querySelectorAll('.page').forEach(p => {
+        p.classList.remove('active');
+      });
+
+      // Zeige gewählte Seite
+      document.getElementById(pageId).classList.add('active');
+
+      // Update Nav-Buttons
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+    }
+  </script>
+</body>
+</html>

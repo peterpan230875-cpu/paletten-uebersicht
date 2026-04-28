@@ -1204,36 +1204,16 @@ app.get('/api/test', async (req, res) => {
 });
 
 // ============================================
-// STATISCHE DATEIEN (nach allen API-Routen!)
-// ============================================
-app.use(express.static(path.join(__dirname, 'public')));
-
-// ============================================
-// MAIN ROUTE - Serviere index.html für alle unbekannten Routen
+// MAIN ROUTE
 // ============================================
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
-// Route für Dark Mode Version
-app.get('/dark', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/index-dark.html'));
-});
-
-// Route für Modern Design Version
-app.get('/modern', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/index-modern.html'));
-});
-
-// Route für V2 - Complete Redesign
-app.get('/v2', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/index-v2.html'));
-});
-
-// Route für Final Version - Voice_App_Demo Design + Full Functionality
-app.get('/final', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/index-final.html'));
-});
+// ============================================
+// STATISCHE DATEIEN (nach allen API-Routen!)
+// ============================================
+app.use(express.static(path.join(__dirname)));
 
 // ============================================
 // SERVER START
