@@ -35,14 +35,341 @@
             overflow-x: hidden;
         }
 
-        /* ===== LOGIN-PHASE: Container transparent (eigenes Card-Design) ===== */
-        body:has(#loginPhase.active) .container,
-        body:has(#adminPanelPhase.active) .container {
-            background: transparent;
-            box-shadow: none;
-            padding: 0;
-            max-width: 500px;
-            overflow: visible;
+        /* ===== ALLE PHASEN: Container transparent (eigenes Card-Design) ===== */
+        .container {
+            background: transparent !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            max-width: 500px !important;
+            overflow: visible !important;
+        }
+
+        /* ===== EINHEITLICHE PHASE-CARD (für alle Phasen) ===== */
+        .phase-card {
+            background: #1a2538;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+            width: 100%;
+        }
+
+        .phase-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #FF6B4A 0%, #FF8C42 50%, #FFD700 100%);
+            z-index: 2;
+        }
+
+        .phase-header {
+            background: #1a2538;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+        }
+
+        .phase-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .phase-header-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #FF6B4A 0%, #FF8C42 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 4px 12px rgba(255, 107, 74, 0.3);
+            flex-shrink: 0;
+        }
+
+        .phase-header-text {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .phase-header-text h1 {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+            letter-spacing: -0.3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .phase-header-text p {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin: 2px 0 0 0;
+        }
+
+        .phase-back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .phase-back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .phase-content {
+            background: white;
+            padding: 28px 24px;
+        }
+
+        .phase-content h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 0 0 8px 0;
+            letter-spacing: -0.5px;
+        }
+
+        .phase-content p.subtitle {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        /* ===== EINHEITLICHE FORM ELEMENTS ===== */
+        .phase-content .form-label,
+        .phase-content label.form-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px;
+            margin-top: 16px;
+        }
+
+        .phase-content .form-label:first-child {
+            margin-top: 0;
+        }
+
+        .phase-content input[type="text"],
+        .phase-content input[type="password"],
+        .phase-content input[type="number"],
+        .phase-content select,
+        .phase-content textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            background: #f8f8f8;
+            color: #1a1a1a;
+            transition: all 0.2s;
+            margin-bottom: 6px;
+            box-sizing: border-box;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .phase-content input:focus,
+        .phase-content select:focus,
+        .phase-content textarea:focus {
+            outline: none;
+            border-color: #FF6B4A;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(255, 107, 74, 0.1);
+        }
+
+        /* ===== EINHEITLICHE BUTTONS ===== */
+        .btn-vibrant-primary {
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #FF6B4A 0%, #FF8C42 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 6px 18px rgba(255, 107, 74, 0.3);
+            margin-top: 12px;
+            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-vibrant-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 107, 74, 0.4);
+        }
+
+        .btn-vibrant-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-vibrant-success {
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 6px 18px rgba(81, 207, 102, 0.3);
+            margin-top: 12px;
+            margin-bottom: 8px;
+        }
+
+        .btn-vibrant-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(81, 207, 102, 0.4);
+        }
+
+        .btn-vibrant-danger {
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 6px 18px rgba(255, 107, 107, 0.3);
+            margin-top: 12px;
+            margin-bottom: 8px;
+        }
+
+        .btn-vibrant-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-vibrant-secondary {
+            width: 100%;
+            padding: 12px 20px;
+            background: white;
+            color: #1a1a1a;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+
+        .btn-vibrant-secondary:hover {
+            background: #f8f8f8;
+            border-color: #FF6B4A;
+        }
+
+        .btn-action-toggle {
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            background: #f8f8f8;
+            color: #1a1a1a;
+            transition: all 0.2s;
+        }
+
+        .btn-action-toggle.active-add {
+            background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .btn-action-toggle.active-remove {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .button-row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        /* ===== STATUS-ANZEIGE / ERROR / SUCCESS BOXES ===== */
+        .vibrant-error-box {
+            background: #ffe0e0;
+            border: 2px solid #ff6b6b;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin: 12px 0;
+            color: #c92a2a;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .vibrant-success-box {
+            background: #e6ffed;
+            border: 2px solid #51cf66;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin: 12px 0;
+            color: #2f9e44;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        /* ===== LOGOUT BUTTON ===== */
+        #logoutContainer {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 100;
+        }
+
+        #logoutContainer button {
+            background: rgba(255, 107, 74, 0.9) !important;
+            color: white !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            padding: 8px 16px !important;
+            border-radius: 8px !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            transition: all 0.2s !important;
+            box-shadow: 0 4px 12px rgba(255, 107, 74, 0.3) !important;
+        }
+
+        #logoutContainer button:hover {
+            background: rgba(255, 107, 74, 1) !important;
+            transform: translateY(-1px);
         }
 
         /* ===== LOGIN CARD (VIBRANT Design) ===== */
@@ -571,28 +898,29 @@
         }
 
         .kundenliste-item {
-            background: white;
-            border: 2px solid #667eea;
+            background: linear-gradient(135deg, #f8f9fa 0%, #fff5f0 100%);
+            border: 2px solid #ffe5dc;
             border-radius: 10px;
-            padding: 15px;
+            padding: 14px 10px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 60px;
+            min-height: 70px;
             text-align: center;
-            font-weight: bold;
-            color: #333;
-            font-size: 14px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            font-weight: 700;
+            color: #FF6B4A;
+            font-size: 13px;
+            line-height: 1.3;
         }
 
         .kundenliste-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
-            border-color: #764ba2;
-            background: #f5f7ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(255, 107, 74, 0.2);
+            border-color: #FF6B4A;
+            background: #fff8f4;
         }
 
         /* ========== EBENE 2: KUNDENDETAILS (Bearbeitbare Paletten) ========== */
@@ -600,61 +928,42 @@
             display: flex;
             flex-direction: column;
             width: 100%;
-            overflow-y: auto;
-            overflow-x: hidden;
-            flex: 1;
-            padding: 20px;
-            gap: 15px;
+            gap: 10px;
             box-sizing: border-box;
-        }
-
-        .kundendetail-list::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        .kundendetail-list::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-
-        .kundendetail-list::-webkit-scrollbar-thumb {
-            background: #667eea;
-            border-radius: 10px;
         }
 
         .kundendetail-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: white;
-            border: 2px solid #667eea;
+            background: linear-gradient(135deg, #f8f9fa 0%, #fff5f0 100%);
+            border: 1px solid #ffe5dc;
             border-radius: 10px;
-            padding: 18px;
+            padding: 14px 16px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
         }
 
         .kundendetail-row:hover {
-            transform: translateX(5px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
-            border-color: #764ba2;
+            transform: translateX(4px);
+            box-shadow: 0 4px 14px rgba(255, 107, 74, 0.2);
+            border-color: #FF6B4A;
         }
 
         .kundendetail-palettenart {
-            font-size: 16px;
-            font-weight: bold;
-            color: #333;
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a1a1a;
             flex: 1;
         }
 
         .kundendetail-saldo {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 18px;
-            font-weight: bold;
-            color: #667eea;
+            gap: 8px;
+            font-size: 17px;
+            font-weight: 700;
+            color: #FF6B4A;
             min-width: 80px;
             justify-content: flex-end;
         }
@@ -714,56 +1023,62 @@
             border-radius: 10px;
         }
 
-        .palettehistorie-item {
+        .palettehistorie-list {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .palettehistorie-item {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
             align-items: center;
             background: white;
-            border-left: 6px solid #667eea;
-            border-radius: 12px;
-            padding: 28px 24px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
-            min-height: 90px;
-            gap: 30px;
+            border-left: 4px solid #FF6B4A;
+            border-radius: 10px;
+            padding: 14px 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: all 0.2s ease;
+            gap: 12px;
         }
 
         .palettehistorie-item:hover {
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
-            transform: translateX(8px);
-            background: #f8f9ff;
+            box-shadow: 0 4px 14px rgba(255, 107, 74, 0.2);
+            transform: translateX(3px);
         }
 
         .palettehistorie-zeitstempel {
-            font-family: 'Courier New', monospace;
-            font-size: 19px;
-            color: #333;
-            font-weight: 800;
-            min-width: 220px;
-            letter-spacing: 0.5px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 13px;
+            color: #555;
+            font-weight: 700;
+            grid-column: 1 / -1;
+            grid-row: 1;
+            margin-bottom: 4px;
         }
 
         .palettehistorie-mitarbeiter {
-            font-size: 17px;
+            font-size: 14px;
             color: #333;
-            font-weight: 700;
-            min-width: 150px;
+            font-weight: 600;
+            grid-column: 1;
+            grid-row: 2;
         }
 
         .palettehistorie-aktion {
-            font-size: 36px;
-            min-width: 60px;
+            font-size: 22px;
+            grid-column: 2;
+            grid-row: 2;
             text-align: center;
-            flex-shrink: 0;
         }
 
         .palettehistorie-menge {
-            font-size: 28px;
-            font-weight: bold;
-            color: #667eea;
-            min-width: 80px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #FF6B4A;
+            grid-column: 3;
+            grid-row: 2;
             text-align: right;
-            flex-shrink: 0;
         }
 
         .palettehistorie-empty {
@@ -1059,242 +1374,315 @@
         <!-- LOGIN PHASE -->
         <!-- LOGIN PHASE: Mitarbeitername + Passwort -->
         <div id="loginPhase" class="phase">
-            <div class="login-card">
-                <div class="login-header">
-                    <div class="login-header-icon">📦</div>
-                    <div class="login-header-text">
-                        <h1>Paletten</h1>
-                        <p>Management System</p>
+            <div class="phase-card">
+                <div class="phase-header">
+                    <div class="phase-header-left">
+                        <div class="phase-header-icon">📦</div>
+                        <div class="phase-header-text">
+                            <h1>Paletten</h1>
+                            <p>Management System</p>
+                        </div>
                     </div>
                 </div>
-                <div class="login-content">
+                <div class="phase-content">
                     <h2>Willkommen</h2>
-                    <p class="login-subtitle">Melden Sie sich an, um fortzufahren</p>
+                    <p class="subtitle">Melden Sie sich an, um fortzufahren</p>
 
-                    <label class="form-label">MITARBEITERNAME</label>
+                    <label class="form-label">Mitarbeitername</label>
                     <input type="text" id="loginMitarbeiter" placeholder="Ihr Name">
 
-                    <label class="form-label">PASSWORT</label>
+                    <label class="form-label">Passwort</label>
                     <input type="password" id="loginPassword" placeholder="Passwort eingeben">
 
-                    <div id="loginErrorBox" class="login-error" style="display: none;">
+                    <div id="loginErrorBox" class="vibrant-error-box" style="display: none;">
                         <span id="loginErrorMessage"></span>
                     </div>
 
-                    <button onclick="handleLoginNew()" class="login-btn-primary">Anmelden</button>
+                    <button onclick="handleLoginNew()" class="btn-vibrant-primary">Anmelden</button>
 
-                    <button onclick="showAdminPanel()" class="login-admin-link">Admin: Mitarbeiter hinzufügen</button>
+                    <button onclick="showAdminPanel()" style="display: block; text-align: center; background: transparent; color: #FF6B4A; border: none; text-decoration: underline; padding: 10px 0; font-size: 14px; font-weight: 700; cursor: pointer; width: 100%;">Admin: Mitarbeiter hinzufügen</button>
                 </div>
             </div>
         </div>
 
         <!-- ADMIN PANEL: Neue Mitarbeiter -->
         <div id="adminPanelPhase" class="phase">
-            <div class="login-card">
-                <div class="login-header">
-                    <div class="login-header-icon">⚙️</div>
-                    <div class="login-header-text">
-                        <h1>Admin</h1>
-                        <p>Mitarbeiter verwalten</p>
+            <div class="phase-card">
+                <div class="phase-header">
+                    <div class="phase-header-left">
+                        <div class="phase-header-icon">⚙️</div>
+                        <div class="phase-header-text">
+                            <h1>Admin</h1>
+                            <p>Mitarbeiter verwalten</p>
+                        </div>
                     </div>
+                    <button class="phase-back-btn" onclick="backToLogin()">← Zurück</button>
                 </div>
-                <div class="login-content">
+                <div class="phase-content">
                     <h2>Mitarbeiter hinzufügen</h2>
-                    <p class="login-subtitle">Neuen Mitarbeiter zum System hinzufügen</p>
+                    <p class="subtitle">Neuen Mitarbeiter zum System hinzufügen</p>
 
-                    <label class="form-label">MITARBEITERNAME</label>
+                    <label class="form-label">Mitarbeitername</label>
                     <input type="text" id="adminMitarbeitername" placeholder="z.B. Klaus">
 
-                    <label class="form-label">ADMIN-PASSWORT</label>
+                    <label class="form-label">Admin-Passwort</label>
                     <input type="password" id="adminPassword" placeholder="Admin-Passwort">
 
-                    <div id="adminErrorBox" class="login-error" style="display: none;">
+                    <div id="adminErrorBox" class="vibrant-error-box" style="display: none;">
                         <span id="adminErrorMessage"></span>
                     </div>
 
-                    <div id="adminSuccessBox" class="login-success" style="display: none;">
+                    <div id="adminSuccessBox" class="vibrant-success-box" style="display: none;">
                         <span id="adminSuccessMessage"></span>
                     </div>
 
-                    <button onclick="addNewEmployee()" class="login-btn-success">Mitarbeiter erstellen</button>
-
-                    <button onclick="backToLogin()" class="login-btn-back">← Zurück zum Login</button>
+                    <button onclick="addNewEmployee()" class="btn-vibrant-success">Mitarbeiter erstellen</button>
                 </div>
             </div>
         </div>
 
         <div id="recordingPhase" class="phase">
-            <div class="recording-section" style="position: relative;">
-                <!-- Hauptinhalt mittig -->
-                <p>Klicke auf den Button und sprich die Palette ein</p>
-                <button id="recordingButton" onclick="toggleRecording()">🎤 Aufnahme starten</button>
-                <p id="status"></p>
+            <div class="phase-card">
+                <div class="phase-header">
+                    <div class="phase-header-left">
+                        <div class="phase-header-icon">🎤</div>
+                        <div class="phase-header-text">
+                            <h1>Aufnahme</h1>
+                            <p>Sprich die Palette ein</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="phase-content">
+                    <div class="recording-section" style="position: relative; text-align: center;">
+                        <div class="microphone-visual" style="width: 110px; height: 110px; background: linear-gradient(135deg, #FF6B4A 0%, #FF8C42 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 50px; margin: 0 auto 20px; box-shadow: 0 8px 24px rgba(255, 107, 74, 0.4);">🎤</div>
 
-                <!-- Manuelle Eingabe Button -->
-                <button onclick="openManualInput()" style="margin-top: 15px; padding: 15px 40px; background: #ff9800; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; max-width: 300px;">✏️ Manuell eingeben</button>
+                        <p style="color: #666; font-size: 14px; margin-bottom: 16px;">Klicke auf den Button und sprich die Palette ein</p>
 
-                <!-- Übersicht-Button unten mittig -->
-                <button onclick="showOverview()" style="margin-top: 15px; margin-bottom: 30px; padding: 15px 40px; background: #51cf66; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; max-width: 300px;">📊 Übersicht</button>
+                        <button id="recordingButton" onclick="toggleRecording()" class="btn-vibrant-primary">🎤 Aufnahme starten</button>
 
-                <!-- V1.381 schwarz, fett, unten in der mitte UNTER Übersicht Button -->
-                <span style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); font-size: 14px; color: #000; font-weight: bold;">V1.381</span>
+                        <p id="status" style="font-size: 13px; color: #999; text-align: center; margin: 12px 0; font-weight: 500;"></p>
+
+                        <button onclick="openManualInput()" class="btn-vibrant-secondary">✏️ Manuell eingeben</button>
+
+                        <button onclick="showOverview()" class="btn-vibrant-success">📊 Übersicht</button>
+
+                        <div style="text-align: center; margin-top: 16px; font-size: 12px; color: #999; font-weight: 600;">V1.382</div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div id="reviewPhase" class="phase">
-            <div class="review-section">
-                <p class="review-label">📝 Erkannter Text - Bitte überprüfen und korrigieren:</p>
-
-                <!-- EDITIERBARE KUNDENINFORMATIONEN -->
-                <div style="background: #f0f4ff; border: 2px solid #667eea; border-radius: 12px; padding: 20px; margin: 20px 0;">
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 8px;">👤 Kundenname:</label>
-                        <input type="text" id="editCustomerName" placeholder="Kundenname eingeben..." style="width: 100%; padding: 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
-                    </div>
-
-                    <div>
-                        <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 8px;">🔢 Kundennummer (optional):</label>
-                        <input type="text" id="editCustomerNumber" placeholder="Kundennummer eingeben..." style="width: 100%; padding: 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+            <div class="phase-card">
+                <div class="phase-header">
+                    <div class="phase-header-left">
+                        <div class="phase-header-icon">📝</div>
+                        <div class="phase-header-text">
+                            <h1>Überprüfen</h1>
+                            <p>Erkannter Text korrigieren</p>
+                        </div>
                     </div>
                 </div>
+                <div class="phase-content">
+                    <h2>Erkannter Text</h2>
+                    <p class="subtitle">Bitte überprüfen und korrigieren</p>
 
-                <p class="review-label" style="margin-top: 20px;">📋 Erkannter Volltext:</p>
-                <div id="textDisplay" class="text-display"></div>
+                    <label class="form-label">Kundenname</label>
+                    <input type="text" id="editCustomerName" placeholder="Kundenname eingeben...">
 
-                <div id="errorBox" style="display: none;" class="error-box">
-                    <span id="errorMessage"></span>
-                </div>
+                    <label class="form-label">Kundennummer (optional)</label>
+                    <input type="text" id="editCustomerNumber" placeholder="Kundennummer eingeben...">
 
-                <div class="button-group">
-                    <button class="btn btn-save" onclick="saveToSupabase()" id="saveBtn">✅ Speichern</button>
-                    <button class="btn btn-discard" onclick="discardAndRestart()">❌ Verwerfen</button>
+                    <label class="form-label">Erkannter Volltext</label>
+                    <div id="textDisplay" style="background: #f8f8f8; border: 1px solid #e0e0e0; border-radius: 10px; padding: 14px; min-height: 80px; font-size: 14px; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; color: #333;"></div>
+
+                    <div id="errorBox" class="vibrant-error-box" style="display: none;">
+                        <span id="errorMessage"></span>
+                    </div>
+
+                    <div class="button-row-2">
+                        <button onclick="saveToSupabase()" id="saveBtn" class="btn-vibrant-success" style="margin-top: 8px;">✅ Speichern</button>
+                        <button onclick="discardAndRestart()" class="btn-vibrant-danger" style="margin-top: 8px;">❌ Verwerfen</button>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div id="successPhase" class="phase">
-            <div class="success-section">
-                <div class="success-icon">✅</div>
-                <p class="success-message">Erfolgreich gespeichert!</p>
-
-                <!-- ZUSAMMENFASSUNG -->
-                <div id="successSummary" style="background: #f0f9ff; border: 2px solid #51cf66; border-radius: 12px; padding: 20px; margin: 20px 0; text-align: left;">
-                    <!-- wird dynamisch gefüllt -->
+            <div class="phase-card">
+                <div class="phase-header">
+                    <div class="phase-header-left">
+                        <div class="phase-header-icon" style="background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%); box-shadow: 0 4px 12px rgba(81, 207, 102, 0.3);">✅</div>
+                        <div class="phase-header-text">
+                            <h1>Gespeichert</h1>
+                            <p>Erfolgreich verarbeitet</p>
+                        </div>
+                    </div>
                 </div>
+                <div class="phase-content">
+                    <div style="text-align: center; padding: 8px 0 16px;">
+                        <div style="font-size: 56px; margin-bottom: 8px;">🎉</div>
+                        <h2 style="text-align: center; color: #51cf66;">Erfolgreich gespeichert!</h2>
+                    </div>
 
-                <button id="newRecordingButton" onclick="restartRecording()">← Zurück</button>
+                    <div id="successSummary" style="background: #f0f9ff; border: 1px solid #c8e6f7; border-radius: 12px; padding: 16px; margin: 8px 0 16px; text-align: left; font-size: 14px;">
+                        <!-- wird dynamisch gefüllt -->
+                    </div>
+
+                    <button id="newRecordingButton" onclick="restartRecording()" class="btn-vibrant-primary">← Zurück zur Aufnahme</button>
+                </div>
             </div>
         </div>
 
         <!-- EBENE 1: KUNDENLISTE (Kompakte Liste) -->
         <div id="kundenlistePhase" class="phase">
-            <div class="kundenliste-section">
-                <div class="kundenliste-header">
-                    <h2>📊 Kundenliste</h2>
-                    <button class="nav-back-btn" onclick="backToRecording()">← Zurück</button>
+            <div class="phase-card">
+                <div class="phase-header">
+                    <div class="phase-header-left">
+                        <div class="phase-header-icon">📊</div>
+                        <div class="phase-header-text">
+                            <h1>Kundenliste</h1>
+                            <p>Übersicht aller Kunden</p>
+                        </div>
+                    </div>
+                    <button class="phase-back-btn" onclick="backToRecording()">← Zurück</button>
                 </div>
-                <div id="kundenlisteContainer" class="kundenliste-grid">
-                    <!-- wird dynamisch gefüllt -->
+                <div class="phase-content">
+                    <div id="kundenlisteContainer" class="kundenliste-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px;">
+                        <!-- wird dynamisch gefüllt -->
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- EBENE 2: KUNDENDETAILS (Bearbeitbare Paletten) -->
         <div id="kundendetailPhase" class="phase">
-            <div class="kundendetail-section">
-                <div class="kundendetail-header">
-                    <h2 id="detailCustomerTitle">📦 Kundendetails</h2>
-                    <button class="nav-back-btn" onclick="backToCustomerList()">← Zurück</button>
+            <div class="phase-card">
+                <div class="phase-header">
+                    <div class="phase-header-left">
+                        <div class="phase-header-icon">📦</div>
+                        <div class="phase-header-text">
+                            <h1 id="detailCustomerTitle">Kundendetails</h1>
+                            <p>Paletten verwalten</p>
+                        </div>
+                    </div>
+                    <button class="phase-back-btn" onclick="backToCustomerList()">← Zurück</button>
                 </div>
-                <div id="kundendetailContainer" class="kundendetail-list">
-                    <!-- wird dynamisch gefüllt -->
+                <div class="phase-content">
+                    <div id="kundendetailContainer" class="kundendetail-list">
+                        <!-- wird dynamisch gefüllt -->
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- EBENE 3: PALETTENHISTORIE (Transaktionszeitleiste) -->
         <div id="paletteHistoriePhase" class="phase">
-            <div class="palettehistorie-section">
-                <div class="palettehistorie-header">
-                    <h2 id="historieTitle">⏱️ Palettenhistorie</h2>
-                    <button class="nav-back-btn" onclick="backToCustomerDetail()">← Zurück</button>
+            <div class="phase-card">
+                <div class="phase-header">
+                    <div class="phase-header-left">
+                        <div class="phase-header-icon">⏱️</div>
+                        <div class="phase-header-text">
+                            <h1 id="historieTitle">Historie</h1>
+                            <p>Transaktionszeitleiste</p>
+                        </div>
+                    </div>
+                    <button class="phase-back-btn" onclick="backToCustomerDetail()">← Zurück</button>
                 </div>
-                <div id="paletteHistorieContainer" class="palettehistorie-list">
-                    <!-- wird dynamisch gefüllt -->
+                <div class="phase-content">
+                    <div id="paletteHistorieContainer" class="palettehistorie-list">
+                        <!-- wird dynamisch gefüllt -->
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- MANUELLE EINGABE PHASE -->
         <div id="manualInputPhase" class="phase">
-            <div class="recording-section">
-                <h2>✏️ Manuelle Eingabe</h2>
-                <p style="color: #666; font-size: 14px; margin-bottom: 20px;">Geben Sie die Palettenart und Anzahl ein</p>
+            <div class="phase-card">
+                <div class="phase-header">
+                    <div class="phase-header-left">
+                        <div class="phase-header-icon">✏️</div>
+                        <div class="phase-header-text">
+                            <h1>Manuelle Eingabe</h1>
+                            <p>Palette manuell erfassen</p>
+                        </div>
+                    </div>
+                    <button class="phase-back-btn" onclick="cancelManualInput()">← Zurück</button>
+                </div>
+                <div class="phase-content">
+                    <h2>Eingabe</h2>
+                    <p class="subtitle">Geben Sie Palettenart und Anzahl ein</p>
 
-                <!-- PALETTENART DROPDOWN -->
-                <div style="margin-bottom: 25px;">
-                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">📦 Palettenart:</label>
-                    <select id="manualPaletteType" style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box; background: white; cursor: pointer;">
+                    <label class="form-label">Palettenart</label>
+                    <select id="manualPaletteType">
                         <option value="">-- Palettenart auswählen --</option>
                     </select>
-                </div>
 
-                <!-- KUNDENNAME -->
-                <div style="margin-bottom: 25px;">
-                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">👤 Kundenname:</label>
-                    <input type="text" id="manualCustomerName" placeholder="Kundenname eingeben..." style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
-                </div>
+                    <label class="form-label">Kundenname</label>
+                    <input type="text" id="manualCustomerName" placeholder="Kundenname eingeben...">
 
-                <!-- KUNDENNUMMER (OPTIONAL) -->
-                <div style="margin-bottom: 25px;">
-                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">🔢 Kundennummer (optional):</label>
-                    <input type="text" id="manualCustomerNumber" placeholder="Kundennummer eingeben..." style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
-                </div>
+                    <label class="form-label">Kundennummer (optional)</label>
+                    <input type="text" id="manualCustomerNumber" placeholder="Kundennummer eingeben...">
 
-                <!-- AKTION (Zu-/Abgang) -->
-                <div style="margin-bottom: 25px;">
-                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">⚡ Aktion:</label>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <button id="manualActionAdd" onclick="setManualAction('add')" style="padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; background: white; color: #667eea; transition: all 0.3s;">➕ Zugang</button>
-                        <button id="manualActionRemove" onclick="setManualAction('remove')" style="padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; background: white; color: #667eea; transition: all 0.3s;">➖ Abgang</button>
+                    <label class="form-label">Aktion</label>
+                    <div class="button-row-2" style="margin-top: 0;">
+                        <button id="manualActionAdd" onclick="setManualAction('add')" class="btn-action-toggle">➕ Zugang</button>
+                        <button id="manualActionRemove" onclick="setManualAction('remove')" class="btn-action-toggle">➖ Abgang</button>
                     </div>
-                </div>
 
-                <!-- ANZAHL -->
-                <div style="margin-bottom: 30px;">
-                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">📊 Anzahl:</label>
-                    <input type="number" id="manualQuantity" placeholder="z.B. 5" min="1" value="1" style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
-                </div>
+                    <label class="form-label">Anzahl</label>
+                    <input type="number" id="manualQuantity" placeholder="z.B. 5" min="1" value="1">
 
-                <!-- BUTTONS -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 30px;">
-                    <button onclick="saveManualInput()" style="padding: 15px; background: #51cf66; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s;">✅ Speichern</button>
-                    <button onclick="cancelManualInput()" style="padding: 15px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s;">❌ Abbrechen</button>
+                    <div class="button-row-2">
+                        <button onclick="saveManualInput()" class="btn-vibrant-success" style="margin-top: 8px;">✅ Speichern</button>
+                        <button onclick="cancelManualInput()" class="btn-vibrant-danger" style="margin-top: 8px;">❌ Abbrechen</button>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- KUNDE BESTÄTIGUNG MODAL -->
-        <div id="customerConfirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
-            <div style="background: white; border-radius: 20px; padding: 30px; max-width: 500px; text-align: center;">
-                <h2 style="margin-bottom: 20px; color: #333;">👤 Ist das der gleiche Kunde?</h2>
-                <p id="customerConfirmQuestion" style="font-size: 18px; color: #666; margin-bottom: 30px;"></p>
+        <div id="customerConfirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; padding: 20px;">
+            <div class="phase-card" style="max-width: 460px; width: 100%;">
+                <div class="phase-header">
+                    <div class="phase-header-left">
+                        <div class="phase-header-icon">👤</div>
+                        <div class="phase-header-text">
+                            <h1>Kunde prüfen</h1>
+                            <p>Ist das der gleiche Kunde?</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="phase-content">
+                    <p id="customerConfirmQuestion" style="font-size: 16px; color: #555; margin-bottom: 20px; text-align: center; line-height: 1.5;"></p>
 
-                <div style="display: flex; gap: 15px; justify-content: center;">
-                    <button onclick="confirmSameCustomer()" style="flex: 1; padding: 15px; background: #51cf66; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">✅ Ja, gleicher Kunde</button>
-                    <button onclick="rejectSameCustomer()" style="flex: 1; padding: 15px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">❌ Nein, neuer Kunde</button>
+                    <div class="button-row-2">
+                        <button onclick="confirmSameCustomer()" class="btn-vibrant-success" style="margin-top: 0;">✅ Ja</button>
+                        <button onclick="rejectSameCustomer()" class="btn-vibrant-danger" style="margin-top: 0;">❌ Nein</button>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- PALETTE AUSWAHL MODAL -->
-        <div id="paletteSelectionModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
-            <div style="background: white; border-radius: 20px; padding: 30px; max-width: 90%; max-height: 90vh; overflow-y: auto;">
-                <h2 style="text-align: center; margin-bottom: 20px; color: #333;">🎯 Bitte wähle die Palettenart:</h2>
-                <div id="paletteButtonsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
-                    <!-- Buttons werden dynamisch generiert -->
+        <div id="paletteSelectionModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; padding: 20px;">
+            <div class="phase-card" style="max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto;">
+                <div class="phase-header">
+                    <div class="phase-header-left">
+                        <div class="phase-header-icon">🎯</div>
+                        <div class="phase-header-text">
+                            <h1>Palette wählen</h1>
+                            <p>Bitte Palettenart auswählen</p>
+                        </div>
+                    </div>
                 </div>
-                <button onclick="cancelPaletteSelection()" style="width: 100%; padding: 15px; margin-top: 20px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">❌ Verwerfen</button>
+                <div class="phase-content">
+                    <div id="paletteButtonsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 12px;">
+                        <!-- Buttons werden dynamisch generiert -->
+                    </div>
+                    <button onclick="cancelPaletteSelection()" class="btn-vibrant-danger">❌ Verwerfen</button>
+                </div>
             </div>
         </div>
 
@@ -2229,15 +2617,17 @@ ${err.message}
                 const btn = document.createElement('button');
                 btn.textContent = palette;
                 btn.style.cssText = `
-                    padding: 20px;
-                    font-size: 16px;
-                    font-weight: bold;
-                    background: #667eea;
+                    padding: 14px 12px;
+                    font-size: 14px;
+                    font-weight: 700;
+                    background: linear-gradient(135deg, #FF6B4A 0%, #FF8C42 100%);
                     color: white;
                     border: none;
                     border-radius: 10px;
                     cursor: pointer;
                     touch-action: manipulation;
+                    box-shadow: 0 4px 12px rgba(255, 107, 74, 0.3);
+                    transition: all 0.2s;
                 `;
                 btn.onclick = () => selectPaletteAndContinue(palette, palettenData);
                 container.appendChild(btn);
@@ -2262,15 +2652,17 @@ ${err.message}
                 const btn = document.createElement('button');
                 btn.textContent = palette;
                 btn.style.cssText = `
-                    padding: 20px;
-                    font-size: 16px;
-                    font-weight: bold;
-                    background: #667eea;
+                    padding: 14px 12px;
+                    font-size: 14px;
+                    font-weight: 700;
+                    background: linear-gradient(135deg, #FF6B4A 0%, #FF8C42 100%);
                     color: white;
                     border: none;
                     border-radius: 10px;
                     cursor: pointer;
                     touch-action: manipulation;
+                    box-shadow: 0 4px 12px rgba(255, 107, 74, 0.3);
+                    transition: all 0.2s;
                 `;
                 btn.onclick = () => selectPaletteAndContinue(palette, null);
                 container.appendChild(btn);
@@ -2864,11 +3256,9 @@ ${err.message}
             document.getElementById('manualQuantity').value = '1';
             manualAction = null;
 
-            // Reset Action Buttons
-            document.getElementById('manualActionAdd').style.background = 'white';
-            document.getElementById('manualActionAdd').style.color = '#667eea';
-            document.getElementById('manualActionRemove').style.background = 'white';
-            document.getElementById('manualActionRemove').style.color = '#667eea';
+            // Reset Action Buttons (entferne aktive Klassen)
+            document.getElementById('manualActionAdd').classList.remove('active-add', 'active-remove');
+            document.getElementById('manualActionRemove').classList.remove('active-add', 'active-remove');
 
             setPhase('manualInputPhase');
         }
@@ -2880,16 +3270,14 @@ ${err.message}
             const addBtn = document.getElementById('manualActionAdd');
             const removeBtn = document.getElementById('manualActionRemove');
 
+            // Reset beide
+            addBtn.classList.remove('active-add', 'active-remove');
+            removeBtn.classList.remove('active-add', 'active-remove');
+
             if (action === 'add') {
-                addBtn.style.background = '#51cf66';
-                addBtn.style.color = 'white';
-                removeBtn.style.background = 'white';
-                removeBtn.style.color = '#667eea';
+                addBtn.classList.add('active-add');
             } else {
-                removeBtn.style.background = '#ff6b6b';
-                removeBtn.style.color = 'white';
-                addBtn.style.background = 'white';
-                addBtn.style.color = '#667eea';
+                removeBtn.classList.add('active-remove');
             }
         }
 
