@@ -12,8 +12,8 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(ellipse at center, #1a2a3a 0%, #0f1820 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -33,6 +33,227 @@
             flex-direction: column;
             overflow-y: auto;
             overflow-x: hidden;
+        }
+
+        /* ===== LOGIN-PHASE: Container transparent (eigenes Card-Design) ===== */
+        body:has(#loginPhase.active) .container,
+        body:has(#adminPanelPhase.active) .container {
+            background: transparent;
+            box-shadow: none;
+            padding: 0;
+            max-width: 500px;
+            overflow: visible;
+        }
+
+        /* ===== LOGIN CARD (VIBRANT Design) ===== */
+        .login-card {
+            background: #1a2538;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #FF6B4A 0%, #FF8C42 50%, #FFD700 100%);
+            z-index: 2;
+        }
+
+        .login-header {
+            background: #1a2538;
+            padding: 24px 28px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .login-header-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #FF6B4A 0%, #FF8C42 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            box-shadow: 0 4px 12px rgba(255, 107, 74, 0.3);
+        }
+
+        .login-header-text h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+            letter-spacing: -0.3px;
+        }
+
+        .login-header-text p {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+            margin: 2px 0 0 0;
+        }
+
+        .login-content {
+            background: white;
+            padding: 32px 28px;
+        }
+
+        .login-content h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 0 0 8px 0;
+            text-align: left;
+            letter-spacing: -0.5px;
+        }
+
+        .login-subtitle {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 24px;
+            text-align: left;
+        }
+
+        .login-content .form-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px;
+        }
+
+        .login-content input[type="text"],
+        .login-content input[type="password"] {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            background: #f8f8f8;
+            color: #1a1a1a;
+            transition: all 0.2s;
+            margin-bottom: 18px;
+            box-sizing: border-box;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .login-content input:focus {
+            outline: none;
+            border-color: #FF6B4A;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(255, 107, 74, 0.1);
+        }
+
+        .login-btn-primary {
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #FF6B4A 0%, #FF8C42 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 6px 18px rgba(255, 107, 74, 0.3);
+            margin-top: 6px;
+            margin-bottom: 16px;
+            letter-spacing: 0.3px;
+        }
+
+        .login-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 107, 74, 0.4);
+        }
+
+        .login-admin-link {
+            display: block;
+            text-align: center;
+            background: transparent;
+            color: #FF6B4A;
+            border: none;
+            text-decoration: underline;
+            padding: 6px 0;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .login-admin-link:hover {
+            color: #FF8C42;
+        }
+
+        .login-error {
+            background: #ffe0e0;
+            border: 2px solid #ff6b6b;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 16px;
+            color: #c92a2a;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .login-success {
+            background: #e6ffed;
+            border: 2px solid #51cf66;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 16px;
+            color: #2f9e44;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .login-btn-success {
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 6px 18px rgba(81, 207, 102, 0.3);
+            margin-top: 6px;
+            margin-bottom: 12px;
+        }
+
+        .login-btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(81, 207, 102, 0.4);
+        }
+
+        .login-btn-back {
+            display: block;
+            text-align: center;
+            background: transparent;
+            color: #888;
+            border: none;
+            padding: 6px 0;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .login-btn-back:hover {
+            color: #FF6B4A;
         }
 
         .phase {
@@ -838,58 +1059,66 @@
         <!-- LOGIN PHASE -->
         <!-- LOGIN PHASE: Mitarbeitername + Passwort -->
         <div id="loginPhase" class="phase">
-            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 40px 20px;">
-                <div style="background: white; border-radius: 20px; padding: 40px; max-width: 400px; width: 100%; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);">
-                    <h2 style="text-align: center; color: #333; margin-bottom: 30px; font-size: 24px;">🔐 Anmeldung</h2>
-
-                    <div style="margin-bottom: 20px;">
-                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">👤 Mitarbeitername</label>
-                        <input type="text" id="loginMitarbeiter" placeholder="z.B. Vorname" style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="login-header-icon">📦</div>
+                    <div class="login-header-text">
+                        <h1>Paletten</h1>
+                        <p>Management System</p>
                     </div>
+                </div>
+                <div class="login-content">
+                    <h2>Willkommen</h2>
+                    <p class="login-subtitle">Melden Sie sich an, um fortzufahren</p>
 
-                    <div style="margin-bottom: 25px;">
-                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">🔑 Passwort</label>
-                        <input type="password" id="loginPassword" placeholder="Passwort eingeben..." style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
-                    </div>
+                    <label class="form-label">MITARBEITERNAME</label>
+                    <input type="text" id="loginMitarbeiter" placeholder="Ihr Name">
 
-                    <div id="loginErrorBox" style="display: none; background: #ffe0e0; border: 2px solid #ff6b6b; border-radius: 10px; padding: 15px; margin-bottom: 20px; color: #c92a2a; font-size: 14px; font-weight: bold; text-align: center;">
+                    <label class="form-label">PASSWORT</label>
+                    <input type="password" id="loginPassword" placeholder="Passwort eingeben">
+
+                    <div id="loginErrorBox" class="login-error" style="display: none;">
                         <span id="loginErrorMessage"></span>
                     </div>
 
-                    <button onclick="handleLoginNew()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; margin-bottom: 12px;">Anmelden</button>
+                    <button onclick="handleLoginNew()" class="login-btn-primary">Anmelden</button>
 
-                    <button onclick="showAdminPanel()" style="width: 100%; padding: 12px; background: #ff9500; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">⚙️ Mitarbeiter hinzufügen</button>
+                    <button onclick="showAdminPanel()" class="login-admin-link">Admin: Mitarbeiter hinzufügen</button>
                 </div>
             </div>
         </div>
 
         <!-- ADMIN PANEL: Neue Mitarbeiter -->
         <div id="adminPanelPhase" class="phase">
-            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 40px 20px;">
-                <div style="background: white; border-radius: 20px; padding: 40px; max-width: 400px; width: 100%; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);">
-                    <h2 style="text-align: center; color: #333; margin-bottom: 30px; font-size: 24px;">⚙️ Mitarbeiter hinzufügen</h2>
-
-                    <div style="margin-bottom: 20px;">
-                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">📝 Mitarbeitername</label>
-                        <input type="text" id="adminMitarbeitername" placeholder="z.B. Klaus" style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="login-header-icon">⚙️</div>
+                    <div class="login-header-text">
+                        <h1>Admin</h1>
+                        <p>Mitarbeiter verwalten</p>
                     </div>
+                </div>
+                <div class="login-content">
+                    <h2>Mitarbeiter hinzufügen</h2>
+                    <p class="login-subtitle">Neuen Mitarbeiter zum System hinzufügen</p>
 
-                    <div style="margin-bottom: 25px;">
-                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">🔑 Admin-Passwort</label>
-                        <input type="password" id="adminPassword" placeholder="Admin-Passwort..." style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
-                    </div>
+                    <label class="form-label">MITARBEITERNAME</label>
+                    <input type="text" id="adminMitarbeitername" placeholder="z.B. Klaus">
 
-                    <div id="adminErrorBox" style="display: none; background: #ffe0e0; border: 2px solid #ff6b6b; border-radius: 10px; padding: 15px; margin-bottom: 20px; color: #c92a2a; font-size: 14px; font-weight: bold; text-align: center;">
+                    <label class="form-label">ADMIN-PASSWORT</label>
+                    <input type="password" id="adminPassword" placeholder="Admin-Passwort">
+
+                    <div id="adminErrorBox" class="login-error" style="display: none;">
                         <span id="adminErrorMessage"></span>
                     </div>
 
-                    <div id="adminSuccessBox" style="display: none; background: #e6ffed; border: 2px solid #51cf66; border-radius: 10px; padding: 15px; margin-bottom: 20px; color: #2f9e44; font-size: 14px; font-weight: bold; text-align: center;">
+                    <div id="adminSuccessBox" class="login-success" style="display: none;">
                         <span id="adminSuccessMessage"></span>
                     </div>
 
-                    <button onclick="addNewEmployee()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; margin-bottom: 12px;">✅ Mitarbeiter erstellen</button>
+                    <button onclick="addNewEmployee()" class="login-btn-success">Mitarbeiter erstellen</button>
 
-                    <button onclick="backToLogin()" style="width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">← Zurück</button>
+                    <button onclick="backToLogin()" class="login-btn-back">← Zurück zum Login</button>
                 </div>
             </div>
         </div>
