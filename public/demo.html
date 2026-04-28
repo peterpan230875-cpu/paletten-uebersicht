@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paletten Übersicht</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== HEADER ===== */
+        .navbar {
+            background: #2c3e50;
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .navbar-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #FF6B5B 0%, #FF9500 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .navbar-user {
+            color: #ecf0f1;
+            font-size: 14px;
+        }
+
+        /* ===== CONTAINER ===== */
+        .container {
+            background: white;
+            max-width: 600px;
+            width: 100%;
+            margin: 20px auto;
+            border-radius: 8px;
+            padding: 40px 30px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            flex: 1;
+        }
+
+        .phase {
+            display: none;
+        }
+
+        .phase.active {
+            display: block;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 40px;
+            line-height: 1.5;
+        }
+
+        /* ===== RECORDING SECTION ===== */
+        .recording-section {
+            text-align: center;
+        }
+
+        .microphone-icon {
+            width: 140px;
+            height: 140px;
+            margin: 40px auto;
+            background: linear-gradient(135deg, #FFE0DC 0%, #FFD4C8 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        #recordingButton {
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #FF6B5B 0%, #FF9500 100%);
+            color: white;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(255, 107, 91, 0.3);
+            margin: 30px 0 20px 0;
+        }
+
+        #recordingButton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 107, 91, 0.4);
+        }
+
+        #recordingButton:active {
+            transform: translateY(0);
+        }
+
+        #recordingButton.recording {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        #status {
+            color: #7f8c8d;
+            font-size: 13px;
+            margin-top: 16px;
+            min-height: 20px;
+        }
+
+        /* ===== BUTTONS ===== */
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 14px 20px;
+            font-size: 16px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .btn:hover {
+            background: #f8f9fa;
+            border-color: #bdc3c7;
+        }
+
+        /* ===== LOGIN & REVIEW ===== */
+        .login-section, .review-section {
+            text-align: center;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin: 12px 0;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #FF9500;
+            box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.1);
+        }
+
+        .success-icon {
+            font-size: 72px;
+            margin: 30px 0;
+        }
+
+        .success-message {
+            font-size: 24px;
+            color: #27ae60;
+            font-weight: 600;
+            margin: 20px 0;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 640px) {
+            .container {
+                margin: 10px;
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            .microphone-icon {
+                width: 120px;
+                height: 120px;
+                font-size: 48px;
+            }
+
+            #recordingButton {
+                padding: 14px 16px;
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR HEADER -->
+    <div class="navbar">
+        <div class="navbar-logo">
+            <div class="navbar-icon">📦</div>
+            <div>
+                <div>Paletten</div>
+                <div style="font-size: 11px; opacity: 0.8;">Management</div>
+            </div>
+        </div>
+        <div class="navbar-user" id="navbar-user">Sven</div>
+    </div>
+
+    <div class="container">
+        <!-- RECORDING PHASE -->
+        <div id="recordingPhase" class="phase active">
+            <div class="recording-section">
+                <h1>Palette erfassen</h1>
+                <p class="subtitle">Sprechen Sie die Palette ein oder geben Sie sie manuell ein</p>
+
+                <div class="microphone-icon">🎤</div>
+
+                <button id="recordingButton" onclick="alert('Recording functionality')">🎤 Aufnahme starten</button>
+                <div id="status"></div>
+
+                <div class="button-group">
+                    <button class="btn" onclick="alert('Manual input')">✏️ Manuell eingeben</button>
+                    <button class="btn" onclick="alert('Overview')">📊 Übersicht</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SUCCESS PHASE (Example) -->
+        <div id="successPhase" class="phase">
+            <div style="text-align: center;">
+                <div class="success-icon">✅</div>
+                <div class="success-message">Erfolgreich gespeichert!</div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
