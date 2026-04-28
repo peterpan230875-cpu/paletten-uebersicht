@@ -1,0 +1,3015 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paletten Ãœbersicht</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== NAVBAR HEADER ===== */
+        .navbar {
+            background: #2c3e50;
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .navbar-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #FF6B5B 0%, #FF9500 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .navbar-user {
+            color: #ecf0f1;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* ===== CONTAINER ===== */
+        .container {
+            background: white;
+            max-width: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            border-radius: 0;
+            box-shadow: none;
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 70px);
+            overflow-y: auto;
+        }
+
+        .phase {
+            display: none;
+            flex: 1;
+            width: 100%;
+            overflow-y: auto;
+        }
+
+        .phase.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== CONTENT SECTION ===== */
+        .recording-section, .review-section, .success-section, .login-section {
+            padding: 40px 30px;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 26px;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+
+        h2 {
+            font-size: 22px;
+            color: #2c3e50;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 40px;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        /* ===== MICROPHONE ICON ===== */
+        .microphone-icon {
+            width: 140px;
+            height: 140px;
+            margin: 40px auto;
+            background: linear-gradient(135deg, #FFE0DC 0%, #FFD4C8 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 56px;
+            box-shadow: 0 6px 20px rgba(255, 107, 91, 0.15);
+        }
+
+        /* ===== RECORDING BUTTON ===== */
+        #recordingButton {
+            width: 100%;
+            padding: 16px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #FF6B5B 0%, #FF9500 100%);
+            color: white;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(255, 107, 91, 0.25);
+            margin: 30px 0 12px 0;
+            max-width: 100%;
+        }
+
+        #recordingButton:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(255, 107, 91, 0.35);
+        }
+
+        #recordingButton:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        #recordingButton:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        #recordingButton.recording {
+            animation: recordingPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes recordingPulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 4px 12px rgba(255, 107, 91, 0.3);
+            }
+            50% {
+                transform: scale(1.02);
+                box-shadow: 0 8px 20px rgba(255, 107, 91, 0.4);
+            }
+        }
+
+        /* ===== STATUS MESSAGE ===== */
+        #status {
+            color: #7f8c8d;
+            font-size: 13px;
+            margin: 12px 0;
+            min-height: 18px;
+            font-weight: 400;
+        }
+
+        .status-recording {
+            color: #e74c3c;
+            font-weight: 500;
+        }
+
+        .status-processing {
+            color: #f39c12;
+            font-weight: 500;
+        }
+
+        .status-error {
+            color: #e74c3c;
+            font-weight: 500;
+        }
+
+        /* ===== BUTTONS ===== */
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 14px 20px;
+            font-size: 15px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            color: #2c3e50;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background: #f8f9fa;
+            border-color: #bdc3c7;
+            transform: translateY(-1px);
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+            border: none;
+        }
+
+        .btn-save:hover {
+            background: linear-gradient(135deg, #229954 0%, #1e8449 100%);
+            color: white;
+        }
+
+        .btn-discard {
+            background: white;
+            color: #2c3e50;
+            border: 1px solid #e0e0e0;
+        }
+
+        /* ===== INPUT FIELDS ===== */
+        input[type="text"],
+        input[type="password"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 14px;
+            margin: 12px 0;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #FF9500;
+            box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.1);
+        }
+
+        /* ===== SUCCESS SECTION ===== */
+        .success-icon {
+            font-size: 72px;
+            margin: 30px 0;
+            animation: successBounce 0.6s ease-out;
+        }
+
+        @keyframes successBounce {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .success-message {
+            font-size: 22px;
+            color: #27ae60;
+            font-weight: 600;
+            margin: 20px 0;
+        }
+
+        /* ===== TEXT DISPLAY ===== */
+        .text-display {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 20px 0;
+            min-height: 80px;
+            text-align: left;
+            color: #2c3e50;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .error-box {
+            background: #fadbd8;
+            border: 1px solid #f5b7b1;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 20px 0;
+            color: #c0392b;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .info-text {
+            font-size: 12px;
+            color: #95a5a6;
+            margin-top: 20px;
+            font-style: italic;
+        }
+
+        /* ===== RESPONSIVE MOBILE ===== */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 16px;
+            }
+
+            .navbar-logo {
+                font-size: 14px;
+                gap: 8px;
+            }
+
+            .navbar-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+
+            .navbar-user {
+                font-size: 13px;
+            }
+
+            .recording-section,
+            .review-section,
+            .success-section,
+            .login-section {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            .subtitle {
+                font-size: 13px;
+                margin-bottom: 30px;
+            }
+
+            .microphone-icon {
+                width: 120px;
+                height: 120px;
+                margin: 30px auto;
+                font-size: 48px;
+            }
+
+            #recordingButton {
+                padding: 14px 20px;
+                font-size: 15px;
+                margin: 20px 0 10px 0;
+            }
+
+            .button-group {
+                gap: 10px;
+                margin-top: 20px;
+            }
+
+            .btn {
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+
+            .success-icon {
+                font-size: 60px;
+            }
+
+            .success-message {
+                font-size: 20px;
+            }
+
+            input[type="text"],
+            input[type="password"],
+            select,
+            textarea {
+                padding: 11px 12px;
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                min-height: calc(100vh - 60px);
+            }
+
+            .navbar {
+                padding: 10px 12px;
+            }
+
+            .navbar-logo {
+                font-size: 13px;
+                gap: 6px;
+            }
+
+            .navbar-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 16px;
+            }
+
+            .recording-section,
+            .review-section,
+            .success-section,
+            .login-section {
+                padding: 20px 16px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .microphone-icon {
+                width: 100px;
+                height: 100px;
+                margin: 25px auto;
+                font-size: 40px;
+            }
+
+            #recordingButton {
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+
+            .success-icon {
+                font-size: 52px;
+            }
+        }
+
+        /* ===== LIST & GRID STYLES ===== */
+        .kundenliste-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+            padding: 20px;
+            width: 100%;
+        }
+
+        .kundenliste-item {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            font-weight: 500;
+            color: #2c3e50;
+            font-size: 13px;
+        }
+
+        .kundenliste-item:hover {
+            border-color: #FF9500;
+            background: #fff8f3;
+            transform: translateY(-2px);
+        }
+
+        .nav-back-btn {
+            background: #FF9500;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav-back-btn:hover {
+            background: #FF7A3D;
+            transform: translateX(-2px);
+        }
+
+        #logoutContainer {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+        }
+
+        #logoutContainer button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        #logoutContainer button:hover {
+            background: #c0392b;
+        }
+
+        @media (max-width: 768px) {
+            .kundenliste-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 10px;
+                padding: 16px;
+            }
+
+            .kundenliste-item {
+                font-size: 12px;
+                padding: 10px;
+            }
+
+            #logoutContainer {
+                top: 12px;
+                right: 16px;
+            }
+
+            #logoutContainer button {
+                padding: 6px 12px;
+                font-size: 11px;
+            }
+        }
+</style>
+</head>
+<body>
+    <div class="container" style="position: relative;">
+        <!-- Logout Button oben -->
+        <div id="logoutContainer" style="display: none; text-align: right; margin-bottom: 15px;">
+            <button onclick="logoutUser()" style="padding: 10px 16px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap;">ðŸ‘‹ Logout (<span id="mitarbeiterDisplay">Marcel</span>)</button>
+        </div>
+
+        <!-- <h1>Paletten Ãœbersicht</h1>
+        <p class="subtitle">Spracherkennung mit Saldo-Tracking</p> -->
+
+        <!-- LOGIN PHASE -->
+        <!-- LOGIN PHASE: Mitarbeitername + Passwort -->
+        <div id="loginPhase" class="phase">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 40px 20px;">
+                <div style="background: white; border-radius: 20px; padding: 40px; max-width: 400px; width: 100%; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);">
+                    <h2 style="text-align: center; color: #333; margin-bottom: 30px; font-size: 24px;">ðŸ” Anmeldung</h2>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">ðŸ‘¤ Mitarbeitername</label>
+                        <input type="text" id="loginMitarbeiter" placeholder="z.B. Vorname" style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
+                    </div>
+
+                    <div style="margin-bottom: 25px;">
+                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">ðŸ”‘ Passwort</label>
+                        <input type="password" id="loginPassword" placeholder="Passwort eingeben..." style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
+                    </div>
+
+                    <div id="loginErrorBox" style="display: none; background: #ffe0e0; border: 2px solid #ff6b6b; border-radius: 10px; padding: 15px; margin-bottom: 20px; color: #c92a2a; font-size: 14px; font-weight: bold; text-align: center;">
+                        <span id="loginErrorMessage"></span>
+                    </div>
+
+                    <button onclick="handleLoginNew()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; margin-bottom: 12px;">Anmelden</button>
+
+                    <button onclick="showAdminPanel()" style="width: 100%; padding: 12px; background: #ff9500; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">âš™ï¸ Mitarbeiter hinzufÃ¼gen</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADMIN PANEL: Neue Mitarbeiter -->
+        <div id="adminPanelPhase" class="phase">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 40px 20px;">
+                <div style="background: white; border-radius: 20px; padding: 40px; max-width: 400px; width: 100%; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);">
+                    <h2 style="text-align: center; color: #333; margin-bottom: 30px; font-size: 24px;">âš™ï¸ Mitarbeiter hinzufÃ¼gen</h2>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">ðŸ“ Mitarbeitername</label>
+                        <input type="text" id="adminMitarbeitername" placeholder="z.B. Klaus" style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
+                    </div>
+
+                    <div style="margin-bottom: 25px;">
+                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">ðŸ”‘ Admin-Passwort</label>
+                        <input type="password" id="adminPassword" placeholder="Admin-Passwort..." style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
+                    </div>
+
+                    <div id="adminErrorBox" style="display: none; background: #ffe0e0; border: 2px solid #ff6b6b; border-radius: 10px; padding: 15px; margin-bottom: 20px; color: #c92a2a; font-size: 14px; font-weight: bold; text-align: center;">
+                        <span id="adminErrorMessage"></span>
+                    </div>
+
+                    <div id="adminSuccessBox" style="display: none; background: #e6ffed; border: 2px solid #51cf66; border-radius: 10px; padding: 15px; margin-bottom: 20px; color: #2f9e44; font-size: 14px; font-weight: bold; text-align: center;">
+                        <span id="adminSuccessMessage"></span>
+                    </div>
+
+                    <button onclick="addNewEmployee()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; margin-bottom: 12px;">âœ… Mitarbeiter erstellen</button>
+
+                    <button onclick="backToLogin()" style="width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">â† ZurÃ¼ck</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="recordingPhase" class="phase">
+            <div class="recording-section" style="position: relative;">
+                <!-- Hauptinhalt mittig -->
+                <p>Klicke auf den Button und sprich die Palette ein</p>
+                <button id="recordingButton" onclick="toggleRecording()">ðŸŽ¤ Aufnahme starten</button>
+                <p id="status"></p>
+
+                <!-- Manuelle Eingabe Button -->
+                <button onclick="openManualInput()" style="margin-top: 15px; padding: 15px 40px; background: #ff9800; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; max-width: 300px;">âœï¸ Manuell eingeben</button>
+
+                <!-- Ãœbersicht-Button unten mittig -->
+                <button onclick="showOverview()" style="margin-top: 15px; margin-bottom: 30px; padding: 15px 40px; background: #51cf66; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; max-width: 300px;">ðŸ“Š Ãœbersicht</button>
+
+                <!-- V1.382 schwarz, fett, unten in der mitte UNTER Ãœbersicht Button -->
+                <span style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); font-size: 14px; color: #000; font-weight: bold;">V1.382</span>
+            </div>
+        </div>
+
+        <div id="reviewPhase" class="phase">
+            <div class="review-section">
+                <p class="review-label">ðŸ“ Erkannter Text - Bitte Ã¼berprÃ¼fen und korrigieren:</p>
+
+                <!-- EDITIERBARE KUNDENINFORMATIONEN -->
+                <div style="background: #f0f4ff; border: 2px solid #667eea; border-radius: 12px; padding: 20px; margin: 20px 0;">
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 8px;">ðŸ‘¤ Kundenname:</label>
+                        <input type="text" id="editCustomerName" placeholder="Kundenname eingeben..." style="width: 100%; padding: 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                    </div>
+
+                    <div>
+                        <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 8px;">ðŸ”¢ Kundennummer (optional):</label>
+                        <input type="text" id="editCustomerNumber" placeholder="Kundennummer eingeben..." style="width: 100%; padding: 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                    </div>
+                </div>
+
+                <p class="review-label" style="margin-top: 20px;">ðŸ“‹ Erkannter Volltext:</p>
+                <div id="textDisplay" class="text-display"></div>
+
+                <div id="errorBox" style="display: none;" class="error-box">
+                    <span id="errorMessage"></span>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-save" onclick="saveToSupabase()" id="saveBtn">âœ… Speichern</button>
+                    <button class="btn btn-discard" onclick="discardAndRestart()">âŒ Verwerfen</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="successPhase" class="phase">
+            <div class="success-section">
+                <div class="success-icon">âœ…</div>
+                <p class="success-message">Erfolgreich gespeichert!</p>
+
+                <!-- ZUSAMMENFASSUNG -->
+                <div id="successSummary" style="background: #f0f9ff; border: 2px solid #51cf66; border-radius: 12px; padding: 20px; margin: 20px 0; text-align: left;">
+                    <!-- wird dynamisch gefÃ¼llt -->
+                </div>
+
+                <button id="newRecordingButton" onclick="restartRecording()">â† ZurÃ¼ck</button>
+            </div>
+        </div>
+
+        <!-- EBENE 1: KUNDENLISTE (Kompakte Liste) -->
+        <div id="kundenlistePhase" class="phase">
+            <div class="kundenliste-section">
+                <div class="kundenliste-header">
+                    <h2>ðŸ“Š Kundenliste</h2>
+                    <button class="nav-back-btn" onclick="backToRecording()">â† ZurÃ¼ck</button>
+                </div>
+                <div id="kundenlisteContainer" class="kundenliste-grid">
+                    <!-- wird dynamisch gefÃ¼llt -->
+                </div>
+            </div>
+        </div>
+
+        <!-- EBENE 2: KUNDENDETAILS (Bearbeitbare Paletten) -->
+        <div id="kundendetailPhase" class="phase">
+            <div class="kundendetail-section">
+                <div class="kundendetail-header">
+                    <h2 id="detailCustomerTitle">ðŸ“¦ Kundendetails</h2>
+                    <button class="nav-back-btn" onclick="backToCustomerList()">â† ZurÃ¼ck</button>
+                </div>
+                <div id="kundendetailContainer" class="kundendetail-list">
+                    <!-- wird dynamisch gefÃ¼llt -->
+                </div>
+            </div>
+        </div>
+
+        <!-- EBENE 3: PALETTENHISTORIE (Transaktionszeitleiste) -->
+        <div id="paletteHistoriePhase" class="phase">
+            <div class="palettehistorie-section">
+                <div class="palettehistorie-header">
+                    <h2 id="historieTitle">â±ï¸ Palettenhistorie</h2>
+                    <button class="nav-back-btn" onclick="backToCustomerDetail()">â† ZurÃ¼ck</button>
+                </div>
+                <div id="paletteHistorieContainer" class="palettehistorie-list">
+                    <!-- wird dynamisch gefÃ¼llt -->
+                </div>
+            </div>
+        </div>
+
+        <!-- MANUELLE EINGABE PHASE -->
+        <div id="manualInputPhase" class="phase">
+            <div class="recording-section">
+                <h2>âœï¸ Manuelle Eingabe</h2>
+                <p style="color: #666; font-size: 14px; margin-bottom: 20px;">Geben Sie die Palettenart und Anzahl ein</p>
+
+                <!-- PALETTENART DROPDOWN -->
+                <div style="margin-bottom: 25px;">
+                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">ðŸ“¦ Palettenart:</label>
+                    <select id="manualPaletteType" style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box; background: white; cursor: pointer;">
+                        <option value="">-- Palettenart auswÃ¤hlen --</option>
+                    </select>
+                </div>
+
+                <!-- KUNDENNAME -->
+                <div style="margin-bottom: 25px;">
+                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">ðŸ‘¤ Kundenname:</label>
+                    <input type="text" id="manualCustomerName" placeholder="Kundenname eingeben..." style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
+                </div>
+
+                <!-- KUNDENNUMMER (OPTIONAL) -->
+                <div style="margin-bottom: 25px;">
+                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">ðŸ”¢ Kundennummer (optional):</label>
+                    <input type="text" id="manualCustomerNumber" placeholder="Kundennummer eingeben..." style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
+                </div>
+
+                <!-- AKTION (Zu-/Abgang) -->
+                <div style="margin-bottom: 25px;">
+                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">âš¡ Aktion:</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button id="manualActionAdd" onclick="setManualAction('add')" style="padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; background: white; color: #667eea; transition: all 0.3s;">âž• Zugang</button>
+                        <button id="manualActionRemove" onclick="setManualAction('remove')" style="padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; background: white; color: #667eea; transition: all 0.3s;">âž– Abgang</button>
+                    </div>
+                </div>
+
+                <!-- ANZAHL -->
+                <div style="margin-bottom: 30px;">
+                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">ðŸ“Š Anzahl:</label>
+                    <input type="number" id="manualQuantity" placeholder="z.B. 5" min="1" value="1" style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
+                </div>
+
+                <!-- BUTTONS -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 30px;">
+                    <button onclick="saveManualInput()" style="padding: 15px; background: #51cf66; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s;">âœ… Speichern</button>
+                    <button onclick="cancelManualInput()" style="padding: 15px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s;">âŒ Abbrechen</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- KUNDE BESTÃ„TIGUNG MODAL -->
+        <div id="customerConfirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
+            <div style="background: white; border-radius: 20px; padding: 30px; max-width: 500px; text-align: center;">
+                <h2 style="margin-bottom: 20px; color: #333;">ðŸ‘¤ Ist das der gleiche Kunde?</h2>
+                <p id="customerConfirmQuestion" style="font-size: 18px; color: #666; margin-bottom: 30px;"></p>
+
+                <div style="display: flex; gap: 15px; justify-content: center;">
+                    <button onclick="confirmSameCustomer()" style="flex: 1; padding: 15px; background: #51cf66; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">âœ… Ja, gleicher Kunde</button>
+                    <button onclick="rejectSameCustomer()" style="flex: 1; padding: 15px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">âŒ Nein, neuer Kunde</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PALETTE AUSWAHL MODAL -->
+        <div id="paletteSelectionModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
+            <div style="background: white; border-radius: 20px; padding: 30px; max-width: 90%; max-height: 90vh; overflow-y: auto;">
+                <h2 style="text-align: center; margin-bottom: 20px; color: #333;">ðŸŽ¯ Bitte wÃ¤hle die Palettenart:</h2>
+                <div id="paletteButtonsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                    <!-- Buttons werden dynamisch generiert -->
+                </div>
+                <button onclick="cancelPaletteSelection()" style="width: 100%; padding: 15px; margin-top: 20px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">âŒ Verwerfen</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // GROQ API Key wird von Backend bereitgestellt (sicherer als hardcodiert!)
+        // ðŸ” GROQ API wird jetzt Ã¼ber Backend-Proxy aufgerufen (sicherer!)
+        // const GROQ_API_KEY wird NICHT mehr im Frontend genutzt
+
+        // ============================================
+        // PALETTENLISTE MIT SYNONYMEN
+        // ============================================
+        const PALETTENLISTE = {
+            // Neue Palettenarten
+            'Grafepalette': ['grafe', 'grafe-palette', 'grafepalette'],
+            'Steinzeug Gitterbox': ['steinzeug gitterbox', 'steinzeug-gitterbox', 'stg gitterbox'],
+            'Steinzeugpalette klein': ['steinzeugpalette klein', 'steinzeug klein', 'stg klein'],
+            'Steinzeugpalette groÃŸ': ['steinzeugpalette groÃŸ', 'steinzeug groÃŸ', 'stg groÃŸ'],
+            'Europalette 2': ['europalette zwei', 'euro zwei', 'europalette 2'],
+            'Europalette 3': ['europalette drei', 'euro drei', 'europalette 3'],
+            'Spezialpalette': ['spezial', 'spezialpalette', 'spezial-palette'],
+            'Velux-Palette': ['velux', 'velux-palette', 'veluxpalette'],
+            // Bestehende Palettenarten
+            'Europalette': ['euro', 'euro-palette', 'epal', 'eur', 'europool', 'flachpalette', 'fp'],
+            'Ziegelpalette': ['ziegel', 'ziegel-palette'],
+            'Gipskartonpalette': ['gipskarton', 'gipskarton-palette', 'gkb', 'gkb-palette'],
+            'Fermacellpalette': ['fermacell', 'fels', 'felspalette', 'fels-palette'],
+            'Gitterbox': ['gitterboxpalette', 'gkr-palette', 'gitterbox', 'gitter-box', 'gkr', 'pvc gitterbox'],
+            'MUHR-Palette': ['muhr'],
+            'Steinzeugpalette': ['steinzeug', 'steinzeug-palette', 'stg', 'stg box', 'stg gitterbox'],
+            'EHL-Palette': ['ehl'],
+            'Eder-Palette': ['eder'],
+            'Limex-Palette': ['limex'],
+            'KS-Palette': ['ks', 'kalksandstein', 'kalk-sandstein'],
+            'Porenbetonpalette': ['porenbeton', 'gasbeton', 'ytong', 'h+h', 'torenbeton'],
+            'KB-Palette': ['kb', 'klinker', 'klinkerpalette']
+        };
+
+        // ============================================
+        // PALETTEN-ERKENNUNGSFUNKTION
+        // ============================================
+        function normalisierePalette(text) {
+            if (!text) return null;
+
+            const normalized = text.toLowerCase().trim();
+
+            // Exakte Treffer zuerst
+            for (let [standard, synonyme] of Object.entries(PALETTENLISTE)) {
+                if (synonyme.includes(normalized)) {
+                    return { gefunden: true, palette: standard, kandidaten: null };
+                }
+            }
+
+            // Teilstring-Treffer (wenn Wort in Text vorkommt)
+            const kandidaten = [];
+            for (let [standard, synonyme] of Object.entries(PALETTENLISTE)) {
+                for (let synonym of synonyme) {
+                    // PrÃ¼fe ob Synonym als ganzes Wort im Text vorkommt
+                    if (normalized.includes(synonym)) {
+                        if (!kandidaten.find(k => k === standard)) {
+                            kandidaten.push(standard);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            if (kandidaten.length === 1) {
+                return { gefunden: true, palette: kandidaten[0], kandidaten: null };
+            }
+
+            if (kandidaten.length > 1) {
+                return { gefunden: false, palette: null, kandidaten: kandidaten };
+            }
+
+            // Nichts gefunden
+            return { gefunden: false, palette: null, kandidaten: null };
+        }
+
+        // ============================================
+        // VARIABLEN
+        // ============================================
+        let isRecording = false;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let recognizedText = "";
+        let audioStream = null;
+        let wartendeAuswahlPaletten = [];
+        let selectedPalette = null;
+        let aktuelleAuswahlPalette = null;  // ðŸŽ¯ SPEICHERE DIE AKTUELLEN DATEN VOR DEM LÃ–SCHEN
+        let erkannteAuswahlPaletten = [];   // ðŸŽ¯ SPEICHERE BEREITS ERKANNTE PALETTEN aus validateText()
+
+        // KundenbestÃ¤tigung
+        let wartendeKundenZuBestaetigung = null;
+        let selectedCustomerName = null;
+
+        // Login & Mitarbeiter
+        let mitarbeiterName = null;
+
+        // ============================================
+        // ðŸ“± DEVICE-DETECTION FÃœR MOBILE-KOMPATIBILITÃ„T
+        // ============================================
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isAndroid = /Android/.test(navigator.userAgent);
+        const isMobile = isIOS || isAndroid;
+        const hasGetUserMedia = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+        const isHTTPS = location.protocol === 'https:';
+
+        // Zeige Device-Info in Console fÃ¼r Debugging
+        console.log('ðŸ“± Device-Info:', {
+            device: isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop',
+            isMobile,
+            hasGetUserMedia,
+            isHTTPS,
+            userAgent: navigator.userAgent.substring(0, 80)
+        });
+
+        // ============================================
+        // ðŸŽ¤ WEB SPEECH API INITIALISIERUNG
+        // ============================================
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+
+        // ðŸ”§ iOS FIX: Funktion zum Neu-Initialisieren der Recognition
+        function initializeRecognition() {
+            console.log('ðŸ”§ Initialisiere Recognition-Objekt neu...');
+            try {
+                // Stoppe alte Recognition falls noch aktiv
+                if (recognition) {
+                    try {
+                        recognition.stop();
+                        recognition.abort();
+                    } catch (e) {}
+                }
+
+                // Erstelle neues Recognition-Objekt
+                if (SpeechRecognition) {
+                    recognition = new SpeechRecognition();
+                    recognition.continuous = false;
+                    recognition.interimResults = true;
+                    recognition.lang = 'de-DE';
+                    console.log('âœ… Neues Recognition-Objekt erstellt');
+                } else {
+                    console.warn('âš ï¸ SpeechRecognition nicht verfÃ¼gbar');
+                }
+            } catch (err) {
+                console.error('ðŸ”´ Fehler beim Initialisieren von Recognition:', err);
+            }
+        }
+
+        if (SpeechRecognition) {
+            initializeRecognition();
+            console.log('âœ… Web Speech API verfÃ¼gbar');
+        } else {
+            console.warn('âš ï¸ Web Speech API nicht verfÃ¼gbar - Fallback zu MediaRecorder');
+        }
+
+        // ðŸ” OPTIONAL: Microphone-Berechtigung pre-check fÃ¼r iOS
+        async function ensureMicrophonePermission() {
+            if (!hasGetUserMedia) {
+                console.warn('âš ï¸ getUserMedia nicht verfÃ¼gbar');
+                return false;
+            }
+
+            try {
+                console.log('ðŸ” PrÃ¼fe Mikrophon-Berechtigung...');
+                const testStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+                // Sofort alle Tracks stoppen - wir brauchen nur die Permission
+                testStream.getTracks().forEach(track => {
+                    console.log('âœ… Track gestoppt:', track.kind);
+                    track.stop();
+                });
+
+                console.log('âœ… Mikrophon-Berechtigung erteilt');
+                return true;
+            } catch (err) {
+                console.warn('âš ï¸ Mikrophon-Berechtigung verweigert:', err.message);
+                return false;
+            }
+        }
+
+        async function toggleRecording() {
+            if (!isRecording) startRecording();
+            else stopRecording();
+        }
+
+        async function startRecording() {
+            try {
+                // ðŸ“± DEBUG: Zeige Device-Info fÃ¼r Debugging
+                console.log('ðŸŽ¤ Starte Aufnahme mit folgenden Bedingungen:', {
+                    device: isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop',
+                    browser: /Safari/.test(navigator.userAgent) ? 'Safari' : /Chrome/.test(navigator.userAgent) ? 'Chrome' : 'Andere',
+                    isHTTPS: location.protocol === 'https:',
+                    hasGetUserMedia: hasGetUserMedia,
+                    recognitionAvailable: !!recognition
+                });
+
+                // ðŸ“± iOS FIX: Stoppe Watchdog wenn Aufnahme startet
+                if (microphoneTimeoutId) {
+                    clearTimeout(microphoneTimeoutId);
+                    microphoneTimeoutId = null;
+                    console.log('â° Watchdog gestoppt - Aufnahme startet');
+                }
+
+                // ðŸŽ¤ NUTZE WEB SPEECH API (Browser-native, beste Compatibility auf Mobile)
+                if (!recognition) {
+                    showError("âš ï¸ Spracherkennung wird von deinem Browser nicht unterstÃ¼tzt! Nutze Safari auf iOS oder Chrome auf Android.");
+                    return;
+                }
+
+                // ðŸ›‘ Stoppe evtl. alte Recognition bevor neue startet
+                try {
+                    recognition.stop();
+                } catch (e) {}
+
+                console.log('ðŸŽ¤ Starte Web Speech API auf:', isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop');
+
+                isRecording = true;
+                let finalTranscript = '';
+
+                const btn = document.getElementById("recordingButton");
+                btn.textContent = "ðŸ”´ Aufnahme lÃ¤uft - jetzt sprechen!";
+                btn.classList.add("recording");
+
+                const status = document.getElementById("status");
+                status.textContent = "ðŸŽ§ HÃ¶re zu...";
+                status.className = "status-recording";
+
+                // ðŸŽ¤ EVENT: Wenn Spracherkennung startet
+                recognition.onstart = () => {
+                    console.log('âœ… Web Speech API aktiviert');
+                    status.textContent = "ðŸŽ§ HÃ¶re zu...";
+                };
+
+                // ðŸŽ¤ EVENT: Text erkannt (inkl. Zwischenergebnisse)
+                recognition.onresult = (event) => {
+                    let interimTranscript = '';
+
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const transcript = event.results[i][0].transcript;
+
+                        if (event.results[i].isFinal) {
+                            finalTranscript += transcript + ' ';
+                            console.log('âœ… Final Text:', transcript);
+                        } else {
+                            interimTranscript += transcript;
+                            console.log('ðŸ”„ Interim Text:', transcript);
+                        }
+                    }
+
+                    // Zeige Zwischenergebnis + Final
+                    const displayText = interimTranscript || finalTranscript;
+                    console.log('ðŸ“ Zeige:', displayText);
+                    status.textContent = `ðŸŽ§ Erkannt: ${displayText}`;
+                };
+
+                // ðŸ”´ EVENT: Fehler bei Spracherkennung
+                recognition.onerror = (event) => {
+                    console.error('ðŸ”´ Speech Recognition Fehler:', event.error);
+                    console.error('   Device:', isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop');
+
+                    // ðŸ” iOS FIX: Gebe Mikrofon auch bei Fehler frei!
+                    console.log('ðŸŽ¤ Gebe Mikrofon frei nach Fehler...');
+                    stopAllAudio();
+                    releaseAudioResources();
+
+                    let errorMsg = `Fehler: ${event.error}`;
+
+                    if (event.error === 'no-speech') {
+                        errorMsg = 'âŒ Keine Sprache erkannt - bitte laut und deutlich sprechen!';
+                    } else if (event.error === 'audio-capture') {
+                        // ðŸŽ™ï¸ Device-spezifische Hinweise fÃ¼r audio-capture Fehler
+                        if (isIOS) {
+                            errorMsg = 'ðŸŽ™ï¸ iOS Mikrofon-Fehler: Probiere die Aufnahme neu oder nutze eine andere App.';
+                        } else if (isAndroid) {
+                            errorMsg = 'ðŸŽ™ï¸ Android Mikrofon-Fehler: ÃœberprÃ¼fe die App-Berechtigung in den Einstellungen.';
+                        } else {
+                            errorMsg = 'ðŸŽ™ï¸ Mikrophon-Fehler - Berechtigung erteilt? Probiere neu!';
+                        }
+                    } else if (event.error === 'network') {
+                        errorMsg = 'ðŸŒ Netzwerk-Fehler - Ã¼berprÃ¼fe deine Internet-Verbindung';
+                    } else if (event.error === 'bad-grammar') {
+                        errorMsg = 'ðŸŽ¤ Sprache nicht verstanden - bitte deutlich sprechen';
+                    } else if (event.error === 'service-not-allowed') {
+                        errorMsg = 'âš ï¸ Speech Recognition ist nicht verfÃ¼gbar - bitte spÃ¤ter erneut versuchen';
+                    }
+
+                    console.error('ðŸ”´ Zeige Error:', errorMsg);
+                    showError(errorMsg);
+                    isRecording = false;
+                    btn.textContent = "ðŸŽ¤ Aufnahme starten";
+                    btn.classList.remove("recording");
+                    btn.disabled = false;
+                };
+
+                // âœ… EVENT: Spracherkennung beendet - WICHTIG!
+                recognition.onend = () => {
+                    console.log('âœ… Recognition onend() aufgerufen');
+                    console.log('   finalTranscript =', finalTranscript);
+                    console.log('   trimmed =', finalTranscript.trim());
+
+                    // ðŸ” iOS FIX: Gebe Mikrofon SOFORT frei wenn Aufnahme endet!
+                    // NICHT WARTEN auf processWithGroq()
+                    console.log('ðŸŽ¤ Gebe Mikrofon SOFORT frei nach Aufnahmeende...');
+                    stopAllAudio();
+                    releaseAudioResources();
+
+                    if (finalTranscript.trim() && finalTranscript.trim().length > 0) {
+                        console.log('ðŸ“¤ Rufe processWithGroq auf mit:', finalTranscript.trim());
+                        // Schicke erkannten Text zu Groq fÃ¼r Strukturierung
+                        processWithGroq(finalTranscript.trim());
+                    } else {
+                        console.warn('âš ï¸ Kein Text erkannt - finalTranscript ist leer');
+                        showError('âŒ Keine Sprache erkannt - versuche es nochmal!');
+                        btn.textContent = "ðŸŽ¤ Aufnahme starten";
+                        btn.classList.remove("recording");
+                        btn.disabled = false;
+                    }
+
+                    isRecording = false;
+                };
+
+                // ðŸš€ STARTE SPRACHERKENNUNG
+                console.log('ðŸš€ Starte recognition.start()');
+                recognition.start();
+
+            } catch (err) {
+                console.error('ðŸ”´ Fehler beim Starten der Aufnahme:', err);
+                console.error('   Error name:', err.name);
+                console.error('   Device:', isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop');
+
+                let userMsg = "Mikrofon konnte nicht aktiviert werden: " + err.message;
+
+                const errorName = err.name || "";
+                const errorMsg = err.message ? err.message.toLowerCase() : "";
+
+                // ðŸ” Bessere Fehlerbehandlung fÃ¼r verschiedene GerÃ¤te
+                if (errorName === "NotAllowedError" || errorMsg.includes("permission")) {
+                    if (isIOS) {
+                        userMsg = "ðŸ” iOS: Bitte erteile Mikrophon-Zugriff in Einstellungen > Safari > Mikrophon";
+                    } else if (isAndroid) {
+                        userMsg = "ðŸ” Android: Bitte erteile Mikrophon-Berechtigung in App-Einstellungen";
+                    } else {
+                        userMsg = "ðŸ” Mikrophon-Berechtigung benÃ¶tigt - bitte im Berechtigungsdialog 'Erlauben' klicken";
+                    }
+                } else if (errorName === "NotFoundError" || errorMsg.includes("notfound")) {
+                    userMsg = "ðŸŽ™ï¸ Kein Mikrophon erkannt - bitte verbinde ein externes GerÃ¤t";
+                } else if (errorName === "NotSupportedError") {
+                    userMsg = "âš ï¸ Dein Browser unterstÃ¼tzt Sprachaufnahme nicht (nutze Safari auf iOS oder Chrome auf Android)";
+                } else if (errorName === "SecurityError") {
+                    userMsg = "ðŸ”’ Sicherheitsfehler - HTTPS ist erforderlich";
+                }
+
+                console.error('ðŸ”´ Zeige Error:', userMsg);
+                showError(userMsg);
+                isRecording = false;
+            }
+        }
+
+        // ============================================
+        // ðŸ›‘ ERWEITERTE MICROPHONE-CLEANUP (V1.378+)
+        // âœ… SAUBER: Explizite Nullifizierung, besseres Logging
+        // âœ… CHROME FIX: recognition.stop() IMMER aufrufen (nicht nur wenn isRecording)
+        // ============================================
+        function stopAllAudio() {
+            console.log('ðŸ›‘ stopAllAudio() aufgerufen');
+            try {
+                // 1. Stop MediaRecorder (falls vorhanden)
+                if (mediaRecorder) {
+                    console.log('â¹ï¸ Stoppe MediaRecorder...');
+                    if (mediaRecorder.state !== 'inactive') {
+                        mediaRecorder.stop();
+                    }
+                    mediaRecorder = null;
+                }
+
+                // 2. Stop Web Speech API (IMMER aufrufen, nicht nur wenn isRecording!)
+                // âœ… FIX: recognition.stop() muss IMMER aufgerufen werden
+                if (recognition) {
+                    try {
+                        console.log('ðŸŽ¤ Stoppe Web Speech Recognition...');
+                        recognition.stop();
+                    } catch (e) {
+                        console.warn('âš ï¸ Recognition.stop() Fehler:', e.message);
+                    }
+                }
+
+                // 3. Stop alle Audio Tracks EXPLIZIT
+                if (audioStream) {
+                    console.log('ðŸŽ§ Stoppe Audio Stream Tracks...');
+                    audioStream.getTracks().forEach(track => {
+                        console.log(`   - ${track.kind} track: stopped`);
+                        try {
+                            track.stop();
+                        } catch (trackError) {
+                            console.warn(`   âš ï¸ Fehler beim Stoppen: ${trackError.message}`);
+                        }
+                    });
+                    audioStream = null;  // ðŸŽ¯ WICHTIG: Stream-Referenz nullifizieren
+                    console.log('âœ… Alle Audio Tracks gestoppt und freigegeben');
+                }
+
+                isRecording = false;
+
+            } catch (err) {
+                console.error('ðŸ”´ Fehler beim Audio-Cleanup:', err.message);
+            }
+        }
+
+        // ============================================
+        // ðŸ§¹ HELPER: Gebe ALLE Audio-Ressourcen frei
+        // ============================================
+        function releaseAudioResources() {
+            console.log('ðŸ”„ Gebe alle Audio-Ressourcen frei...');
+            try {
+                // Entferne Event-Listener fÃ¼r Audio-Tracks
+                if (audioStream && audioStream.getTracks) {
+                    audioStream.getTracks().forEach(track => {
+                        try {
+                            if (track.onended) track.onended = null;
+                            if (track.onmute) track.onmute = null;
+                            if (track.onunmute) track.onunmute = null;
+                        } catch (e) {
+                            // Ignore cleanup errors
+                        }
+                    });
+                }
+
+                // Stoppe und nullifiziere alle Ressourcen
+                stopAllAudio();
+
+                // Explizite Nullifizierung aller Media-Variablen
+                mediaRecorder = null;
+                audioStream = null;
+                audioChunks = [];
+
+                // ðŸ” iOS FIX: Nullifiziere Recognition und erstelle neues Objekt
+                // Das hilft iOS das Mikrofon komplett freizugeben
+                recognition = null;
+                console.log('ðŸ”§ Re-initialisiere Recognition fÃ¼r iOS-KompatibilitÃ¤t...');
+                initializeRecognition();
+
+                console.log('âœ… Alle Audio-Ressourcen freigegeben');
+            } catch (err) {
+                console.error('âš ï¸ Fehler beim Freigeben von Ressourcen:', err);
+            }
+        }
+
+        // ðŸ” iOS SPEZIFISCH: Timeout-Cleanup fÃ¼r wenn Device gesperrt wird
+        // iOS sendet visibilitychange nicht zuverlÃ¤ssig beim Sperren
+        let microphoneTimeoutId = null;
+        function startMicrophoneWatchdog() {
+            // Stoppe alten Timeout falls vorhanden
+            if (microphoneTimeoutId) {
+                clearTimeout(microphoneTimeoutId);
+            }
+
+            // Starte neuen Timeout: Nach 5 Sekunden InaktivitÃ¤t â†’ Cleanup
+            microphoneTimeoutId = setTimeout(() => {
+                console.log('â° iOS Watchdog: Stoppe Mikrofon nach InaktivitÃ¤t');
+                stopAllAudio();
+            }, 5000);
+        }
+
+        // ðŸ“µ Event 1: Wenn Handy gesperrt / App minimiert wird
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                console.log('ðŸ“µ App in Hintergrund - cleanup Audio');
+                // âœ… CHROME FIX: Stoppe IMMER, nicht nur wenn isRecording
+                stopAllAudio();
+            } else {
+                // App kommt zurÃ¼ck: Starte Watchdog
+                console.log('ðŸ‘ï¸ App zurÃ¼ck - starte Mikrofon-Watchdog');
+                startMicrophoneWatchdog();
+            }
+        });
+
+        // ðŸ‘‹ Event 2: Wenn Benutzer Seite verlÃ¤sst / Browser-Tab schlieÃŸt
+        window.addEventListener('pagehide', () => {
+            console.log('ðŸ‘‹ Seite wird verlassen - cleanup Microphone');
+            // âœ… CHROME FIX: Stoppe IMMER
+            stopAllAudio();
+        });
+
+        // ðŸ”„ Event 3: Wenn Browser-Tab aktualisiert wird
+        window.addEventListener('beforeunload', () => {
+            if (recognition) recognition.stop();
+            stopAllAudio();
+        });
+
+        // ðŸ“± Event 4: iOS-spezifisch - beim Fokus verlieren
+        window.addEventListener('blur', () => {
+            console.log('ðŸ’¤ Window blur - iOS Watchdog startet');
+            startMicrophoneWatchdog();
+        });
+
+        window.addEventListener('focus', () => {
+            console.log('ðŸ‘ï¸ Window focus - iOS Watchdog gestoppt');
+            if (microphoneTimeoutId) {
+                clearTimeout(microphoneTimeoutId);
+                microphoneTimeoutId = null;
+            }
+        });
+
+        function stopRecording() {
+            if (recognition && isRecording) {
+                recognition.stop();
+                isRecording = false;
+
+                const btn = document.getElementById("recordingButton");
+                btn.textContent = "ðŸŽ¤ Aufnahme starten";
+                btn.classList.remove("recording");
+                btn.disabled = true;
+
+                const status = document.getElementById("status");
+                status.textContent = "Wird verarbeitet...";
+                status.className = "status-processing";
+            }
+        }
+
+        // ============================================
+        // ðŸ§¹ TEXT MIT GROQ STRUKTURIEREN (nicht Audio!)
+        // ============================================
+        async function processWithGroq(rohText) {
+            console.log('ðŸ§¹ processWithGroq() aufgerufen mit:', rohText);
+
+            // âœ… CHROME FIX: Gebe Mikrofon SOFORT frei sobald Verarbeitung startet!
+            console.log('ðŸŽ¤ Gebe Mikrofon frei nach Aufnahme...');
+            stopAllAudio();
+
+            const status = document.getElementById("status");
+            status.textContent = "ðŸ§¹ Strukturiere mit Backend...";
+
+            try {
+                console.log('ðŸ“¤ Sende Text zum Backend-Proxy: ' + rohText.substring(0, 100));
+
+                // ðŸ” NUTZE BACKEND-PROXY STATT DIREKTER GROQ-AUFRUF (sicherer!)
+                const backendRes = await fetch("/api/structure-text", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        text: rohText
+                    })
+                });
+
+                console.log('ðŸ“¨ Backend Response Status:', backendRes.status);
+
+                const backendData = await backendRes.json();
+                console.log('ðŸ“¨ Backend Response:', backendData);
+
+                if (!backendRes.ok || !backendData.success) {
+                    const errorMsg = backendData.error || 'Unbekannter Fehler';
+                    console.error('ðŸ”´ Backend Fehler:', errorMsg);
+                    throw new Error(errorMsg);
+                }
+
+                recognizedText = backendData.text;
+                console.log('âœ… Backend strukturiert:', recognizedText.substring(0, 150));
+
+                // Zeige Review-Phase
+                console.log('ðŸ“‹ Rufe showReviewPhase auf');
+                showReviewPhase(recognizedText);
+
+            } catch (err) {
+                console.error('âŒ processWithGroq Fehler:', err);
+                console.error('   Message:', err.message);
+                console.error('   Stack:', err.stack);
+
+                // ðŸ”´ ZEIGE FEHLER DIREKT AUF BILDSCHIRM FÃœR DEBUGGING
+                const errorMsg = `
+âŒ GROQ FEHLER:
+
+${err.message}
+
+ðŸ“ Erkannter Text war:
+"${rohText}"
+
+ðŸ’¡ MÃ¶gliche LÃ¶sung:
+- Refresh die Seite (F5)
+- Versuche es nochmal
+- Sprich langsamer/deutlicher
+                `;
+
+                status.textContent = errorMsg;
+                status.style.whiteSpace = "pre-wrap";
+                status.style.textAlign = "left";
+                status.style.fontSize = "12px";
+                status.style.color = "#d32f2f";
+                status.style.background = "#ffebee";
+                status.style.padding = "10px";
+                status.style.borderRadius = "5px";
+
+                showError("Groq API Fehler: " + err.message);
+
+                const btn = document.getElementById("recordingButton");
+                if (btn) {
+                    btn.textContent = "ðŸŽ¤ Aufnahme starten";
+                    btn.disabled = false;
+                    btn.classList.remove("recording");
+                }
+            }
+        }
+
+
+        function erstelleNormalisierthenText(text) {
+            // Erstelle eine Version mit normalisierten Palettennamen
+            const lines = text.split('\n');
+            let normalisierterText = '';
+            let kundenname = '';
+            let kundennummer = '';
+            let aktion = '';
+
+            // Erste Phase: Parse Kundeninfo
+            for (let line of lines) {
+                if (line.startsWith('Kundenname:')) {
+                    kundenname = line.replace('Kundenname:', '').trim();
+                    normalisierterText += line + '\n';
+                } else if (line.startsWith('Kundennummer:')) {
+                    kundennummer = line.replace('Kundennummer:', '').trim();
+                    normalisierterText += line + '\n';
+                } else if (line.startsWith('Aktion:')) {
+                    aktion = line.replace('Aktion:', '').trim();
+                    normalisierterText += line + '\n';
+                } else if (line.startsWith('Palettenart:')) {
+                    // ðŸŽ¯ NORMALISIERE PALETTENART
+                    const palettenartRaw = line.replace('Palettenart:', '').trim();
+                    const erkennungsResult = normalisierePalette(palettenartRaw);
+
+                    if (erkennungsResult.gefunden) {
+                        // Zeige normalisierte Version
+                        normalisierterText += `Palettenart: ${erkennungsResult.palette}\n`;
+                    } else {
+                        // Falls nicht normalisiert, zeige Original
+                        normalisierterText += line + '\n';
+                    }
+                } else if (line.startsWith('Menge:') || line.startsWith('---')) {
+                    normalisierterText += line + '\n';
+                } else if (line.trim() !== '') {
+                    normalisierterText += line + '\n';
+                }
+            }
+
+            return normalisierterText;
+        }
+
+        function showReviewPhase(text) {
+            document.querySelectorAll(".phase").forEach(p => p.classList.remove("active"));
+            document.getElementById("reviewPhase").classList.add("active");
+
+            // ðŸŽ¯ ZEIGE NORMALISIERTEN TEXT MIT KORREKTEN PALETTENNAMEN
+            const normalisierterText = erstelleNormalisierthenText(text);
+            document.getElementById("textDisplay").textContent = normalisierterText;
+            document.getElementById("errorBox").style.display = "none";
+
+            // Parse Kundenname und Kundennummer aus dem ORIGINAL-Text
+            const lines = text.split('\n');
+            let kundenname = '';
+            let kundennummer = '';
+
+            for (let line of lines) {
+                if (line.startsWith('Kundenname:')) {
+                    kundenname = line.replace('Kundenname:', '').trim();
+                } else if (line.startsWith('Kundennummer:')) {
+                    kundennummer = line.replace('Kundennummer:', '').trim();
+                }
+            }
+
+            // FÃ¼lle die bearbeitbaren Felder
+            document.getElementById("editCustomerName").value = kundenname;
+            document.getElementById("editCustomerNumber").value = kundennummer;
+
+            const saveBtn = document.getElementById("saveBtn");
+            saveBtn.disabled = false;
+            saveBtn.textContent = "âœ… Speichern";
+        }
+
+        function discardAndRestart() {
+            console.log('ðŸ”„ discardAndRestart() gestartet');
+
+            try {
+                // âœ… WICHTIG: Stoppe Mikrofon SOFORT bevor alles zurÃ¼ckgesetzt wird!
+                stopAllAudio();
+                releaseAudioResources();
+
+                // ðŸ“± iOS FIX: Starte Watchdog fÃ¼r Hintergrund-Cleanup
+                console.log('â° Watchdog wird nach Verwerfen gestartet');
+                try {
+                    if (typeof startMicrophoneWatchdog === 'function') {
+                        startMicrophoneWatchdog();
+                    } else {
+                        console.warn('âš ï¸ startMicrophoneWatchdog ist keine Funktion');
+                    }
+                } catch (watchdogErr) {
+                    console.warn('âš ï¸ Fehler beim Starten des Watchdog:', watchdogErr.message);
+                    // Nicht kritisch - weiter gehts
+                }
+            } catch (cleanupErr) {
+                console.error('âš ï¸ Fehler beim Cleanup:', cleanupErr.message);
+                // Weiter gehts trotz Fehler
+            }
+
+            recognizedText = "";
+            audioChunks = [];
+            isRecording = false;
+
+            // ðŸ›‘ RESET ALLE AUSWAHL-VARIABLEN fÃ¼r nÃ¤chste Aufnahme
+            erkannteAuswahlPaletten = [];
+            wartendeAuswahlPaletten = [];
+            aktuelleAuswahlPalette = null;
+            selectedPalette = null;
+
+            const btn = document.getElementById("recordingButton");
+            if (btn) {
+                btn.textContent = "ðŸŽ¤ Aufnahme starten";
+                btn.disabled = false;
+                btn.classList.remove("recording");
+            }
+
+            const status = document.getElementById("status");
+            if (status) {
+                status.textContent = "";
+                status.className = "";
+            }
+
+            // âœ… WICHTIG: Nutze setPhase() um Logout-Button zu zeigen!
+            console.log('ðŸ”„ Kehre zur recordingPhase zurÃ¼ck mit setPhase()');
+            try {
+                setPhase('recordingPhase');
+                console.log('âœ… setPhase("recordingPhase") erfolgreich aufgerufen');
+            } catch (phaseErr) {
+                console.error('âŒ Fehler beim Setzen der Phase:', phaseErr.message);
+                // Fallback: Zeige Phase manuell an
+                console.log('ðŸ”§ Fallback: Zeige Phase manuell an');
+                document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
+                const recordingPhase = document.getElementById('recordingPhase');
+                if (recordingPhase) {
+                    recordingPhase.classList.add('active');
+                }
+                const logoutContainer = document.getElementById('logoutContainer');
+                if (logoutContainer) {
+                    logoutContainer.style.display = 'block';
+                }
+            }
+        }
+
+        // ============================================
+        // APP BEENDEN FUNKTION
+        // ============================================
+        function beendenApp() {
+            console.log('ðŸ›‘ App wird beendet...');
+
+            // 1. STOPPLE UND GEBE MIKROFON FREI
+            try {
+                // Stoppe Web Speech API Recognition
+                if (recognition && isRecording) {
+                    console.log('ðŸŽ¤ Stoppe Speech Recognition');
+                    recognition.stop();
+                    isRecording = false;
+                }
+
+                // Stopppe Audio Stream (falls noch aktiv)
+                if (audioStream) {
+                    console.log('ðŸŽ¤ Stoppe Audio Stream Tracks');
+                    audioStream.getTracks().forEach(track => {
+                        track.stop();
+                    });
+                    audioStream = null;
+                }
+
+                // MediaRecorder stoppen (falls noch aktiv)
+                if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                    console.log('ðŸŽ¤ Stoppe MediaRecorder');
+                    mediaRecorder.stop();
+                }
+
+                console.log('âœ… Mikrofon komplett freigegeben');
+            } catch (err) {
+                console.error('âš ï¸ Fehler beim Stoppen des Mikrofons:', err);
+            }
+
+            // 2. SEITE NEU LADEN
+            console.log('ðŸ”„ Lade Seite neu...');
+            setTimeout(() => {
+                location.reload();
+            }, 500); // Kurze VerzÃ¶gerung um Logs zu sehen
+        }
+
+        function restartRecording() {
+            discardAndRestart();
+        }
+
+        function validateText(text) {
+            const lines = text.split('\n');
+
+            // Extrahiere Kundeninfo (kommt einmal am Anfang)
+            let kundenname = '';
+            let kundennummer = '';
+            let aktion = '';
+
+            // Trenne nach '---' um mehrere Palettengruppen zu parsen
+            const gruppen = text.split('---').map(g => g.trim());
+            const palettenListe = [];
+
+            // Erste Gruppe: Kundeninfo + erste Palettenart
+            const ersteGruppe = gruppen[0].split('\n');
+
+            for (let line of ersteGruppe) {
+                if (line.startsWith('Kundenname:')) {
+                    kundenname = line.replace('Kundenname:', '').trim();
+                } else if (line.startsWith('Kundennummer:')) {
+                    kundennummer = line.replace('Kundennummer:', '').trim();
+                } else if (line.startsWith('Aktion:')) {
+                    aktion = line.replace('Aktion:', '').trim();
+                }
+            }
+
+            // Parse alle Palettengruppen
+            for (let gruppe of gruppen) {
+                let palettenartRaw = '';
+                let menge = '';
+                const gruppenLinien = gruppe.split('\n');
+
+                for (let line of gruppenLinien) {
+                    if (line.startsWith('Palettenart:')) {
+                        palettenartRaw = line.replace('Palettenart:', '').trim();
+                    } else if (line.startsWith('Menge:')) {
+                        menge = line.replace('Menge:', '').trim();
+                    }
+                }
+
+                if (palettenartRaw && menge) {
+                    // ðŸŽ¯ NORMALISIERE PALETTENART
+                    const erkennungsResult = normalisierePalette(palettenartRaw);
+
+                    if (!erkennungsResult.gefunden) {
+                        // Keine eindeutige Palette erkannt
+                        if (erkennungsResult.kandidaten && erkennungsResult.kandidaten.length > 0) {
+                            // Mehrere Kandidaten -> zeige Auswahl
+                            wartendeAuswahlPaletten.push({
+                                kundenname,
+                                kundennummer,
+                                palettenartRaw,
+                                kandidaten: erkennungsResult.kandidaten,
+                                menge: parseInt(menge),
+                                aktion
+                            });
+                        } else {
+                            // Gar keine Kandidaten - SPEICHERE die Daten BEVOR modal angezeigt wird!
+                            const palettenData = {
+                                kundenname,
+                                kundennummer,
+                                palettenartRaw,
+                                menge: parseInt(menge),
+                                aktion
+                            };
+                            // ðŸ›‘ NUR zu aktuelleAuswahlPalette, NICHT zu wartendeAuswahlPaletten!
+                            // (wartendeAuswahlPaletten ist fÃ¼r Paletten mit Kandidaten, nicht fÃ¼r nicht erkannte)
+                            aktuelleAuswahlPalette = palettenData;  // ðŸŽ¯ WICHTIG: Speichere fÃ¼r Modal
+
+                            // ðŸŽ¯ SPEICHERE ERKANNTE PALETTEN JETZT, BEVOR ERROR GEWORFEN WIRD!
+                            console.log('ðŸ” DEBUG: Speichere erkannteAuswahlPaletten vor Error');
+                            console.log('   palettenListe vor speichern:', palettenListe);
+                            erkannteAuswahlPaletten = palettenListe;
+                            console.log('âœ… Erkannte Paletten vor Error gespeichert:', erkannteAuswahlPaletten);
+
+                            showPaletteSelectionAllPalettes(palettenartRaw);
+                            throw new Error(`âš ï¸ Palette nicht erkannt: "${palettenartRaw}" â€“ bitte auswÃ¤hlen`);
+                        }
+                    } else {
+                        // Eindeutige Palette erkannt
+                        palettenListe.push({
+                            kundenname,
+                            kundennummer,
+                            palettenart: erkennungsResult.palette,
+                            menge: parseInt(menge),
+                            aktion
+                        });
+                    }
+                }
+            }
+
+            // ðŸŽ¯ SPEICHERE ERKANNTE PALETTEN SOFORT, BEVOR ERROR GEWORFEN WIRD!
+            // Das ist KRITISCH: Wenn unten eine Error geworfen wird, brauchen wir diese Daten noch
+            console.log('ðŸ” DEBUG: Speichere erkannteAuswahlPaletten nach Schleife');
+            console.log('   palettenListe vor speichern:', palettenListe);
+            erkannteAuswahlPaletten = palettenListe;
+            console.log('âœ… Erkannte Paletten gespeichert:', erkannteAuswahlPaletten);
+
+            // Wenn wartende Auswahl existiert, unterbreche und zeige Dialog
+            if (wartendeAuswahlPaletten.length > 0) {
+                showPaletteSelectionForCandidates(wartendeAuswahlPaletten[0]);
+                throw new Error(`âš ï¸ Palette nicht eindeutig erkannt â€“ bitte auswÃ¤hlen`);
+            }
+
+            // Validierung
+            if (!kundenname && !kundennummer) {
+                throw new Error("âš ï¸ Kundenname oder Kundennummer erforderlich");
+            }
+            if (palettenListe.length === 0) {
+                throw new Error("âš ï¸ Keine Palettenarten erkannt!");
+            }
+
+            for (let p of palettenListe) {
+                if (!p.palettenart) {
+                    throw new Error("âš ï¸ Palettenart fehlt!");
+                }
+                if (!p.menge || isNaN(p.menge)) {
+                    throw new Error("âš ï¸ Menge fehlt oder ist ungÃ¼ltig!");
+                }
+            }
+
+            return palettenListe;  // Array statt einzelnes Objekt!
+        }
+
+        // ============================================
+        // PALETTE AUSWAHL FUNKTIONEN
+        // ============================================
+        function showPaletteSelectionForCandidates(palettenData) {
+            const modal = document.getElementById('paletteSelectionModal');
+            const container = document.getElementById('paletteButtonsContainer');
+            container.innerHTML = '';
+
+            // ðŸŽ¯ SPEICHERE DIE AKTUELLEN DATEN, BEVOR SIE AUS DEM ARRAY GELÃ–SCHT WERDEN
+            aktuelleAuswahlPalette = palettenData;
+
+            // Zeige nur die Kandidaten
+            for (let palette of palettenData.kandidaten) {
+                const btn = document.createElement('button');
+                btn.textContent = palette;
+                btn.style.cssText = `
+                    padding: 20px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    background: #667eea;
+                    color: white;
+                    border: none;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    touch-action: manipulation;
+                `;
+                btn.onclick = () => selectPaletteAndContinue(palette, palettenData);
+                container.appendChild(btn);
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        function showPaletteSelectionAllPalettes(unerkannterText) {
+            const modal = document.getElementById('paletteSelectionModal');
+            const container = document.getElementById('paletteButtonsContainer');
+            container.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #666; font-size: 14px;">Unbekannt: "${unerkannterText}"<br>Bitte wÃ¤hle eine Palette:</p>`;
+
+            // ðŸŽ¯ WICHTIG: Speichere die aktuellen Daten wenn noch vorhanden
+            // Wenn aktuelleAuswahlPalette noch null ist, nutze wartendeAuswahlPaletten[0]
+            if (!aktuelleAuswahlPalette && wartendeAuswahlPaletten.length > 0) {
+                aktuelleAuswahlPalette = wartendeAuswahlPaletten[0];
+            }
+
+            // Zeige ALLE Paletten
+            for (let palette of Object.keys(PALETTENLISTE)) {
+                const btn = document.createElement('button');
+                btn.textContent = palette;
+                btn.style.cssText = `
+                    padding: 20px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    background: #667eea;
+                    color: white;
+                    border: none;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    touch-action: manipulation;
+                `;
+                btn.onclick = () => selectPaletteAndContinue(palette, null);
+                container.appendChild(btn);
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        function selectPaletteAndContinue(palette, palettenData) {
+            document.getElementById('paletteSelectionModal').style.display = 'none';
+            selectedPalette = palette;
+
+            console.log('ðŸŽ¯ Palette ausgewÃ¤hlt:', palette);
+            console.log('   aktuelleAuswahlPalette:', aktuelleAuswahlPalette);
+            console.log('   wartendeAuswahlPaletten:', wartendeAuswahlPaletten);
+
+            // ðŸŽ¯ VERWENDE aktuelleAuswahlPalette ALS PRIMÃ„R-QUELLE
+            if (aktuelleAuswahlPalette) {
+                console.log('âœ… Nutze aktuelleAuswahlPalette');
+                aktuelleAuswahlPalette.palettenart = palette;
+
+                // ðŸ›‘ WICHTIG: Entferne diese Palette auch aus wartendeAuswahlPaletten
+                // damit sie nicht doppelt gespeichert wird!
+                wartendeAuswahlPaletten = wartendeAuswahlPaletten.filter(item =>
+                    item.palettenartRaw !== aktuelleAuswahlPalette.palettenartRaw
+                );
+                console.log('ðŸ›‘ Entferne Palette aus Warteschlange um Duplikat zu vermeiden');
+            } else if (wartendeAuswahlPaletten.length > 0) {
+                // Fallback nur wenn aktuelleAuswahlPalette nicht vorhanden
+                console.log('âœ… Nutze wartendeAuswahlPaletten als Fallback');
+                wartendeAuswahlPaletten[0].palettenart = palette;
+                wartendeAuswahlPaletten.shift();
+            } else {
+                console.error('âŒ Fehler: Keine Palette-Daten vorhanden!');
+                showError('Fehler bei Palette-Auswahl. Bitte versuche es erneut.');
+                return;
+            }
+
+            // Fortsetzen mit saveToSupabase
+            saveToSupabaseWithSelected();
+        }
+
+        function cancelPaletteSelection() {
+            document.getElementById('paletteSelectionModal').style.display = 'none';
+            wartendeAuswahlPaletten = [];
+            erkannteAuswahlPaletten = [];
+            selectedPalette = null;
+            discardAndRestart();
+        }
+
+        // ============================================
+        // KUNDENBESTÃ„TIGUNG FUNKTIONEN
+        // ============================================
+        async function pruefeAhnlicheKunden(kundenname) {
+            if (!kundenname) return null;
+
+            try {
+                console.log('ðŸ” PrÃ¼fe Ã¤hnliche Kunden fÃ¼r:', kundenname);
+
+                const response = await fetch('/api/find-similar-customers', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ kundenname })
+                });
+
+                const result = await response.json();
+                console.log('ðŸ” API-Antwort:', JSON.stringify(result));
+
+                if (result.found && result.candidates && result.candidates.length > 0) {
+                    console.log('âœ… Ã„hnlicher Kunde gefunden:', result.candidates[0]);
+                    return result.candidates[0];
+                }
+
+                console.log('âŒ Kein Ã¤hnlicher Kunde gefunden');
+                return null;
+
+            } catch (err) {
+                console.error('âŒ Fehler beim PrÃ¼fen Ã¤hnlicher Kunden:', err);
+                return null;
+            }
+        }
+
+        // Ã„hnlichkeitsprÃ¼fung im Frontend (wie Backend, aber mit vollstÃ¤ndiger Levenshtein-Logik)
+        function berechneStringAhnlichkeit(s1, s2) {
+            const str1 = s1.toLowerCase().trim();
+            const str2 = s2.toLowerCase().trim();
+
+            // 1. EXAKTE TREFFER
+            if (str1 === str2) return 100;
+
+            // 2. ENTFERNE BINDESTRICHE UND LEERZEICHEN
+            const str1Clean = str1.replace(/[\s\-]/g, '');
+            const str2Clean = str2.replace(/[\s\-]/g, '');
+
+            if (str1Clean === str2Clean) return 95;
+
+            // 3. SUBSTRING-MATCH: Wenn ein Name vollstÃ¤ndig im anderen enthalten ist
+            if (str1.includes(str2) || str2.includes(str1)) {
+                return 90;
+            }
+
+            // 4. WORT-BASIERTE Ã„HNLICHKEIT
+            const woerter1 = str1.split(/[\s\-]+/).filter(w => w.length > 0);
+            const woerter2 = str2.split(/[\s\-]+/).filter(w => w.length > 0);
+
+            // ZÃ¤hle gemeinsame WÃ¶rter
+            const gemeinsameListe = [];
+            for (let w1 of woerter1) {
+                if (woerter2.includes(w1) && w1.length >= 3) {
+                    gemeinsameListe.push(w1);
+                }
+            }
+
+            // Wenn WÃ¶rter gemeinsam sind
+            if (gemeinsameListe.length > 0) {
+                return 85;  // Starker Match fÃ¼r gemeinsame WÃ¶rter
+            }
+
+            // 5. LEVENSHTEIN-Ã„HNLICHE DISTANZ (Zeichenmatches)
+            let matches = 0;
+            for (let char of str1Clean) {
+                if (str2Clean.includes(char)) matches++;
+            }
+            const ahnlichkeit = (matches / Math.max(str1Clean.length, str2Clean.length)) * 100;
+
+            return ahnlichkeit;
+        }
+
+        async function pruefeAhnlicheKundenAlternativ(kundenname) {
+            // Falls die API nicht funktioniert, mache einen einfachen Datenbankabfrage im Frontend
+            try {
+                const response = await fetch('/api/get-all-customers', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (!response.ok) return null;
+
+                const allCustomers = await response.json();
+                console.log('ðŸ“‹ Alle Kunden:', allCustomers);
+
+                let besterMatch = null;
+                let besteAhnlichkeit = 60;  // Schwellenwert
+
+                for (let customer of allCustomers) {
+                    const ahnlichkeit = berechneStringAhnlichkeit(kundenname, customer);
+                    console.log(`  Vergleich: "${kundenname}" vs "${customer}" = ${ahnlichkeit}%`);
+
+                    if (ahnlichkeit > besteAhnlichkeit && ahnlichkeit < 100) {
+                        besteAhnlichkeit = ahnlichkeit;
+                        besterMatch = { name: customer, similarity: ahnlichkeit };
+                    }
+                }
+
+                return besterMatch;
+
+            } catch (err) {
+                console.error('Fehler bei Alternative:', err);
+                return null;
+            }
+        }
+
+        function showCustomerConfirmModal(neuerName, ahnlicherName) {
+            wartendeKundenZuBestaetigung = {
+                neuerName: neuerName,
+                ahnlicherName: ahnlicherName
+            };
+
+            const modal = document.getElementById('customerConfirmModal');
+            const question = document.getElementById('customerConfirmQuestion');
+
+            question.innerHTML = `Erkannt: <strong>"${neuerName}"</strong><br><br>Meinst du: <strong>"${ahnlicherName}"</strong>?`;
+
+            modal.style.display = 'flex';
+        }
+
+        function confirmSameCustomer() {
+            document.getElementById('customerConfirmModal').style.display = 'none';
+
+            if (wartendeKundenZuBestaetigung) {
+                selectedCustomerName = wartendeKundenZuBestaetigung.ahnlicherName;
+                wartendeKundenZuBestaetigung = null;
+                saveToSupabaseWithCustomerMerge();
+            }
+        }
+
+        function rejectSameCustomer() {
+            document.getElementById('customerConfirmModal').style.display = 'none';
+
+            if (wartendeKundenZuBestaetigung) {
+                selectedCustomerName = wartendeKundenZuBestaetigung.neuerName;
+                wartendeKundenZuBestaetigung = null;
+                saveToSupabaseWithCustomerMerge();
+            }
+        }
+
+        async function saveToSupabaseWithCustomerMerge() {
+            try {
+                const palettenListe = validateText(recognizedText);
+
+                // Verwende die vom Modal ausgewÃ¤hlte Kundennummer
+                const korrigierteKundennummer = document.getElementById("editCustomerNumber").value.trim();
+
+                for (let item of palettenListe) {
+                    if (selectedCustomerName) {
+                        item.kundenname = selectedCustomerName;
+                    }
+                    if (korrigierteKundennummer) {
+                        item.kundennummer = korrigierteKundennummer;
+                    }
+                }
+
+                await speichereZeilen(palettenListe);
+                selectedCustomerName = null;
+
+            } catch (err) {
+                const errorBox = document.getElementById("errorBox");
+                document.getElementById("errorMessage").textContent = "âŒ " + err.message;
+                errorBox.style.display = "block";
+            }
+        }
+
+        async function speichereZeilen(palettenListe) {
+            // Speichere JEDE Palettenart einzeln
+            let erfolgreich = 0;
+            let fehler = null;
+            const gespeichertePaletten = [];
+
+            for (let palettenData of palettenListe) {
+                const response = await fetch('/api/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text_content: recognizedText,
+                        kundenname: palettenData.kundenname || null,
+                        kundennummer: palettenData.kundennummer || null,
+                        palettenart: palettenData.palettenart,
+                        menge: palettenData.menge,
+                        aktion: palettenData.aktion || null,
+                        mitarbeiter: mitarbeiterName
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    fehler = result.error || 'Fehler beim Speichern';
+                    break;
+                }
+
+                erfolgreich++;
+
+                // Speichere fÃ¼r Zusammenfassung
+                gespeichertePaletten.push({
+                    menge: palettenData.menge,
+                    palettenart: palettenData.palettenart,
+                    kundenname: palettenData.kundenname,
+                    aktion: palettenData.aktion
+                });
+            }
+
+            if (fehler) {
+                throw new Error(fehler);
+            }
+
+            // Erfolg-Phase anzeigen mit Zusammenfassung
+            document.querySelectorAll(".phase").forEach(p => p.classList.remove("active"));
+            zeigeSuccessWithSummary(gespeichertePaletten);
+            document.getElementById("successPhase").classList.add("active");
+        }
+
+        function zeigeSuccessWithSummary(gespeichertePaletten) {
+            const summaryDiv = document.getElementById("successSummary");
+            let summaryHTML = '<div style="font-size: 16px; line-height: 1.8;">';
+
+            // Gruppiere nach Kunde und Palette
+            const gruppiert = {};
+            for (let p of gespeichertePaletten) {
+                const key = `${p.kundenname}`;
+                if (!gruppiert[key]) {
+                    gruppiert[key] = [];
+                }
+                gruppiert[key].push(p);
+            }
+
+            // Baue die Zusammenfassung
+            for (let kundenname in gruppiert) {
+                summaryHTML += `<strong style="color: #333; display: block; margin-top: 12px; margin-bottom: 6px;">ðŸ“¦ ${kundenname}:</strong>`;
+
+                for (let p of gruppiert[kundenname]) {
+                    const mengeText = p.menge === 1 ? 'Palette' : 'Paletten';
+
+                    // Bestimme Aktion und Symbol
+                    let aktion = 'mitgenommen';
+                    let symbol = 'âž•';
+
+                    if (p.aktion) {
+                        const aktionLower = p.aktion.toLowerCase();
+                        if (aktionLower.includes('zurÃ¼ck') || aktionLower.includes('zuruck') ||
+                            aktionLower.includes('erhalten') || aktionLower.includes('abgegeben')) {
+                            aktion = 'zurÃ¼ckgebracht';
+                            symbol = 'âž–';
+                        }
+                    }
+
+                    summaryHTML += `<div style="margin-left: 20px; color: #555; margin-bottom: 6px;">${symbol} ${p.menge}x ${p.palettenart} <span style="color: #999; font-size: 13px;">(${aktion})</span></div>`;
+                }
+            }
+
+            summaryHTML += '</div>';
+            summaryDiv.innerHTML = summaryHTML;
+        }
+
+        async function saveToSupabase() {
+            const saveBtn = document.getElementById("saveBtn");
+            saveBtn.disabled = true;
+            saveBtn.textContent = "â³ Wird gespeichert...";
+
+            try {
+                const palettenListe = validateText(recognizedText);
+                console.log('ðŸ“‹ Erkannte Palettengruppen:', palettenListe.length);
+
+                // ðŸŽ¯ ÃœBERSCHREIBE MIT KORRIGIERTEN WERTEN VOM USER
+                const korrigierterKundenname = document.getElementById("editCustomerName").value.trim();
+                const korrigierteKundennummer = document.getElementById("editCustomerNumber").value.trim();
+
+                console.log('âœï¸ Korrigierte Kundeninformationen:');
+                console.log('   Kundenname:', korrigierterKundenname);
+                console.log('   Kundennummer:', korrigierteKundennummer);
+
+                // Ãœberschreibe Kundenname und Kundennummer in allen Palettengruppen
+                for (let item of palettenListe) {
+                    if (korrigierterKundenname) item.kundenname = korrigierterKundenname;
+                    if (korrigierteKundennummer) item.kundennummer = korrigierteKundennummer;
+                }
+
+                // ðŸŽ¯ KUNDENPRÃœFUNG: Sind Ã¤hnliche Kunden vorhanden?
+                if (palettenListe.length > 0 && palettenListe[0].kundenname) {
+                    const kundenname = palettenListe[0].kundenname;
+                    console.log('ðŸ‘¤ Erkannter Kundenname:', kundenname);
+
+                    // PrÃ¼fe auf Ã¤hnliche bereits existierende Kunden
+                    let ahnlicherKunde = await pruefeAhnlicheKunden(kundenname);
+
+                    // Falls API fehlschlÃ¤gt, verwende Alternative
+                    if (!ahnlicherKunde) {
+                        console.log('ðŸ”„ API fehlgeschlagen, versuche Alternative...');
+                        ahnlicherKunde = await pruefeAhnlicheKundenAlternativ(kundenname);
+                    }
+
+                    if (ahnlicherKunde) {
+                        console.log('âœ…âœ… Zeige KundenbestÃ¤tigung-Modal');
+                        // Ã„hnlicher Kunde gefunden - zeige BestÃ¤tigungsdialog
+                        showCustomerConfirmModal(kundenname, ahnlicherKunde.name);
+                        saveBtn.disabled = false;
+                        saveBtn.textContent = "âœ… Speichern";
+                        return;  // Warte auf BenutzerbestÃ¤tigung
+                    }
+
+                    console.log('âž¡ï¸ Kein Ã¤hnlicher Kunde - speichere direkt ab');
+                }
+
+                // Kein Ã¤hnlicher Kunde gefunden - speichere direkt
+                await speichereZeilen(palettenListe);
+
+            } catch (err) {
+                console.error('âŒ Fehler in saveToSupabase:', err);
+                const errorBox = document.getElementById("errorBox");
+                document.getElementById("errorMessage").textContent = err.message;
+                errorBox.style.display = "block";
+
+                const saveBtn = document.getElementById("saveBtn");
+                saveBtn.disabled = false;
+                saveBtn.textContent = "âœ… Speichern";
+            }
+        }
+
+        async function saveToSupabaseWithSelected() {
+            // Diese Funktion wird nach der Palettenauswahl aufgerufen
+            try {
+                console.log('ðŸ” DEBUG saveToSupabaseWithSelected()');
+                console.log('   erkannteAuswahlPaletten:', erkannteAuswahlPaletten);
+                console.log('   aktuelleAuswahlPalette:', aktuelleAuswahlPalette);
+                console.log('   wartendeAuswahlPaletten:', wartendeAuswahlPaletten);
+
+                // ðŸŽ¯ ÃœBERSCHREIBE MIT KORRIGIERTEN WERTEN VOM USER
+                const korrigierterKundenname = document.getElementById("editCustomerName").value.trim();
+                const korrigierteKundennummer = document.getElementById("editCustomerNumber").value.trim();
+
+                // ðŸŽ¯ STARTE MIT DEN BEREITS ERKANNTEN PALETTEN!
+                // Das verhindert, dass erkannte Paletten ignoriert werden, wenn eine unbekannte Palette auswahl kommt
+                const palettenListe = [...erkannteAuswahlPaletten];
+                console.log('ðŸ“‹ palettenListe nach erkannteAuswahlPaletten:', palettenListe);
+
+                // ðŸŽ¯ SPEICHERE AKTUELLE PALETTE (mit Benutzer-Auswahl korrigiert)
+                if (aktuelleAuswahlPalette) {
+                    palettenListe.push({
+                        kundenname: korrigierterKundenname || aktuelleAuswahlPalette.kundenname,
+                        kundennummer: korrigierteKundennummer || aktuelleAuswahlPalette.kundennummer,
+                        palettenart: aktuelleAuswahlPalette.palettenart,
+                        menge: aktuelleAuswahlPalette.menge,
+                        aktion: aktuelleAuswahlPalette.aktion
+                    });
+                    console.log('âœ… Verwende aktuelleAuswahlPalette:', aktuelleAuswahlPalette);
+
+                    // ðŸ›‘ WICHTIG: Entferne diese Palette aus wartendeAuswahlPaletten um Doppel-Speicherung zu verhindern!
+                    // Nutze palettenartRaw zum Vergleichen, da wartendeAuswahlPaletten dieses Feld hat
+                    wartendeAuswahlPaletten = wartendeAuswahlPaletten.filter(item =>
+                        item.palettenartRaw !== aktuelleAuswahlPalette.palettenartRaw
+                    );
+                    console.log('ðŸ›‘ Entferne Palette aus Warteschlange um Duplikat zu vermeiden');
+                }
+
+                // ðŸŽ¯ WICHTIG: AUCH DIE WARTENDEN PALETTEN SPEICHERN (die bereits korrekt erkannt wurden!)
+                for (let item of wartendeAuswahlPaletten) {
+                    palettenListe.push({
+                        kundenname: korrigierterKundenname || item.kundenname,
+                        kundennummer: korrigierteKundennummer || item.kundennummer,
+                        palettenart: item.palettenart,
+                        menge: item.menge,
+                        aktion: item.aktion
+                    });
+                    console.log('âœ… Speichere wartende Palette:', item.palettenart);
+                }
+
+                if (palettenListe.length > 0) {
+                    console.log('ðŸ“Š Speichere insgesamt', palettenListe.length, 'Paletten');
+                    await speichereZeilen(palettenListe);
+                    wartendeAuswahlPaletten = [];
+                    erkannteAuswahlPaletten = [];
+                    aktuelleAuswahlPalette = null;
+                    selectedPalette = null;
+                } else {
+                    showError('Keine Paletten zum Speichern vorhanden');
+                }
+
+            } catch (err) {
+                const errorBox = document.getElementById("errorBox");
+                document.getElementById("errorMessage").textContent = "âŒ " + err.message;
+                errorBox.style.display = "block";
+            }
+        }
+
+        function showError(message) {
+            const errorBox = document.getElementById("errorBox");
+            document.getElementById("errorMessage").textContent = "âš ï¸ " + message;
+            errorBox.style.display = "block";
+
+            const status = document.getElementById("status");
+            status.textContent = "âŒ Fehler aufgetreten";
+            status.className = "status-error";
+        }
+
+        // ========== DREISTUFIGE ÃœBERSICHT FUNKTIONEN ==========
+        let currentCustomer = null;  // Speichere aktuell ausgewÃ¤hlten Kunden
+        let currentPalette = null;   // Speichere aktuell ausgewÃ¤hlte Palettenart
+
+        function showOverview() {
+            // Ebene 1: Zeige Kundenliste
+            setPhase('kundenlistePhase');
+            loadCustomerList();
+        }
+
+        function backToRecording() {
+            setPhase('recordingPhase');
+        }
+
+        function backToCustomerList() {
+            currentCustomer = null;
+            setPhase('kundenlistePhase');
+        }
+
+        function backToCustomerDetail() {
+            currentPalette = null;
+            setPhase('kundendetailPhase');
+        }
+
+        function setPhase(phaseName) {
+            // Verstecke alle Phasen
+            const phases = document.querySelectorAll('.phase');
+            phases.forEach(phase => {
+                phase.classList.remove('active');
+            });
+
+            // Zeige die gewÃ¼nschte Phase
+            const targetPhase = document.getElementById(phaseName);
+            if (targetPhase) {
+                targetPhase.classList.add('active');
+            }
+
+            // Zeige Logout-Button nur in recordingPhase
+            const logoutContainer = document.getElementById('logoutContainer');
+            if (logoutContainer) {  // âœ… Sicherer Null-Check
+                if (phaseName === 'recordingPhase') {
+                    logoutContainer.style.display = 'block';
+                    console.log('âœ… Logout-Button angezeigt (recordingPhase)');
+                } else {
+                    logoutContainer.style.display = 'none';
+                    console.log('âŒ Logout-Button versteckt (nicht recordingPhase)');
+                }
+            } else {
+                console.warn('âš ï¸ logoutContainer nicht gefunden!');
+            }
+        }
+
+        // ============================================
+        // MANUELLE EINGABE FUNKTIONEN
+        // ============================================
+        let manualAction = null;  // 'add' oder 'remove'
+
+        // ============================================
+        // HILFSFUNKTION: NAMEN KAPITALISIEREN
+        // ============================================
+        function kapitalisiereName(text) {
+            if (!text) return text;
+
+            // Teile den Text in WÃ¶rter und kapitalisiere jeden ersten Buchstaben
+            return text
+                .toLowerCase()  // Alles zuerst klein
+                .split(' ')     // Teile in WÃ¶rter
+                .map(word => {
+                    // Ersten Buchstabe groÃŸschreiben, Rest klein
+                    return word.charAt(0).toUpperCase() + word.slice(1);
+                })
+                .join(' ');     // Zusammensetzen
+        }
+
+        // ðŸ“¦ Alle Palettenarten (Neue + Bestehende aus PALETTENLISTE)
+        const ALLE_PALETTENARTEN = [
+            // Neue Palettenarten
+            'Grafepalette',
+            'Steinzeug Gitterbox',
+            'Steinzeugpalette klein',
+            'Steinzeugpalette groÃŸ',
+            'Europalette 2',
+            'Europalette 3',
+            'Spezialpalette',
+            'Velux-Palette',
+            // Bestehende Palettenarten aus PALETTENLISTE
+            'Europalette',
+            'Ziegelpalette',
+            'Gipskartonpalette',
+            'Fermacellpalette',
+            'Gitterbox',
+            'MUHR-Palette',
+            'Steinzeugpalette',
+            'EHL-Palette',
+            'Eder-Palette',
+            'Limex-Palette',
+            'KS-Palette',
+            'Porenbetonpalette',
+            'KB-Palette'
+        ].sort();  // Alphabetisch sortiert
+
+        async function openManualInput() {
+            console.log('ðŸ”“ Ã–ffne manuelle Eingabe...');
+
+            let palettenarten = [...ALLE_PALETTENARTEN];  // Standard-Liste verwenden
+
+            // Versuche vom Backend zu laden (optional)
+            try {
+                const response = await fetch('/api/get-palettenarten');
+                if (response.ok) {
+                    const dbPalettenarten = await response.json();
+                    if (dbPalettenarten && dbPalettenarten.length > 0) {
+                        palettenarten = dbPalettenarten;
+                        console.log('âœ… Palettenarten vom Backend geladen:', palettenarten.length);
+                    }
+                }
+            } catch (err) {
+                console.warn('âš ï¸ Backend nicht verfÃ¼gbar, verwende lokale Liste:', err.message);
+            }
+
+            // FÃ¼lle Dropdown mit Palettenarten
+            const select = document.getElementById('manualPaletteType');
+            select.innerHTML = '<option value="">-- Palettenart auswÃ¤hlen --</option>';
+
+            palettenarten.forEach(art => {
+                const option = document.createElement('option');
+                option.value = art;
+                option.textContent = art;
+                select.appendChild(option);
+            });
+
+            console.log('ðŸ“¦ Palettenarten verfÃ¼gbar:', palettenarten.length);
+
+            // Reset Felder
+            document.getElementById('manualPaletteType').value = '';
+            document.getElementById('manualCustomerName').value = '';
+            document.getElementById('manualCustomerNumber').value = '';
+            document.getElementById('manualQuantity').value = '1';
+            manualAction = null;
+
+            // Reset Action Buttons
+            document.getElementById('manualActionAdd').style.background = 'white';
+            document.getElementById('manualActionAdd').style.color = '#667eea';
+            document.getElementById('manualActionRemove').style.background = 'white';
+            document.getElementById('manualActionRemove').style.color = '#667eea';
+
+            setPhase('manualInputPhase');
+        }
+
+        function setManualAction(action) {
+            manualAction = action;
+            console.log('âš¡ Setze Aktion:', action);
+
+            const addBtn = document.getElementById('manualActionAdd');
+            const removeBtn = document.getElementById('manualActionRemove');
+
+            if (action === 'add') {
+                addBtn.style.background = '#51cf66';
+                addBtn.style.color = 'white';
+                removeBtn.style.background = 'white';
+                removeBtn.style.color = '#667eea';
+            } else {
+                removeBtn.style.background = '#ff6b6b';
+                removeBtn.style.color = 'white';
+                addBtn.style.background = 'white';
+                addBtn.style.color = '#667eea';
+            }
+        }
+
+        function cancelManualInput() {
+            console.log('âŒ Abbrechen - ZurÃ¼ck zur Aufnahme');
+            manualAction = null;
+            setPhase('recordingPhase');
+        }
+
+        async function saveManualInput() {
+            console.log('ðŸ’¾ Speichere manuelle Eingabe...');
+
+            const paletteType = document.getElementById('manualPaletteType').value;
+            // âœ… KAPITALISIERE Namen: "jens meier" â†’ "Jens Meier"
+            const customerName = kapitalisiereName(document.getElementById('manualCustomerName').value.trim());
+            const customerNumber = document.getElementById('manualCustomerNumber').value.trim();
+            const quantityInput = document.getElementById('manualQuantity').value;
+            const quantity = quantityInput ? parseInt(quantityInput) : 1;
+
+            console.log('ðŸ“‹ Eingaben gelesen:', {
+                paletteType: paletteType || '(leer)',
+                customerName: customerName || '(leer)',
+                customerNumber: customerNumber || '(keine)',
+                quantityInput: quantityInput || '(leer)',
+                quantity: quantity,
+                manualAction: manualAction || '(nicht gewÃ¤hlt)'
+            });
+
+            // Validierung
+            if (!paletteType) {
+                console.warn('âš ï¸ Palettenart nicht gewÃ¤hlt');
+                showError('âŒ Bitte Palettenart wÃ¤hlen!');
+                return;
+            }
+
+            if (!customerName) {
+                console.warn('âš ï¸ Kundenname nicht eingegeben');
+                showError('âŒ Bitte Kundenname eingeben!');
+                return;
+            }
+
+            if (!manualAction) {
+                console.warn('âš ï¸ Aktion nicht gewÃ¤hlt');
+                showError('âŒ Bitte Aktion (Zugang/Abgang) wÃ¤hlen!');
+                return;
+            }
+
+            if (quantity <= 0) {
+                console.warn('âš ï¸ Anzahl ungÃ¼ltig:', quantity);
+                showError('âŒ Anzahl muss grÃ¶ÃŸer als 0 sein!');
+                return;
+            }
+
+            // Bestimme Menge basierend auf Aktion
+            const finalQuantity = manualAction === 'add' ? quantity : -quantity;
+            const mitarbeiter = mitarbeiterName || 'System';
+
+            console.log('ðŸ“Š Manuelle Eingabe validiert:', {
+                paletteType,
+                customerName,
+                customerNumber,
+                action: manualAction,
+                quantity: finalQuantity,
+                mitarbeiter
+            });
+
+            try {
+                // Erstelle text_content fÃ¼r den API-Endpoint
+                const textContent = `${customerName} hat ${finalQuantity > 0 ? finalQuantity : Math.abs(finalQuantity)} ${paletteType} ${finalQuantity > 0 ? 'mitgenommen' : 'zurÃ¼ckgebracht'}${customerNumber ? ' (' + customerNumber + ')' : ''}`;
+
+                // Speichere zu Supabase - Backend erwartet EINZELNE Werte, nicht Arrays!
+                const payload = {
+                    text_content: textContent,  // ERFORDERLICH!
+                    kundenname: customerName,
+                    kundennummer: customerNumber || null,
+                    palettenart: paletteType,   // Einzelner Wert, nicht Array!
+                    menge: finalQuantity,       // Einzelner Wert, nicht Array!
+                    aktion: finalQuantity > 0 ? 'mitgenommen' : 'zurÃ¼ckgebracht',
+                    mitarbeiter: mitarbeiter
+                };
+
+                console.log('ðŸ“¤ Sende Payload zum Backend:', payload);
+
+                const response = await fetch('/api/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                console.log('ðŸ“¨ Response Status:', response.status, response.statusText);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('ðŸ”´ Backend Fehler:', errorText);
+                    throw new Error(`Server Fehler (${response.status}): ${errorText}`);
+                }
+
+                const result = await response.json();
+                console.log('âœ… Manuelle Eingabe gespeichert:', result);
+
+                // Zeige Zusammenfassung in der Erfolgsseite
+                const summaryHtml = `
+                    <div style="margin: 20px 0;">
+                        <h3 style="color: #333; margin-top: 0;">ðŸ“‹ Gespeicherte Daten:</h3>
+
+                        <div style="background: white; border-left: 4px solid #51cf66; padding: 15px; margin: 10px 0; border-radius: 8px;">
+                            <div style="display: flex; justify-content: space-between; margin: 8px 0;">
+                                <span style="font-weight: bold; color: #666;">ðŸ‘¤ Kundenname:</span>
+                                <span style="color: #333; font-size: 16px; font-weight: 600;">${escapeHtml(customerName)}</span>
+                            </div>
+                            ${customerNumber ? `
+                            <div style="display: flex; justify-content: space-between; margin: 8px 0;">
+                                <span style="font-weight: bold; color: #666;">ðŸ”¢ Kundennummer:</span>
+                                <span style="color: #333; font-size: 16px; font-weight: 600;">${escapeHtml(customerNumber)}</span>
+                            </div>
+                            ` : ''}
+                        </div>
+
+                        <div style="background: white; border-left: 4px solid #667eea; padding: 15px; margin: 10px 0; border-radius: 8px;">
+                            <div style="display: flex; justify-content: space-between; margin: 8px 0;">
+                                <span style="font-weight: bold; color: #666;">ðŸ“¦ Palettenart:</span>
+                                <span style="color: #333; font-size: 16px; font-weight: 600;">${escapeHtml(paletteType)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin: 8px 0;">
+                                <span style="font-weight: bold; color: #666;">ðŸ“Š Menge:</span>
+                                <span style="color: #333; font-size: 16px; font-weight: 600;">${Math.abs(finalQuantity)}x</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin: 8px 0;">
+                                <span style="font-weight: bold; color: #666;">âš¡ Aktion:</span>
+                                <span style="color: #333; font-size: 16px; font-weight: 600;">${finalQuantity > 0 ? 'âž• Zugang' : 'âž– Abgang'}</span>
+                            </div>
+                        </div>
+
+                        <div style="background: white; border-left: 4px solid #ff9800; padding: 15px; margin: 10px 0; border-radius: 8px;">
+                            <div style="display: flex; justify-content: space-between; margin: 8px 0;">
+                                <span style="font-weight: bold; color: #666;">ðŸ‘¤ Mitarbeiter:</span>
+                                <span style="color: #333; font-size: 16px; font-weight: 600;">${escapeHtml(mitarbeiter)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('successSummary').innerHTML = summaryHtml;
+
+                // Zeige Erfolgsseite
+                // âœ… WICHTIG: BLEIBT BESTEHEN - Benutzer muss manuell "ZurÃ¼ck" klicken
+                setPhase('successPhase');
+
+            } catch (err) {
+                console.error('ðŸ”´ Fehler beim Speichern:', err);
+                console.error('   Message:', err.message);
+                console.error('   Stack:', err.stack);
+                showError('âŒ Fehler beim Speichern: ' + err.message);
+            }
+        }
+
+        // ========== EBENE 1: KUNDENLISTE (Kompakte Liste) ==========
+        async function loadCustomerList() {
+            try {
+                const response = await fetch('/api/get-all-saldos');
+                const customers = await response.json();
+
+                console.log('ðŸ“Š Kundenliste geladen:', customers.length);
+
+                const container = document.getElementById('kundenlisteContainer');
+
+                if (!customers || customers.length === 0) {
+                    container.innerHTML = '<div class="palettehistorie-empty">ðŸ“­ Noch keine Kunden</div>';
+                    return;
+                }
+
+                // Baue kompakte Kundenliste - FILTER: Nur Kunden mit Saldo > 0
+                let html = '';
+                let gezeigtKunden = 0;
+
+                for (let customer of customers) {
+                    const gesamtSaldo = customer.paletten.reduce((sum, p) => sum + p.saldo, 0);
+
+                    // ðŸ”¥ FILTER: Zeige nur Kunden mit Gesamtsaldo > 0
+                    if (gesamtSaldo === 0) continue;
+
+                    gezeigtKunden++;
+                    const displayName = escapeHtml(customer.name);
+                    html += `
+                        <div class="kundenliste-item" data-kundenname="${displayName}" style="cursor: pointer;">
+                            ${displayName}<br>
+                            <span style="font-size: 12px; color: #999;">(${gesamtSaldo})</span>
+                        </div>
+                    `;
+                }
+
+                if (gezeigtKunden === 0) {
+                    container.innerHTML = '<div class="palettehistorie-empty">ðŸ“­ Noch keine Kunden mit Paletten</div>';
+                    return;
+                }
+
+                container.innerHTML = html;
+
+                // ðŸ”¥ WICHTIG: Event Listener hinzufÃ¼gen NACHDEM HTML eingefÃ¼gt wurde
+                const items = container.querySelectorAll('.kundenliste-item');
+                items.forEach(item => {
+                    item.addEventListener('click', function() {
+                        const kundenname = this.getAttribute('data-kundenname');
+                        console.log('ðŸ–±ï¸ Klick auf Kunde:', kundenname);
+                        showCustomerDetail(kundenname);
+                    });
+                });
+
+                console.log('âœ… Kundenliste angezeigt mit', gezeigtKunden, 'Kunden');
+            } catch (err) {
+                console.error('âŒ Fehler beim Laden der Kundenliste:', err);
+                const container = document.getElementById('kundenlisteContainer');
+                container.innerHTML = `<div class="palettehistorie-empty">âŒ Fehler: ${err.message}</div>`;
+            }
+        }
+
+        // ========== EBENE 2: KUNDENDETAILS (Bearbeitbare Paletten) ==========
+        async function showCustomerDetail(kundenname) {
+            try {
+                currentCustomer = kundenname;
+                console.log('ðŸ‘¤ Lade Details fÃ¼r:', kundenname);
+
+                // Update Title
+                document.getElementById('detailCustomerTitle').textContent = `ðŸ“¦ ${kundenname}`;
+
+                const response = await fetch(`/api/customer-detail/${encodeURIComponent(kundenname)}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                const container = document.getElementById('kundendetailContainer');
+                let html = '';
+
+                if (!data.paletten || data.paletten.length === 0) {
+                    html = '<div class="palettehistorie-empty">Keine Paletten mit Saldo > 0</div>';
+                } else {
+                    for (let palette of data.paletten) {
+                        const displayPalette = escapeHtml(palette.palettenart);
+                        html += `
+                            <div class="kundendetail-row">
+                                <div class="kundendetail-palettenart" data-kundenname="${escapeHtml(kundenname)}" data-palettenart="${displayPalette}" style="cursor: pointer; text-decoration: underline;">
+                                    ${displayPalette}
+                                </div>
+                                <div class="kundendetail-saldo" data-kundenname="${escapeHtml(kundenname)}" data-palettenart="${displayPalette}" data-saldo="${palette.saldo}" style="cursor: pointer;">
+                                    <span>${palette.saldo}</span> âœï¸
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
+                container.innerHTML = html;
+
+                // ðŸ”¥ WICHTIG: Event Listener hinzufÃ¼gen NACHDEM HTML eingefÃ¼gt wurde
+                const paletteItems = container.querySelectorAll('.kundendetail-palettenart');
+                paletteItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        const kname = this.getAttribute('data-kundenname');
+                        const pname = this.getAttribute('data-palettenart');
+                        console.log('ðŸ–±ï¸ Klick auf Palette:', pname);
+                        showPaletteHistory(kname, pname);
+                    });
+                });
+
+                const saldoItems = container.querySelectorAll('.kundendetail-saldo');
+                saldoItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        const kname = this.getAttribute('data-kundenname');
+                        const pname = this.getAttribute('data-palettenart');
+                        const saldo = parseInt(this.getAttribute('data-saldo'));
+                        console.log('ðŸ–±ï¸ Klick auf Saldo:', kname, pname, saldo);
+                        editSaldo(kname, pname, saldo);
+                    });
+                });
+
+                setPhase('kundendetailPhase');
+                console.log('âœ… Kundendetails angezeigt');
+            } catch (err) {
+                console.error('âŒ Fehler beim Laden der Details:', err);
+                const container = document.getElementById('kundendetailContainer');
+                container.innerHTML = `<div class="palettehistorie-empty">âŒ Fehler: ${err.message}</div>`;
+            }
+        }
+
+        // ========== EBENE 3: PALETTENHISTORIE (Transaktionszeitleiste) ==========
+        async function showPaletteHistory(kundenname, palettenart) {
+            try {
+                currentPalette = palettenart;
+                console.log('â±ï¸ Lade Historie fÃ¼r:', kundenname, '-', palettenart);
+
+                // Update Title
+                document.getElementById('historieTitle').textContent = `â±ï¸ ${palettenart}`;
+
+                const response = await fetch(`/api/palette-history/${encodeURIComponent(kundenname)}/${encodeURIComponent(palettenart)}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                const container = document.getElementById('paletteHistorieContainer');
+                let html = '';
+
+                if (!data.history || data.history.length === 0) {
+                    html = '<div class="palettehistorie-empty">ðŸ“­ Keine Transaktionen</div>';
+                } else {
+                    for (let transaction of data.history) {
+                        // Bestimme Symbol basierend auf Aktion
+                        const aktion = transaction.aktion ? transaction.aktion.toLowerCase() : '';
+                        let symbol = 'â“';
+                        if (aktion.includes('mitgenommen') || aktion.includes('zurÃ¼ck') === false) {
+                            symbol = 'âž•';
+                        } else if (aktion.includes('zurÃ¼ck') || aktion.includes('zuruck') || aktion.includes('erhalten') || aktion.includes('abgegeben')) {
+                            symbol = 'âž–';
+                        }
+
+                        html += `
+                            <div class="palettehistorie-item">
+                                <div class="palettehistorie-zeitstempel">${transaction.zeitstempel}</div>
+                                <div class="palettehistorie-mitarbeiter">${escapeHtml(transaction.mitarbeiter)}</div>
+                                <div class="palettehistorie-aktion">${symbol}</div>
+                                <div class="palettehistorie-menge">${transaction.menge}x</div>
+                            </div>
+                        `;
+                    }
+                }
+
+                container.innerHTML = html;
+                setPhase('paletteHistoriePhase');
+                console.log('âœ… Palettenhistorie angezeigt');
+            } catch (err) {
+                console.error('âŒ Fehler beim Laden der Historie:', err);
+                const container = document.getElementById('paletteHistorieContainer');
+                container.innerHTML = `<div class="palettehistorie-empty">âŒ Fehler: ${err.message}</div>`;
+            }
+        }
+
+        // ========== SALDO BEARBEITEN (Manuelle Ã„nderung mit Transaktion) ==========
+        async function editSaldo(kundenname, palettenart, aktuellerSaldo) {
+            const neuerSaldo = prompt(`Neuer Saldo fÃ¼r ${palettenart}?\n(Aktuell: ${aktuellerSaldo})`, aktuellerSaldo);
+
+            if (neuerSaldo === null) return;  // Benutzer hat Abbrechen geklickt
+
+            const saldoZahl = parseInt(neuerSaldo);
+            if (isNaN(saldoZahl) || saldoZahl < 0) {
+                alert('âš ï¸ Bitte geben Sie eine gÃ¼ltige Zahl ein (>= 0)');
+                return;
+            }
+
+            // Wenn sich nichts geÃ¤ndert hat, abbrechen
+            if (saldoZahl === aktuellerSaldo) {
+                console.log('â„¹ï¸ Saldo gleich geblieben, keine Ã„nderung');
+                return;
+            }
+
+            try {
+                console.log('ðŸ’¾ Manuelle Saldo-Ã„nderung:', kundenname, palettenart, aktuellerSaldo, 'â†’', saldoZahl);
+
+                // ðŸ”¥ WICHTIG: Sende alterSaldo und Mitarbeiter
+                const response = await fetch('/api/update-saldo', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        kundenname,
+                        palettenart,
+                        alterSaldo: aktuellerSaldo,      // ðŸ”¥ NEUER PARAMETER
+                        neuerSaldo: saldoZahl,
+                        mitarbeiter: mitarbeiterName      // ðŸ”¥ NEUER PARAMETER
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    throw new Error(result.error || 'Fehler beim Speichern');
+                }
+
+                // ðŸ”¥ ZEIGE TRANSAKTION DETAILS
+                const differenz = result.differenz;
+                const menge = result.menge;
+                const symbol = differenz > 0 ? 'âž•' : 'âž–';
+
+                console.log(`âœ… Transaktion erstellt: ${symbol} ${menge}x ${palettenart} (${result.aktion})`);
+                alert(`âœ… Saldo aktualisiert: ${aktuellerSaldo} â†’ ${saldoZahl}\n\n${symbol} ${menge}x ${palettenart} ${result.aktion}\nðŸ“ Eintrag erstellt fÃ¼r: ${mitarbeiterName}`);
+
+                // Aktualisiere die Kundendetails
+                await showCustomerDetail(kundenname);
+            } catch (err) {
+                console.error('âŒ Fehler beim Speichern:', err);
+                alert('âŒ Fehler: ' + err.message);
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ========== LOGIN & SESSION FUNKTIONEN (Mitarbeiter-basiert) ==========
+        function initializeApp() {
+            const sessionData = localStorage.getItem('palettenSession');
+
+            if (sessionData) {
+                try {
+                    const session = JSON.parse(sessionData);
+                    if (isSessionValid(session)) {
+                        mitarbeiterName = session.mitarbeiter;
+                        console.log('âœ… Session gÃ¼ltig, Mitarbeiter:', mitarbeiterName);
+                        document.getElementById('mitarbeiterDisplay').textContent = mitarbeiterName;
+                        setPhase('recordingPhase');
+                        return;
+                    } else {
+                        console.log('â° Session abgelaufen');
+                        localStorage.removeItem('palettenSession');
+                    }
+                } catch (err) {
+                    console.error('âŒ Fehler beim Parsen der Session:', err);
+                    localStorage.removeItem('palettenSession');
+                }
+            }
+
+            // Keine gÃ¼ltige Session: Zeige Login
+            setPhase('loginPhase');
+        }
+
+        function isSessionValid(session) {
+            const now = Date.now();
+            const sessionAge = now - session.timestamp;
+            const sixHours = 6 * 60 * 60 * 1000;  // 6 Stunden in Millisekunden
+            return sessionAge < sixHours;
+        }
+
+        // ========== NEUER LOGIN (mit Mitarbeiter-Datenbank) ==========
+        async function handleLoginNew() {
+            const mitarbeitername = document.getElementById('loginMitarbeiter').value.trim();
+            const passwort = document.getElementById('loginPassword').value;
+
+            console.log('ðŸ” Login-Versuch:', mitarbeitername);
+
+            if (!mitarbeitername || !passwort) {
+                showLoginError('âŒ Mitarbeitername und Passwort erforderlich');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/login-mitarbeiter', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mitarbeitername,
+                        passwort
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Login erfolgreich
+                    const sessionData = {
+                        mitarbeiter: mitarbeitername,
+                        timestamp: Date.now()
+                    };
+                    localStorage.setItem('palettenSession', JSON.stringify(sessionData));
+                    mitarbeiterName = mitarbeitername;
+
+                    console.log('âœ… Login erfolgreich:', mitarbeitername);
+                    document.getElementById('mitarbeiterDisplay').textContent = mitarbeitername;
+
+                    // Zeige Error-Box verstecken
+                    document.getElementById('loginErrorBox').style.display = 'none';
+
+                    // Wechsle zur Recording-Phase
+                    setPhase('recordingPhase');
+                } else if (result.firstTime) {
+                    // Mitarbeiter existiert, aber Passwort muss noch gesetzt werden
+                    showLoginError(`âš ï¸ ${result.error}\n\nBitte setzen Sie ein Passwort.`);
+
+                    // Automatisch Passwort-Dialog anzeigen
+                    const newPassword = prompt(`Passwort fÃ¼r "${mitarbeitername}" setzen:\n\n(mind. 4 Zeichen)`, '');
+                    if (newPassword && newPassword.length >= 4) {
+                        await setPassword(mitarbeitername, newPassword);
+                    }
+                } else {
+                    showLoginError('âŒ ' + result.error);
+                }
+            } catch (err) {
+                console.error('âŒ Fehler beim Login:', err);
+                showLoginError('âŒ Fehler: ' + err.message);
+            }
+        }
+
+        // ========== PASSWORT SETZEN (First-Time Setup) ==========
+        async function setPassword(mitarbeitername, passwort) {
+            try {
+                const response = await fetch('/api/set-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mitarbeitername,
+                        passwort
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('âœ… Passwort gesetzt! Melden Sie sich jetzt an.');
+                    // Versuche erneut zu loggen
+                    document.getElementById('loginPassword').value = passwort;
+                    handleLoginNew();
+                } else {
+                    showLoginError('âŒ ' + result.error);
+                }
+            } catch (err) {
+                console.error('âŒ Fehler beim Setzen des Passworts:', err);
+                showLoginError('âŒ Fehler: ' + err.message);
+            }
+        }
+
+        // ========== ADMIN PANEL: Neue Mitarbeiter ==========
+        function showAdminPanel() {
+            setPhase('adminPanelPhase');
+            document.getElementById('adminErrorBox').style.display = 'none';
+            document.getElementById('adminSuccessBox').style.display = 'none';
+            document.getElementById('adminMitarbeitername').value = '';
+            document.getElementById('adminPassword').value = '';
+        }
+
+        function backToLogin() {
+            setPhase('loginPhase');
+            document.getElementById('loginMitarbeiter').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginErrorBox').style.display = 'none';
+        }
+
+        async function addNewEmployee() {
+            const name = document.getElementById('adminMitarbeitername').value.trim();
+            const adminPassword = document.getElementById('adminPassword').value;
+
+            if (!name) {
+                showAdminError('âŒ Mitarbeitername erforderlich');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/add-employee', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name,
+                        adminPassword
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAdminSuccess(`âœ… ${result.message}`);
+                    document.getElementById('adminMitarbeitername').value = '';
+                    document.getElementById('adminPassword').value = '';
+
+                    setTimeout(() => {
+                        backToLogin();
+                    }, 2000);
+                } else {
+                    showAdminError('âŒ ' + result.error);
+                }
+            } catch (err) {
+                console.error('âŒ Fehler beim HinzufÃ¼gen des Mitarbeiters:', err);
+                showAdminError('âŒ Fehler: ' + err.message);
+            }
+        }
+
+        // ========== LOGOUT ==========
+        function logoutUser() {
+            console.log('ðŸ‘‹ Logout');
+            localStorage.removeItem('palettenSession');
+            mitarbeiterName = null;
+
+            // Leere Input-Felder
+            document.getElementById('loginMitarbeiter').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginErrorBox').style.display = 'none';
+
+            // Zeige Login-Phase
+            setPhase('loginPhase');
+        }
+
+        // ========== HELPER FUNKTIONEN ==========
+        function showLoginError(message) {
+            const errorBox = document.getElementById('loginErrorBox');
+            document.getElementById('loginErrorMessage').textContent = message;
+            errorBox.style.display = 'block';
+        }
+
+        function showAdminError(message) {
+            const errorBox = document.getElementById('adminErrorBox');
+            document.getElementById('adminErrorMessage').textContent = message;
+            errorBox.style.display = 'block';
+            document.getElementById('adminSuccessBox').style.display = 'none';
+        }
+
+        function showAdminSuccess(message) {
+            const successBox = document.getElementById('adminSuccessBox');
+            document.getElementById('adminSuccessMessage').textContent = message;
+            successBox.style.display = 'block';
+            document.getElementById('adminErrorBox').style.display = 'none';
+        }
+
+        // Enter-Taste zum Login
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginPassword = document.getElementById('loginPassword');
+            if (loginPassword) {
+                loginPassword.addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter') {
+                        handleLoginNew();
+                    }
+                });
+            }
+
+            // Initialisiere App (Ã¼berprÃ¼fe Session)
+            initializeApp();
+        });
+    </script>
+</body>
+</html>
+
