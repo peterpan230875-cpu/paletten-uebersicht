@@ -1220,6 +1220,11 @@ app.get('/dark', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index-dark.html'));
 });
 
+// Route für Modern Design Version
+app.get('/modern', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/index-modern.html'));
+});
+
 // ============================================
 // SERVER START
 // ============================================
