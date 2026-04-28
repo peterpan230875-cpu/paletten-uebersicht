@@ -1,10 +1,40 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paletten Ãœbersicht</title>
+    <title>Paletten Übersicht</title>
     <style>
+        /* ===== CSS CUSTOM PROPERTIES (Light Mode Default) ===== */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --border-color: #e5e7eb;
+            --primary-color: #2563eb;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --warning-color: #f97316;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        body.dark-mode {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-tertiary: #94a3b8;
+            --border-color: #334155;
+            --primary-color: #06b6d4;
+            --success-color: #10b981;
+            --error-color: #f87171;
+            --warning-color: #fb923c;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,265 +43,291 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f5f5;
+            background: linear-gradient(135deg, #f5f5f5 0%, #f0f0f0 100%);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-        }
-
-        /* ===== NAVBAR HEADER ===== */
-        .navbar {
-            background: #2c3e50;
-            color: white;
-            padding: 16px 20px;
-            display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .navbar-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 600;
-            font-size: 16px;
-        }
-
-        .navbar-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #FF6B5B 0%, #FF9500 100%);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-        }
-
-        .navbar-user {
-            color: #ecf0f1;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        /* ===== CONTAINER ===== */
-        .container {
-            background: white;
-            max-width: 100%;
-            width: 100%;
-            margin: 0;
             padding: 0;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        /* Modern Header/Navbar using pseudo-element */
+        body::before {
+            content: '';
+            display: block;
+            width: 100%;
+            height: 60px;
+            background: #1a2332;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            flex-shrink: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+
+        .container {
+            background: var(--bg-primary);
             border-radius: 0;
-            box-shadow: none;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.12);
+            padding: 24px;
+            max-width: 600px;
+            width: 100%;
+            max-height: calc(100vh - 60px);
             display: flex;
             flex-direction: column;
-            min-height: calc(100vh - 70px);
             overflow-y: auto;
+            overflow-x: hidden;
+            margin-top: 60px;
+            flex: 1;
         }
 
         .phase {
             display: none;
             flex: 1;
-            width: 100%;
             overflow-y: auto;
+            overflow-x: hidden;
+            width: 100%;
         }
 
         .phase.active {
             display: flex;
             flex-direction: column;
+            width: 100%;
+            height: 100%;
+            animation: fadeIn 0.3s ease;
         }
 
-        /* ===== CONTENT SECTION ===== */
-        .recording-section, .review-section, .success-section, .login-section {
-            padding: 40px 30px;
-            max-width: 600px;
-            width: 100%;
-            margin: 0 auto;
-            text-align: center;
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         h1 {
-            font-size: 26px;
-            color: #2c3e50;
-            margin-bottom: 12px;
-            font-weight: 600;
-            letter-spacing: -0.3px;
-        }
-
-        h2 {
-            font-size: 22px;
-            color: #2c3e50;
-            margin-bottom: 12px;
+            text-align: center;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
         .subtitle {
-            color: #7f8c8d;
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
             font-size: 14px;
-            margin-bottom: 40px;
-            line-height: 1.6;
-            font-weight: 400;
+            font-weight: 500;
         }
 
-        /* ===== MICROPHONE ICON ===== */
-        .microphone-icon {
-            width: 140px;
-            height: 140px;
-            margin: 40px auto;
-            background: linear-gradient(135deg, #FFE0DC 0%, #FFD4C8 100%);
-            border-radius: 50%;
+        .recording-section {
+            text-align: center;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            position: relative;
+        }
+
+        /* Microphone Icon Circle - 120px with light pink background */
+        .recording-section::before {
+            content: '🎤';
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 56px;
-            box-shadow: 0 6px 20px rgba(255, 107, 91, 0.15);
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFE0DC 0%, #FFD4C8 100%);
+            font-size: 60px;
+            margin: 30px 0;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
         }
 
-        /* ===== RECORDING BUTTON ===== */
         #recordingButton {
-            width: 100%;
-            padding: 16px 24px;
-            font-size: 16px;
-            font-weight: 600;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            background: linear-gradient(135deg, #FF6B5B 0%, #FF9500 100%);
+            font-size: 18px;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
             color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(255, 107, 91, 0.25);
-            margin: 30px 0 12px 0;
-            max-width: 100%;
+            margin: 20px 0;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
         }
 
         #recordingButton:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(255, 107, 91, 0.35);
+            box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
         }
 
         #recordingButton:active:not(:disabled) {
             transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
         }
 
         #recordingButton:disabled {
-            background: #bdc3c7;
+            background: var(--border-color);
+            color: var(--text-tertiary);
             cursor: not-allowed;
-            opacity: 0.7;
+            opacity: 0.6;
         }
 
         #recordingButton.recording {
+            background: linear-gradient(135deg, var(--error-color) 0%, #dc2626 100%);
             animation: recordingPulse 1.5s ease-in-out infinite;
         }
 
         @keyframes recordingPulse {
             0%, 100% {
                 transform: scale(1);
-                box-shadow: 0 4px 12px rgba(255, 107, 91, 0.3);
+                box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
             }
             50% {
                 transform: scale(1.02);
-                box-shadow: 0 8px 20px rgba(255, 107, 91, 0.4);
+                box-shadow: 0 8px 24px rgba(239, 68, 68, 0.5);
             }
         }
 
-        /* ===== STATUS MESSAGE ===== */
         #status {
-            color: #7f8c8d;
-            font-size: 13px;
-            margin: 12px 0;
-            min-height: 18px;
-            font-weight: 400;
+            font-size: 16px;
+            margin: 16px 0;
+            font-weight: 500;
+            min-height: 24px;
+            color: var(--text-primary);
+            padding: 12px 16px;
+            border-radius: 6px;
+            border-left: 4px solid;
         }
 
         .status-recording {
-            color: #e74c3c;
-            font-weight: 500;
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error-color);
+            border-left-color: var(--error-color);
         }
 
         .status-processing {
-            color: #f39c12;
-            font-weight: 500;
+            background: rgba(249, 115, 22, 0.1);
+            color: var(--warning-color);
+            border-left-color: var(--warning-color);
         }
 
         .status-error {
-            color: #e74c3c;
-            font-weight: 500;
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error-color);
+            border-left-color: var(--error-color);
         }
 
-        /* ===== BUTTONS ===== */
+        .review-section {
+            padding: 20px;
+        }
+
+        .text-display {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 20px 0;
+            min-height: 100px;
+            font-size: 16px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: var(--text-primary);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+
+        .text-display:hover {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.02);
+        }
+
+        .review-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
         .button-group {
             display: flex;
-            flex-direction: column;
             gap: 12px;
-            margin-top: 30px;
+            margin-top: 24px;
+            justify-content: center;
         }
 
         .btn {
-            padding: 14px 20px;
-            font-size: 15px;
-            border: 1px solid #e0e0e0;
-            background: white;
-            border-radius: 8px;
+            flex: 1;
+            padding: 14px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.2s ease;
-            font-weight: 500;
-            color: #2c3e50;
-            width: 100%;
-        }
-
-        .btn:hover {
-            background: #f8f9fa;
-            border-color: #bdc3c7;
-            transform: translateY(-1px);
+            max-width: 250px;
+            box-shadow: var(--shadow-md);
         }
 
         .btn-save {
-            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
             color: white;
-            border: none;
         }
 
-        .btn-save:hover {
-            background: linear-gradient(135deg, #229954 0%, #1e8449 100%);
-            color: white;
+        .btn-save:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
         }
 
         .btn-discard {
-            background: white;
-            color: #2c3e50;
-            border: 1px solid #e0e0e0;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+            box-shadow: none;
         }
 
-        /* ===== INPUT FIELDS ===== */
-        input[type="text"],
-        input[type="password"],
-        select,
-        textarea {
-            width: 100%;
-            padding: 12px 14px;
-            margin: 12px 0;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            font-size: 14px;
-            font-family: inherit;
-            transition: all 0.2s ease;
+        .btn-discard:hover:not(:disabled) {
+            background: var(--border-color);
+            border-color: var(--text-secondary);
+            transform: translateY(-2px);
         }
 
-        input:focus,
-        select:focus,
-        textarea:focus {
-            outline: none;
-            border-color: #FF9500;
-            box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.1);
+        .btn:disabled {
+            background: var(--border-color);
+            color: var(--text-tertiary);
+            cursor: not-allowed;
+            opacity: 0.6;
+            box-shadow: none;
         }
 
-        /* ===== SUCCESS SECTION ===== */
+        .success-section {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
         .success-icon {
             font-size: 72px;
-            margin: 30px 0;
+            margin-bottom: 20px;
             animation: successBounce 0.6s ease-out;
         }
 
@@ -290,72 +346,484 @@
         }
 
         .success-message {
-            font-size: 22px;
-            color: #27ae60;
+            font-size: 24px;
+            color: var(--success-color);
             font-weight: 600;
-            margin: 20px 0;
+            margin-bottom: 20px;
         }
 
-        /* ===== TEXT DISPLAY ===== */
-        .text-display {
-            background: #f8f9fa;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
+        #successSummary {
+            background: rgba(16, 185, 129, 0.05);
+            border: 2px solid var(--success-color);
+            border-radius: 8px;
             padding: 16px;
             margin: 20px 0;
-            min-height: 80px;
             text-align: left;
-            color: #2c3e50;
-            font-size: 14px;
+        }
+
+        #successSummary strong {
+            color: var(--text-primary);
+            display: block;
+            margin-top: 12px;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        #successSummary div {
+            margin-left: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-size: 16px;
             line-height: 1.6;
-            white-space: pre-wrap;
-            word-break: break-word;
+        }
+
+        #newRecordingButton {
+            font-size: 16px;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-md);
+        }
+
+        #newRecordingButton:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
         }
 
         .error-box {
-            background: #fadbd8;
-            border: 1px solid #f5b7b1;
-            border-radius: 6px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid var(--error-color);
+            border-radius: 8px;
             padding: 16px;
             margin: 20px 0;
-            color: #c0392b;
+            color: var(--error-color);
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
+            animation: errorShake 0.4s ease;
+        }
+
+        @keyframes errorShake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
         }
 
         .info-text {
             font-size: 12px;
-            color: #95a5a6;
+            color: var(--text-secondary);
             margin-top: 20px;
             font-style: italic;
         }
 
-        /* ===== RESPONSIVE MOBILE ===== */
-        @media (max-width: 768px) {
-            .navbar {
-                padding: 12px 16px;
+        /* MODERN DESIGN - Manual Input & Overview Buttons */
+        button[onclick="openManualInput()"],
+        button[onclick="showOverview()"] {
+            background: white !important;
+            color: #2c3e50 !important;
+            border: 2px solid #e0e0e0 !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        button[onclick="openManualInput()"],
+        button[onclick="showOverview()"] {
+            transition: all 0.2s ease !important;
+        }
+
+        button[onclick="openManualInput()"],
+        button[onclick="showOverview()"] {
+            cursor: pointer;
+        }
+
+        button[onclick="openManualInput()"] {
+            margin-top: 15px !important;
+        }
+
+        button[onclick="showOverview()"] {
+            margin-top: 15px !important;
+            margin-bottom: 30px !important;
+        }
+
+        button[onclick="openManualInput()"],
+        button[onclick="showOverview()"] {
+            font-weight: 600 !important;
+        }
+
+        button[onclick="openManualInput()"],
+        button[onclick="showOverview()"] {
+            font-size: 16px !important;
+        }
+
+        button[onclick="openManualInput()"],
+        button[onclick="showOverview()"] {
+            border-radius: 10px !important;
+        }
+
+        button[onclick="openManualInput()"],
+        button[onclick="showOverview()"] {
+            padding: 15px 40px !important;
+        }
+
+        button[onclick="openManualInput()"],
+        button[onclick="showOverview()"] {
+            width: 100% !important;
+        }
+
+        button[onclick="openManualInput()"],
+        button[onclick="showOverview()"] {
+            max-width: 300px !important;
+        }
+
+        button[onclick="openManualInput()"],
+        button[onclick="showOverview()"] {
+            display: inline-block;
+        }
+
+        button[onclick="openManualInput()"]:hover,
+        button[onclick="showOverview()"]:hover {
+            background: #f8f9fa !important;
+            border-color: #bdc3c7 !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        /* ========== DREISTUFIGE ÜBERSICHT STYLES ========== */
+
+        .kundenliste-section, .kundendetail-section, .palettehistorie-section {
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .kundenliste-header, .kundendetail-header, .palettehistorie-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0;
+            padding: 16px;
+            gap: 12px;
+            flex-shrink: 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .kundenliste-header h2, .kundendetail-header h2, .palettehistorie-header h2 {
+            color: var(--text-primary);
+            font-size: 20px;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .nav-back-btn {
+            padding: 10px 16px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            box-shadow: var(--shadow-md);
+        }
+
+        .nav-back-btn:hover {
+            background: #1d4ed8;
+            transform: translateX(-2px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+        }
+
+        /* ========== EBENE 1: KUNDENLISTE ========== */
+        .kundenliste-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            width: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            flex: 1;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        .kundenliste-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .kundenliste-grid::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        .kundenliste-grid::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        .kundenliste-item {
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 14px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .kundenliste-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.2);
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.02);
+        }
+
+        /* ========== EBENE 2: KUNDENDETAILS ========== */
+        .kundendetail-list {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            flex: 1;
+            padding: 16px;
+            gap: 12px;
+            box-sizing: border-box;
+        }
+
+        .kundendetail-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .kundendetail-list::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        .kundendetail-list::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        .kundendetail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .kundendetail-row:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.2);
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.02);
+        }
+
+        .kundendetail-palettenart {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            flex: 1;
+        }
+
+        .kundendetail-saldo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-color);
+            min-width: 80px;
+            justify-content: flex-end;
+        }
+
+        .saldo-input {
+            width: 80px;
+            padding: 8px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .saldo-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .saldo-button {
+            padding: 8px 16px;
+            background: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .saldo-button:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        /* ========== EBENE 3: PALETTENHISTORIE ========== */
+        .palettehistorie-list {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            flex: 1;
+            padding: 16px;
+            gap: 12px;
+            box-sizing: border-box;
+        }
+
+        .palettehistorie-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .palettehistorie-list::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        .palettehistorie-list::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        .palettehistorie-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-primary);
+            border-left: 4px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+            gap: 12px;
+            min-height: 80px;
+        }
+
+        .palettehistorie-item:hover {
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.2);
+            transform: translateX(4px);
+            background: rgba(37, 99, 235, 0.02);
+        }
+
+        .palettehistorie-zeitstempel {
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 700;
+            min-width: 140px;
+            letter-spacing: 0.3px;
+        }
+
+        .palettehistorie-mitarbeiter {
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 600;
+            min-width: 100px;
+        }
+
+        .palettehistorie-aktion {
+            font-size: 32px;
+            min-width: 50px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .palettehistorie-menge {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-color);
+            min-width: 60px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .palettehistorie-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        /* Login & Admin Panel Button Styling */
+        button[onclick="handleLoginNew()"],
+        button[onclick="addNewEmployee()"],
+        button[onclick="backToLogin()"] {
+            transition: all 0.2s ease;
+        }
+
+        button[onclick="handleLoginNew()"]:hover,
+        button[onclick="addNewEmployee()"]:hover,
+        button[onclick="backToLogin()"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Admin Panel Button */
+        button[onclick="showAdminPanel()"] {
+            background: #FF9500 !important;
+            transition: all 0.2s ease;
+        }
+
+        button[onclick="showAdminPanel()"]:hover {
+            background: #E68A00 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 149, 0, 0.3) !important;
+        }
+
+        /* ========== MOBILE RESPONSIVE ========== */
+        @media (max-width: 640px) {
+            body::before {
+                height: 50px;
             }
 
-            .navbar-logo {
-                font-size: 14px;
-                gap: 8px;
+            .container {
+                border-radius: 0;
+                padding: 16px;
+                max-height: calc(100vh - 50px);
+                margin-top: 50px;
+                box-shadow: none;
+                border-radius: 0;
             }
 
-            .navbar-icon {
-                width: 36px;
-                height: 36px;
-                font-size: 18px;
-            }
-
-            .navbar-user {
-                font-size: 13px;
-            }
-
-            .recording-section,
-            .review-section,
-            .success-section,
-            .login-section {
-                padding: 30px 20px;
+            @supports (padding: env(safe-area-inset-bottom)) {
+                .container {
+                    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+                }
             }
 
             h1 {
@@ -364,195 +832,205 @@
 
             .subtitle {
                 font-size: 13px;
-                margin-bottom: 30px;
+                margin-bottom: 20px;
             }
 
-            .microphone-icon {
-                width: 120px;
-                height: 120px;
-                margin: 30px auto;
-                font-size: 48px;
+            .recording-section {
+                padding: 16px;
             }
 
             #recordingButton {
-                padding: 14px 20px;
-                font-size: 15px;
-                margin: 20px 0 10px 0;
+                font-size: 16px;
+                padding: 12px 24px;
+                margin: 16px 0;
+                width: 100%;
+                max-width: 100%;
             }
 
             .button-group {
+                flex-direction: column;
                 gap: 10px;
                 margin-top: 20px;
             }
 
             .btn {
-                padding: 12px 16px;
+                max-width: 100%;
+                width: 100%;
+                padding: 12px 20px;
+                font-size: 16px;
+            }
+
+            input[type="text"], input[type="password"], select, textarea {
+                font-size: 16px !important;
+                padding: 12px !important;
+            }
+
+            .text-display {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .review-section {
+                padding: 16px;
+            }
+
+            /* KUNDENLISTE */
+            .kundenliste-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 10px;
+                padding: 12px;
+            }
+
+            .kundenliste-item {
+                font-size: 12px;
+                padding: 12px;
+                min-height: 90px;
+            }
+
+            /* KUNDENDETAILS */
+            .kundendetail-row {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 12px;
+                gap: 8px;
+            }
+
+            .kundendetail-palettenart {
+                font-size: 14px;
+                width: 100%;
+            }
+
+            .kundendetail-saldo {
+                width: 100%;
+                justify-content: space-between;
+                min-width: auto;
+                font-size: 16px;
+            }
+
+            .saldo-input {
+                width: 70px;
                 font-size: 14px;
             }
 
+            .saldo-button {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            /* PALETTENHISTORIE */
+            .palettehistorie-item {
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 12px;
+                min-height: auto;
+            }
+
+            .palettehistorie-zeitstempel {
+                font-size: 11px;
+                min-width: 100%;
+                order: -1;
+            }
+
+            .palettehistorie-mitarbeiter {
+                font-size: 13px;
+                min-width: auto;
+            }
+
+            .palettehistorie-aktion {
+                font-size: 24px;
+                min-width: 40px;
+            }
+
+            .palettehistorie-menge {
+                font-size: 18px;
+                min-width: 50px;
+            }
+
+            /* HEADER */
+            .kundenliste-header, .kundendetail-header, .palettehistorie-header {
+                flex-wrap: wrap;
+                padding: 12px;
+                gap: 8px;
+            }
+
+            .kundenliste-header h2, .kundendetail-header h2, .palettehistorie-header h2 {
+                font-size: 18px;
+                width: 100%;
+            }
+
+            .nav-back-btn {
+                width: 100%;
+                padding: 10px;
+            }
+
+            .success-section {
+                padding: 24px 16px;
+            }
+
             .success-icon {
-                font-size: 60px;
+                font-size: 56px;
             }
 
             .success-message {
                 font-size: 20px;
             }
 
-            input[type="text"],
-            input[type="password"],
-            select,
-            textarea {
-                padding: 11px 12px;
-                font-size: 16px;
+            #successSummary {
+                padding: 12px !important;
+                margin: 16px 0 !important;
+            }
+
+            .error-box {
+                font-size: 13px;
+                padding: 12px;
             }
         }
 
         @media (max-width: 480px) {
             .container {
-                min-height: calc(100vh - 60px);
-            }
-
-            .navbar {
-                padding: 10px 12px;
-            }
-
-            .navbar-logo {
-                font-size: 13px;
-                gap: 6px;
-            }
-
-            .navbar-icon {
-                width: 32px;
-                height: 32px;
-                font-size: 16px;
-            }
-
-            .recording-section,
-            .review-section,
-            .success-section,
-            .login-section {
-                padding: 20px 16px;
+                padding: 12px;
             }
 
             h1 {
                 font-size: 20px;
             }
 
-            .microphone-icon {
-                width: 100px;
-                height: 100px;
-                margin: 25px auto;
-                font-size: 40px;
-            }
-
-            #recordingButton {
-                padding: 12px 16px;
-                font-size: 14px;
-            }
-
-            .success-icon {
-                font-size: 52px;
-            }
-        }
-
-        /* ===== LIST & GRID STYLES ===== */
-        .kundenliste-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 12px;
-            padding: 20px;
-            width: 100%;
-        }
-
-        .kundenliste-item {
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            padding: 12px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: center;
-            font-weight: 500;
-            color: #2c3e50;
-            font-size: 13px;
-        }
-
-        .kundenliste-item:hover {
-            border-color: #FF9500;
-            background: #fff8f3;
-            transform: translateY(-2px);
-        }
-
-        .nav-back-btn {
-            background: #FF9500;
-            color: white;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-
-        .nav-back-btn:hover {
-            background: #FF7A3D;
-            transform: translateX(-2px);
-        }
-
-        #logoutContainer {
-            position: absolute;
-            top: 16px;
-            right: 20px;
-        }
-
-        #logoutContainer button {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-
-        #logoutContainer button:hover {
-            background: #c0392b;
-        }
-
-        @media (max-width: 768px) {
             .kundenliste-grid {
-                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-                gap: 10px;
-                padding: 16px;
-            }
-
-            .kundenliste-item {
-                font-size: 12px;
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+                gap: 8px;
                 padding: 10px;
             }
 
-            #logoutContainer {
-                top: 12px;
-                right: 16px;
+            .kundenliste-item {
+                font-size: 11px;
+                padding: 10px;
+                min-height: 80px;
             }
 
-            #logoutContainer button {
-                padding: 6px 12px;
-                font-size: 11px;
+            .palettehistorie-zeitstempel {
+                font-size: 10px;
+            }
+
+            #recordingButton {
+                font-size: 14px;
+                padding: 10px 20px;
+            }
+
+            .nav-back-btn {
+                padding: 8px 12px;
+                font-size: 13px;
             }
         }
-</style>
+    </style>
 </head>
 <body>
     <div class="container" style="position: relative;">
         <!-- Logout Button oben -->
         <div id="logoutContainer" style="display: none; text-align: right; margin-bottom: 15px;">
-            <button onclick="logoutUser()" style="padding: 10px 16px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap;">ðŸ‘‹ Logout (<span id="mitarbeiterDisplay">Marcel</span>)</button>
+            <button onclick="logoutUser()" style="padding: 10px 16px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap;">👋 Logout (<span id="mitarbeiterDisplay">Marcel</span>)</button>
         </div>
 
-        <!-- <h1>Paletten Ãœbersicht</h1>
+        <!-- <h1>Paletten Übersicht</h1>
         <p class="subtitle">Spracherkennung mit Saldo-Tracking</p> -->
 
         <!-- LOGIN PHASE -->
@@ -560,15 +1038,15 @@
         <div id="loginPhase" class="phase">
             <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 40px 20px;">
                 <div style="background: white; border-radius: 20px; padding: 40px; max-width: 400px; width: 100%; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);">
-                    <h2 style="text-align: center; color: #333; margin-bottom: 30px; font-size: 24px;">ðŸ” Anmeldung</h2>
+                    <h2 style="text-align: center; color: #333; margin-bottom: 30px; font-size: 24px;">🔐 Anmeldung</h2>
 
                     <div style="margin-bottom: 20px;">
-                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">ðŸ‘¤ Mitarbeitername</label>
+                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">👤 Mitarbeitername</label>
                         <input type="text" id="loginMitarbeiter" placeholder="z.B. Vorname" style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
                     </div>
 
                     <div style="margin-bottom: 25px;">
-                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">ðŸ”‘ Passwort</label>
+                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">🔑 Passwort</label>
                         <input type="password" id="loginPassword" placeholder="Passwort eingeben..." style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
                     </div>
 
@@ -578,7 +1056,7 @@
 
                     <button onclick="handleLoginNew()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; margin-bottom: 12px;">Anmelden</button>
 
-                    <button onclick="showAdminPanel()" style="width: 100%; padding: 12px; background: #ff9500; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">âš™ï¸ Mitarbeiter hinzufÃ¼gen</button>
+                    <button onclick="showAdminPanel()" style="width: 100%; padding: 12px; background: #ff9500; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">⚙️ Mitarbeiter hinzufügen</button>
                 </div>
             </div>
         </div>
@@ -587,15 +1065,15 @@
         <div id="adminPanelPhase" class="phase">
             <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 40px 20px;">
                 <div style="background: white; border-radius: 20px; padding: 40px; max-width: 400px; width: 100%; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);">
-                    <h2 style="text-align: center; color: #333; margin-bottom: 30px; font-size: 24px;">âš™ï¸ Mitarbeiter hinzufÃ¼gen</h2>
+                    <h2 style="text-align: center; color: #333; margin-bottom: 30px; font-size: 24px;">⚙️ Mitarbeiter hinzufügen</h2>
 
                     <div style="margin-bottom: 20px;">
-                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">ðŸ“ Mitarbeitername</label>
+                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">📝 Mitarbeitername</label>
                         <input type="text" id="adminMitarbeitername" placeholder="z.B. Klaus" style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
                     </div>
 
                     <div style="margin-bottom: 25px;">
-                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">ðŸ”‘ Admin-Passwort</label>
+                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">🔑 Admin-Passwort</label>
                         <input type="password" id="adminPassword" placeholder="Admin-Passwort..." style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
                     </div>
 
@@ -607,9 +1085,9 @@
                         <span id="adminSuccessMessage"></span>
                     </div>
 
-                    <button onclick="addNewEmployee()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; margin-bottom: 12px;">âœ… Mitarbeiter erstellen</button>
+                    <button onclick="addNewEmployee()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; margin-bottom: 12px;">✅ Mitarbeiter erstellen</button>
 
-                    <button onclick="backToLogin()" style="width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">â† ZurÃ¼ck</button>
+                    <button onclick="backToLogin()" style="width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">← Zurück</button>
                 </div>
             </div>
         </div>
@@ -618,38 +1096,38 @@
             <div class="recording-section" style="position: relative;">
                 <!-- Hauptinhalt mittig -->
                 <p>Klicke auf den Button und sprich die Palette ein</p>
-                <button id="recordingButton" onclick="toggleRecording()">ðŸŽ¤ Aufnahme starten</button>
+                <button id="recordingButton" onclick="toggleRecording()">🎤 Aufnahme starten</button>
                 <p id="status"></p>
 
                 <!-- Manuelle Eingabe Button -->
-                <button onclick="openManualInput()" style="margin-top: 15px; padding: 15px 40px; background: #ff9800; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; max-width: 300px;">âœï¸ Manuell eingeben</button>
+                <button onclick="openManualInput()" style="margin-top: 15px; padding: 15px 40px; background: #ff9800; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; max-width: 300px;">✏️ Manuell eingeben</button>
 
-                <!-- Ãœbersicht-Button unten mittig -->
-                <button onclick="showOverview()" style="margin-top: 15px; margin-bottom: 30px; padding: 15px 40px; background: #51cf66; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; max-width: 300px;">ðŸ“Š Ãœbersicht</button>
+                <!-- Übersicht-Button unten mittig -->
+                <button onclick="showOverview()" style="margin-top: 15px; margin-bottom: 30px; padding: 15px 40px; background: #51cf66; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; max-width: 300px;">📊 Übersicht</button>
 
-                <!-- V1.382 schwarz, fett, unten in der mitte UNTER Ãœbersicht Button -->
+                <!-- V1.382 schwarz, fett, unten in der mitte UNTER Übersicht Button -->
                 <span style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); font-size: 14px; color: #000; font-weight: bold;">V1.382</span>
             </div>
         </div>
 
         <div id="reviewPhase" class="phase">
             <div class="review-section">
-                <p class="review-label">ðŸ“ Erkannter Text - Bitte Ã¼berprÃ¼fen und korrigieren:</p>
+                <p class="review-label">📝 Erkannter Text - Bitte überprüfen und korrigieren:</p>
 
                 <!-- EDITIERBARE KUNDENINFORMATIONEN -->
                 <div style="background: #f0f4ff; border: 2px solid #667eea; border-radius: 12px; padding: 20px; margin: 20px 0;">
                     <div style="margin-bottom: 15px;">
-                        <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 8px;">ðŸ‘¤ Kundenname:</label>
+                        <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 8px;">👤 Kundenname:</label>
                         <input type="text" id="editCustomerName" placeholder="Kundenname eingeben..." style="width: 100%; padding: 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
                     </div>
 
                     <div>
-                        <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 8px;">ðŸ”¢ Kundennummer (optional):</label>
+                        <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 8px;">🔢 Kundennummer (optional):</label>
                         <input type="text" id="editCustomerNumber" placeholder="Kundennummer eingeben..." style="width: 100%; padding: 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
                     </div>
                 </div>
 
-                <p class="review-label" style="margin-top: 20px;">ðŸ“‹ Erkannter Volltext:</p>
+                <p class="review-label" style="margin-top: 20px;">📋 Erkannter Volltext:</p>
                 <div id="textDisplay" class="text-display"></div>
 
                 <div id="errorBox" style="display: none;" class="error-box">
@@ -657,23 +1135,23 @@
                 </div>
 
                 <div class="button-group">
-                    <button class="btn btn-save" onclick="saveToSupabase()" id="saveBtn">âœ… Speichern</button>
-                    <button class="btn btn-discard" onclick="discardAndRestart()">âŒ Verwerfen</button>
+                    <button class="btn btn-save" onclick="saveToSupabase()" id="saveBtn">✅ Speichern</button>
+                    <button class="btn btn-discard" onclick="discardAndRestart()">❌ Verwerfen</button>
                 </div>
             </div>
         </div>
 
         <div id="successPhase" class="phase">
             <div class="success-section">
-                <div class="success-icon">âœ…</div>
+                <div class="success-icon">✅</div>
                 <p class="success-message">Erfolgreich gespeichert!</p>
 
                 <!-- ZUSAMMENFASSUNG -->
                 <div id="successSummary" style="background: #f0f9ff; border: 2px solid #51cf66; border-radius: 12px; padding: 20px; margin: 20px 0; text-align: left;">
-                    <!-- wird dynamisch gefÃ¼llt -->
+                    <!-- wird dynamisch gefüllt -->
                 </div>
 
-                <button id="newRecordingButton" onclick="restartRecording()">â† ZurÃ¼ck</button>
+                <button id="newRecordingButton" onclick="restartRecording()">← Zurück</button>
             </div>
         </div>
 
@@ -681,11 +1159,11 @@
         <div id="kundenlistePhase" class="phase">
             <div class="kundenliste-section">
                 <div class="kundenliste-header">
-                    <h2>ðŸ“Š Kundenliste</h2>
-                    <button class="nav-back-btn" onclick="backToRecording()">â† ZurÃ¼ck</button>
+                    <h2>📊 Kundenliste</h2>
+                    <button class="nav-back-btn" onclick="backToRecording()">← Zurück</button>
                 </div>
                 <div id="kundenlisteContainer" class="kundenliste-grid">
-                    <!-- wird dynamisch gefÃ¼llt -->
+                    <!-- wird dynamisch gefüllt -->
                 </div>
             </div>
         </div>
@@ -694,11 +1172,11 @@
         <div id="kundendetailPhase" class="phase">
             <div class="kundendetail-section">
                 <div class="kundendetail-header">
-                    <h2 id="detailCustomerTitle">ðŸ“¦ Kundendetails</h2>
-                    <button class="nav-back-btn" onclick="backToCustomerList()">â† ZurÃ¼ck</button>
+                    <h2 id="detailCustomerTitle">📦 Kundendetails</h2>
+                    <button class="nav-back-btn" onclick="backToCustomerList()">← Zurück</button>
                 </div>
                 <div id="kundendetailContainer" class="kundendetail-list">
-                    <!-- wird dynamisch gefÃ¼llt -->
+                    <!-- wird dynamisch gefüllt -->
                 </div>
             </div>
         </div>
@@ -707,11 +1185,11 @@
         <div id="paletteHistoriePhase" class="phase">
             <div class="palettehistorie-section">
                 <div class="palettehistorie-header">
-                    <h2 id="historieTitle">â±ï¸ Palettenhistorie</h2>
-                    <button class="nav-back-btn" onclick="backToCustomerDetail()">â† ZurÃ¼ck</button>
+                    <h2 id="historieTitle">⏱️ Palettenhistorie</h2>
+                    <button class="nav-back-btn" onclick="backToCustomerDetail()">← Zurück</button>
                 </div>
                 <div id="paletteHistorieContainer" class="palettehistorie-list">
-                    <!-- wird dynamisch gefÃ¼llt -->
+                    <!-- wird dynamisch gefüllt -->
                 </div>
             </div>
         </div>
@@ -719,61 +1197,61 @@
         <!-- MANUELLE EINGABE PHASE -->
         <div id="manualInputPhase" class="phase">
             <div class="recording-section">
-                <h2>âœï¸ Manuelle Eingabe</h2>
+                <h2>✏️ Manuelle Eingabe</h2>
                 <p style="color: #666; font-size: 14px; margin-bottom: 20px;">Geben Sie die Palettenart und Anzahl ein</p>
 
                 <!-- PALETTENART DROPDOWN -->
                 <div style="margin-bottom: 25px;">
-                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">ðŸ“¦ Palettenart:</label>
+                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">📦 Palettenart:</label>
                     <select id="manualPaletteType" style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box; background: white; cursor: pointer;">
-                        <option value="">-- Palettenart auswÃ¤hlen --</option>
+                        <option value="">-- Palettenart auswählen --</option>
                     </select>
                 </div>
 
                 <!-- KUNDENNAME -->
                 <div style="margin-bottom: 25px;">
-                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">ðŸ‘¤ Kundenname:</label>
+                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">👤 Kundenname:</label>
                     <input type="text" id="manualCustomerName" placeholder="Kundenname eingeben..." style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
                 </div>
 
                 <!-- KUNDENNUMMER (OPTIONAL) -->
                 <div style="margin-bottom: 25px;">
-                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">ðŸ”¢ Kundennummer (optional):</label>
+                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">🔢 Kundennummer (optional):</label>
                     <input type="text" id="manualCustomerNumber" placeholder="Kundennummer eingeben..." style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
                 </div>
 
                 <!-- AKTION (Zu-/Abgang) -->
                 <div style="margin-bottom: 25px;">
-                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">âš¡ Aktion:</label>
+                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">⚡ Aktion:</label>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <button id="manualActionAdd" onclick="setManualAction('add')" style="padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; background: white; color: #667eea; transition: all 0.3s;">âž• Zugang</button>
-                        <button id="manualActionRemove" onclick="setManualAction('remove')" style="padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; background: white; color: #667eea; transition: all 0.3s;">âž– Abgang</button>
+                        <button id="manualActionAdd" onclick="setManualAction('add')" style="padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; background: white; color: #667eea; transition: all 0.3s;">➕ Zugang</button>
+                        <button id="manualActionRemove" onclick="setManualAction('remove')" style="padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; background: white; color: #667eea; transition: all 0.3s;">➖ Abgang</button>
                     </div>
                 </div>
 
                 <!-- ANZAHL -->
                 <div style="margin-bottom: 30px;">
-                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">ðŸ“Š Anzahl:</label>
+                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">📊 Anzahl:</label>
                     <input type="number" id="manualQuantity" placeholder="z.B. 5" min="1" value="1" style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
                 </div>
 
                 <!-- BUTTONS -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 30px;">
-                    <button onclick="saveManualInput()" style="padding: 15px; background: #51cf66; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s;">âœ… Speichern</button>
-                    <button onclick="cancelManualInput()" style="padding: 15px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s;">âŒ Abbrechen</button>
+                    <button onclick="saveManualInput()" style="padding: 15px; background: #51cf66; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s;">✅ Speichern</button>
+                    <button onclick="cancelManualInput()" style="padding: 15px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s;">❌ Abbrechen</button>
                 </div>
             </div>
         </div>
 
-        <!-- KUNDE BESTÃ„TIGUNG MODAL -->
+        <!-- KUNDE BESTÄTIGUNG MODAL -->
         <div id="customerConfirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
             <div style="background: white; border-radius: 20px; padding: 30px; max-width: 500px; text-align: center;">
-                <h2 style="margin-bottom: 20px; color: #333;">ðŸ‘¤ Ist das der gleiche Kunde?</h2>
+                <h2 style="margin-bottom: 20px; color: #333;">👤 Ist das der gleiche Kunde?</h2>
                 <p id="customerConfirmQuestion" style="font-size: 18px; color: #666; margin-bottom: 30px;"></p>
 
                 <div style="display: flex; gap: 15px; justify-content: center;">
-                    <button onclick="confirmSameCustomer()" style="flex: 1; padding: 15px; background: #51cf66; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">âœ… Ja, gleicher Kunde</button>
-                    <button onclick="rejectSameCustomer()" style="flex: 1; padding: 15px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">âŒ Nein, neuer Kunde</button>
+                    <button onclick="confirmSameCustomer()" style="flex: 1; padding: 15px; background: #51cf66; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">✅ Ja, gleicher Kunde</button>
+                    <button onclick="rejectSameCustomer()" style="flex: 1; padding: 15px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">❌ Nein, neuer Kunde</button>
                 </div>
             </div>
         </div>
@@ -781,11 +1259,11 @@
         <!-- PALETTE AUSWAHL MODAL -->
         <div id="paletteSelectionModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
             <div style="background: white; border-radius: 20px; padding: 30px; max-width: 90%; max-height: 90vh; overflow-y: auto;">
-                <h2 style="text-align: center; margin-bottom: 20px; color: #333;">ðŸŽ¯ Bitte wÃ¤hle die Palettenart:</h2>
+                <h2 style="text-align: center; margin-bottom: 20px; color: #333;">🎯 Bitte wähle die Palettenart:</h2>
                 <div id="paletteButtonsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
                     <!-- Buttons werden dynamisch generiert -->
                 </div>
-                <button onclick="cancelPaletteSelection()" style="width: 100%; padding: 15px; margin-top: 20px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">âŒ Verwerfen</button>
+                <button onclick="cancelPaletteSelection()" style="width: 100%; padding: 15px; margin-top: 20px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">❌ Verwerfen</button>
             </div>
         </div>
 
@@ -793,7 +1271,7 @@
 
     <script>
         // GROQ API Key wird von Backend bereitgestellt (sicherer als hardcodiert!)
-        // ðŸ” GROQ API wird jetzt Ã¼ber Backend-Proxy aufgerufen (sicherer!)
+        // 🔐 GROQ API wird jetzt über Backend-Proxy aufgerufen (sicherer!)
         // const GROQ_API_KEY wird NICHT mehr im Frontend genutzt
 
         // ============================================
@@ -804,7 +1282,7 @@
             'Grafepalette': ['grafe', 'grafe-palette', 'grafepalette'],
             'Steinzeug Gitterbox': ['steinzeug gitterbox', 'steinzeug-gitterbox', 'stg gitterbox'],
             'Steinzeugpalette klein': ['steinzeugpalette klein', 'steinzeug klein', 'stg klein'],
-            'Steinzeugpalette groÃŸ': ['steinzeugpalette groÃŸ', 'steinzeug groÃŸ', 'stg groÃŸ'],
+            'Steinzeugpalette groß': ['steinzeugpalette groß', 'steinzeug groß', 'stg groß'],
             'Europalette 2': ['europalette zwei', 'euro zwei', 'europalette 2'],
             'Europalette 3': ['europalette drei', 'euro drei', 'europalette 3'],
             'Spezialpalette': ['spezial', 'spezialpalette', 'spezial-palette'],
@@ -844,7 +1322,7 @@
             const kandidaten = [];
             for (let [standard, synonyme] of Object.entries(PALETTENLISTE)) {
                 for (let synonym of synonyme) {
-                    // PrÃ¼fe ob Synonym als ganzes Wort im Text vorkommt
+                    // Prüfe ob Synonym als ganzes Wort im Text vorkommt
                     if (normalized.includes(synonym)) {
                         if (!kandidaten.find(k => k === standard)) {
                             kandidaten.push(standard);
@@ -876,10 +1354,10 @@
         let audioStream = null;
         let wartendeAuswahlPaletten = [];
         let selectedPalette = null;
-        let aktuelleAuswahlPalette = null;  // ðŸŽ¯ SPEICHERE DIE AKTUELLEN DATEN VOR DEM LÃ–SCHEN
-        let erkannteAuswahlPaletten = [];   // ðŸŽ¯ SPEICHERE BEREITS ERKANNTE PALETTEN aus validateText()
+        let aktuelleAuswahlPalette = null;  // 🎯 SPEICHERE DIE AKTUELLEN DATEN VOR DEM LÖSCHEN
+        let erkannteAuswahlPaletten = [];   // 🎯 SPEICHERE BEREITS ERKANNTE PALETTEN aus validateText()
 
-        // KundenbestÃ¤tigung
+        // Kundenbestätigung
         let wartendeKundenZuBestaetigung = null;
         let selectedCustomerName = null;
 
@@ -887,7 +1365,7 @@
         let mitarbeiterName = null;
 
         // ============================================
-        // ðŸ“± DEVICE-DETECTION FÃœR MOBILE-KOMPATIBILITÃ„T
+        // 📱 DEVICE-DETECTION FÜR MOBILE-KOMPATIBILITÄT
         // ============================================
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
         const isAndroid = /Android/.test(navigator.userAgent);
@@ -895,8 +1373,8 @@
         const hasGetUserMedia = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
         const isHTTPS = location.protocol === 'https:';
 
-        // Zeige Device-Info in Console fÃ¼r Debugging
-        console.log('ðŸ“± Device-Info:', {
+        // Zeige Device-Info in Console für Debugging
+        console.log('📱 Device-Info:', {
             device: isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop',
             isMobile,
             hasGetUserMedia,
@@ -905,14 +1383,14 @@
         });
 
         // ============================================
-        // ðŸŽ¤ WEB SPEECH API INITIALISIERUNG
+        // 🎤 WEB SPEECH API INITIALISIERUNG
         // ============================================
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let recognition = null;
 
-        // ðŸ”§ iOS FIX: Funktion zum Neu-Initialisieren der Recognition
+        // 🔧 iOS FIX: Funktion zum Neu-Initialisieren der Recognition
         function initializeRecognition() {
-            console.log('ðŸ”§ Initialisiere Recognition-Objekt neu...');
+            console.log('🔧 Initialisiere Recognition-Objekt neu...');
             try {
                 // Stoppe alte Recognition falls noch aktiv
                 if (recognition) {
@@ -928,43 +1406,43 @@
                     recognition.continuous = false;
                     recognition.interimResults = true;
                     recognition.lang = 'de-DE';
-                    console.log('âœ… Neues Recognition-Objekt erstellt');
+                    console.log('✅ Neues Recognition-Objekt erstellt');
                 } else {
-                    console.warn('âš ï¸ SpeechRecognition nicht verfÃ¼gbar');
+                    console.warn('⚠️ SpeechRecognition nicht verfügbar');
                 }
             } catch (err) {
-                console.error('ðŸ”´ Fehler beim Initialisieren von Recognition:', err);
+                console.error('🔴 Fehler beim Initialisieren von Recognition:', err);
             }
         }
 
         if (SpeechRecognition) {
             initializeRecognition();
-            console.log('âœ… Web Speech API verfÃ¼gbar');
+            console.log('✅ Web Speech API verfügbar');
         } else {
-            console.warn('âš ï¸ Web Speech API nicht verfÃ¼gbar - Fallback zu MediaRecorder');
+            console.warn('⚠️ Web Speech API nicht verfügbar - Fallback zu MediaRecorder');
         }
 
-        // ðŸ” OPTIONAL: Microphone-Berechtigung pre-check fÃ¼r iOS
+        // 🔐 OPTIONAL: Microphone-Berechtigung pre-check für iOS
         async function ensureMicrophonePermission() {
             if (!hasGetUserMedia) {
-                console.warn('âš ï¸ getUserMedia nicht verfÃ¼gbar');
+                console.warn('⚠️ getUserMedia nicht verfügbar');
                 return false;
             }
 
             try {
-                console.log('ðŸ” PrÃ¼fe Mikrophon-Berechtigung...');
+                console.log('🔐 Prüfe Mikrophon-Berechtigung...');
                 const testStream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
                 // Sofort alle Tracks stoppen - wir brauchen nur die Permission
                 testStream.getTracks().forEach(track => {
-                    console.log('âœ… Track gestoppt:', track.kind);
+                    console.log('✅ Track gestoppt:', track.kind);
                     track.stop();
                 });
 
-                console.log('âœ… Mikrophon-Berechtigung erteilt');
+                console.log('✅ Mikrophon-Berechtigung erteilt');
                 return true;
             } catch (err) {
-                console.warn('âš ï¸ Mikrophon-Berechtigung verweigert:', err.message);
+                console.warn('⚠️ Mikrophon-Berechtigung verweigert:', err.message);
                 return false;
             }
         }
@@ -976,8 +1454,8 @@
 
         async function startRecording() {
             try {
-                // ðŸ“± DEBUG: Zeige Device-Info fÃ¼r Debugging
-                console.log('ðŸŽ¤ Starte Aufnahme mit folgenden Bedingungen:', {
+                // 📱 DEBUG: Zeige Device-Info für Debugging
+                console.log('🎤 Starte Aufnahme mit folgenden Bedingungen:', {
                     device: isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop',
                     browser: /Safari/.test(navigator.userAgent) ? 'Safari' : /Chrome/.test(navigator.userAgent) ? 'Chrome' : 'Andere',
                     isHTTPS: location.protocol === 'https:',
@@ -985,44 +1463,44 @@
                     recognitionAvailable: !!recognition
                 });
 
-                // ðŸ“± iOS FIX: Stoppe Watchdog wenn Aufnahme startet
+                // 📱 iOS FIX: Stoppe Watchdog wenn Aufnahme startet
                 if (microphoneTimeoutId) {
                     clearTimeout(microphoneTimeoutId);
                     microphoneTimeoutId = null;
-                    console.log('â° Watchdog gestoppt - Aufnahme startet');
+                    console.log('⏰ Watchdog gestoppt - Aufnahme startet');
                 }
 
-                // ðŸŽ¤ NUTZE WEB SPEECH API (Browser-native, beste Compatibility auf Mobile)
+                // 🎤 NUTZE WEB SPEECH API (Browser-native, beste Compatibility auf Mobile)
                 if (!recognition) {
-                    showError("âš ï¸ Spracherkennung wird von deinem Browser nicht unterstÃ¼tzt! Nutze Safari auf iOS oder Chrome auf Android.");
+                    showError("⚠️ Spracherkennung wird von deinem Browser nicht unterstützt! Nutze Safari auf iOS oder Chrome auf Android.");
                     return;
                 }
 
-                // ðŸ›‘ Stoppe evtl. alte Recognition bevor neue startet
+                // 🛑 Stoppe evtl. alte Recognition bevor neue startet
                 try {
                     recognition.stop();
                 } catch (e) {}
 
-                console.log('ðŸŽ¤ Starte Web Speech API auf:', isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop');
+                console.log('🎤 Starte Web Speech API auf:', isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop');
 
                 isRecording = true;
                 let finalTranscript = '';
 
                 const btn = document.getElementById("recordingButton");
-                btn.textContent = "ðŸ”´ Aufnahme lÃ¤uft - jetzt sprechen!";
+                btn.textContent = "🔴 Aufnahme läuft - jetzt sprechen!";
                 btn.classList.add("recording");
 
                 const status = document.getElementById("status");
-                status.textContent = "ðŸŽ§ HÃ¶re zu...";
+                status.textContent = "🎧 Höre zu...";
                 status.className = "status-recording";
 
-                // ðŸŽ¤ EVENT: Wenn Spracherkennung startet
+                // 🎤 EVENT: Wenn Spracherkennung startet
                 recognition.onstart = () => {
-                    console.log('âœ… Web Speech API aktiviert');
-                    status.textContent = "ðŸŽ§ HÃ¶re zu...";
+                    console.log('✅ Web Speech API aktiviert');
+                    status.textContent = "🎧 Höre zu...";
                 };
 
-                // ðŸŽ¤ EVENT: Text erkannt (inkl. Zwischenergebnisse)
+                // 🎤 EVENT: Text erkannt (inkl. Zwischenergebnisse)
                 recognition.onresult = (event) => {
                     let interimTranscript = '';
 
@@ -1031,78 +1509,78 @@
 
                         if (event.results[i].isFinal) {
                             finalTranscript += transcript + ' ';
-                            console.log('âœ… Final Text:', transcript);
+                            console.log('✅ Final Text:', transcript);
                         } else {
                             interimTranscript += transcript;
-                            console.log('ðŸ”„ Interim Text:', transcript);
+                            console.log('🔄 Interim Text:', transcript);
                         }
                     }
 
                     // Zeige Zwischenergebnis + Final
                     const displayText = interimTranscript || finalTranscript;
-                    console.log('ðŸ“ Zeige:', displayText);
-                    status.textContent = `ðŸŽ§ Erkannt: ${displayText}`;
+                    console.log('📝 Zeige:', displayText);
+                    status.textContent = `🎧 Erkannt: ${displayText}`;
                 };
 
-                // ðŸ”´ EVENT: Fehler bei Spracherkennung
+                // 🔴 EVENT: Fehler bei Spracherkennung
                 recognition.onerror = (event) => {
-                    console.error('ðŸ”´ Speech Recognition Fehler:', event.error);
+                    console.error('🔴 Speech Recognition Fehler:', event.error);
                     console.error('   Device:', isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop');
 
-                    // ðŸ” iOS FIX: Gebe Mikrofon auch bei Fehler frei!
-                    console.log('ðŸŽ¤ Gebe Mikrofon frei nach Fehler...');
+                    // 🔐 iOS FIX: Gebe Mikrofon auch bei Fehler frei!
+                    console.log('🎤 Gebe Mikrofon frei nach Fehler...');
                     stopAllAudio();
                     releaseAudioResources();
 
                     let errorMsg = `Fehler: ${event.error}`;
 
                     if (event.error === 'no-speech') {
-                        errorMsg = 'âŒ Keine Sprache erkannt - bitte laut und deutlich sprechen!';
+                        errorMsg = '❌ Keine Sprache erkannt - bitte laut und deutlich sprechen!';
                     } else if (event.error === 'audio-capture') {
-                        // ðŸŽ™ï¸ Device-spezifische Hinweise fÃ¼r audio-capture Fehler
+                        // 🎙️ Device-spezifische Hinweise für audio-capture Fehler
                         if (isIOS) {
-                            errorMsg = 'ðŸŽ™ï¸ iOS Mikrofon-Fehler: Probiere die Aufnahme neu oder nutze eine andere App.';
+                            errorMsg = '🎙️ iOS Mikrofon-Fehler: Probiere die Aufnahme neu oder nutze eine andere App.';
                         } else if (isAndroid) {
-                            errorMsg = 'ðŸŽ™ï¸ Android Mikrofon-Fehler: ÃœberprÃ¼fe die App-Berechtigung in den Einstellungen.';
+                            errorMsg = '🎙️ Android Mikrofon-Fehler: Überprüfe die App-Berechtigung in den Einstellungen.';
                         } else {
-                            errorMsg = 'ðŸŽ™ï¸ Mikrophon-Fehler - Berechtigung erteilt? Probiere neu!';
+                            errorMsg = '🎙️ Mikrophon-Fehler - Berechtigung erteilt? Probiere neu!';
                         }
                     } else if (event.error === 'network') {
-                        errorMsg = 'ðŸŒ Netzwerk-Fehler - Ã¼berprÃ¼fe deine Internet-Verbindung';
+                        errorMsg = '🌐 Netzwerk-Fehler - überprüfe deine Internet-Verbindung';
                     } else if (event.error === 'bad-grammar') {
-                        errorMsg = 'ðŸŽ¤ Sprache nicht verstanden - bitte deutlich sprechen';
+                        errorMsg = '🎤 Sprache nicht verstanden - bitte deutlich sprechen';
                     } else if (event.error === 'service-not-allowed') {
-                        errorMsg = 'âš ï¸ Speech Recognition ist nicht verfÃ¼gbar - bitte spÃ¤ter erneut versuchen';
+                        errorMsg = '⚠️ Speech Recognition ist nicht verfügbar - bitte später erneut versuchen';
                     }
 
-                    console.error('ðŸ”´ Zeige Error:', errorMsg);
+                    console.error('🔴 Zeige Error:', errorMsg);
                     showError(errorMsg);
                     isRecording = false;
-                    btn.textContent = "ðŸŽ¤ Aufnahme starten";
+                    btn.textContent = "🎤 Aufnahme starten";
                     btn.classList.remove("recording");
                     btn.disabled = false;
                 };
 
-                // âœ… EVENT: Spracherkennung beendet - WICHTIG!
+                // ✅ EVENT: Spracherkennung beendet - WICHTIG!
                 recognition.onend = () => {
-                    console.log('âœ… Recognition onend() aufgerufen');
+                    console.log('✅ Recognition onend() aufgerufen');
                     console.log('   finalTranscript =', finalTranscript);
                     console.log('   trimmed =', finalTranscript.trim());
 
-                    // ðŸ” iOS FIX: Gebe Mikrofon SOFORT frei wenn Aufnahme endet!
+                    // 🔐 iOS FIX: Gebe Mikrofon SOFORT frei wenn Aufnahme endet!
                     // NICHT WARTEN auf processWithGroq()
-                    console.log('ðŸŽ¤ Gebe Mikrofon SOFORT frei nach Aufnahmeende...');
+                    console.log('🎤 Gebe Mikrofon SOFORT frei nach Aufnahmeende...');
                     stopAllAudio();
                     releaseAudioResources();
 
                     if (finalTranscript.trim() && finalTranscript.trim().length > 0) {
-                        console.log('ðŸ“¤ Rufe processWithGroq auf mit:', finalTranscript.trim());
-                        // Schicke erkannten Text zu Groq fÃ¼r Strukturierung
+                        console.log('📤 Rufe processWithGroq auf mit:', finalTranscript.trim());
+                        // Schicke erkannten Text zu Groq für Strukturierung
                         processWithGroq(finalTranscript.trim());
                     } else {
-                        console.warn('âš ï¸ Kein Text erkannt - finalTranscript ist leer');
-                        showError('âŒ Keine Sprache erkannt - versuche es nochmal!');
-                        btn.textContent = "ðŸŽ¤ Aufnahme starten";
+                        console.warn('⚠️ Kein Text erkannt - finalTranscript ist leer');
+                        showError('❌ Keine Sprache erkannt - versuche es nochmal!');
+                        btn.textContent = "🎤 Aufnahme starten";
                         btn.classList.remove("recording");
                         btn.disabled = false;
                     }
@@ -1110,12 +1588,12 @@
                     isRecording = false;
                 };
 
-                // ðŸš€ STARTE SPRACHERKENNUNG
-                console.log('ðŸš€ Starte recognition.start()');
+                // 🚀 STARTE SPRACHERKENNUNG
+                console.log('🚀 Starte recognition.start()');
                 recognition.start();
 
             } catch (err) {
-                console.error('ðŸ”´ Fehler beim Starten der Aufnahme:', err);
+                console.error('🔴 Fehler beim Starten der Aufnahme:', err);
                 console.error('   Error name:', err.name);
                 console.error('   Device:', isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop');
 
@@ -1124,40 +1602,40 @@
                 const errorName = err.name || "";
                 const errorMsg = err.message ? err.message.toLowerCase() : "";
 
-                // ðŸ” Bessere Fehlerbehandlung fÃ¼r verschiedene GerÃ¤te
+                // 🔐 Bessere Fehlerbehandlung für verschiedene Geräte
                 if (errorName === "NotAllowedError" || errorMsg.includes("permission")) {
                     if (isIOS) {
-                        userMsg = "ðŸ” iOS: Bitte erteile Mikrophon-Zugriff in Einstellungen > Safari > Mikrophon";
+                        userMsg = "🔐 iOS: Bitte erteile Mikrophon-Zugriff in Einstellungen > Safari > Mikrophon";
                     } else if (isAndroid) {
-                        userMsg = "ðŸ” Android: Bitte erteile Mikrophon-Berechtigung in App-Einstellungen";
+                        userMsg = "🔐 Android: Bitte erteile Mikrophon-Berechtigung in App-Einstellungen";
                     } else {
-                        userMsg = "ðŸ” Mikrophon-Berechtigung benÃ¶tigt - bitte im Berechtigungsdialog 'Erlauben' klicken";
+                        userMsg = "🔐 Mikrophon-Berechtigung benötigt - bitte im Berechtigungsdialog 'Erlauben' klicken";
                     }
                 } else if (errorName === "NotFoundError" || errorMsg.includes("notfound")) {
-                    userMsg = "ðŸŽ™ï¸ Kein Mikrophon erkannt - bitte verbinde ein externes GerÃ¤t";
+                    userMsg = "🎙️ Kein Mikrophon erkannt - bitte verbinde ein externes Gerät";
                 } else if (errorName === "NotSupportedError") {
-                    userMsg = "âš ï¸ Dein Browser unterstÃ¼tzt Sprachaufnahme nicht (nutze Safari auf iOS oder Chrome auf Android)";
+                    userMsg = "⚠️ Dein Browser unterstützt Sprachaufnahme nicht (nutze Safari auf iOS oder Chrome auf Android)";
                 } else if (errorName === "SecurityError") {
-                    userMsg = "ðŸ”’ Sicherheitsfehler - HTTPS ist erforderlich";
+                    userMsg = "🔒 Sicherheitsfehler - HTTPS ist erforderlich";
                 }
 
-                console.error('ðŸ”´ Zeige Error:', userMsg);
+                console.error('🔴 Zeige Error:', userMsg);
                 showError(userMsg);
                 isRecording = false;
             }
         }
 
         // ============================================
-        // ðŸ›‘ ERWEITERTE MICROPHONE-CLEANUP (V1.378+)
-        // âœ… SAUBER: Explizite Nullifizierung, besseres Logging
-        // âœ… CHROME FIX: recognition.stop() IMMER aufrufen (nicht nur wenn isRecording)
+        // 🛑 ERWEITERTE MICROPHONE-CLEANUP (V1.378+)
+        // ✅ SAUBER: Explizite Nullifizierung, besseres Logging
+        // ✅ CHROME FIX: recognition.stop() IMMER aufrufen (nicht nur wenn isRecording)
         // ============================================
         function stopAllAudio() {
-            console.log('ðŸ›‘ stopAllAudio() aufgerufen');
+            console.log('🛑 stopAllAudio() aufgerufen');
             try {
                 // 1. Stop MediaRecorder (falls vorhanden)
                 if (mediaRecorder) {
-                    console.log('â¹ï¸ Stoppe MediaRecorder...');
+                    console.log('⏹️ Stoppe MediaRecorder...');
                     if (mediaRecorder.state !== 'inactive') {
                         mediaRecorder.stop();
                     }
@@ -1165,45 +1643,45 @@
                 }
 
                 // 2. Stop Web Speech API (IMMER aufrufen, nicht nur wenn isRecording!)
-                // âœ… FIX: recognition.stop() muss IMMER aufgerufen werden
+                // ✅ FIX: recognition.stop() muss IMMER aufgerufen werden
                 if (recognition) {
                     try {
-                        console.log('ðŸŽ¤ Stoppe Web Speech Recognition...');
+                        console.log('🎤 Stoppe Web Speech Recognition...');
                         recognition.stop();
                     } catch (e) {
-                        console.warn('âš ï¸ Recognition.stop() Fehler:', e.message);
+                        console.warn('⚠️ Recognition.stop() Fehler:', e.message);
                     }
                 }
 
                 // 3. Stop alle Audio Tracks EXPLIZIT
                 if (audioStream) {
-                    console.log('ðŸŽ§ Stoppe Audio Stream Tracks...');
+                    console.log('🎧 Stoppe Audio Stream Tracks...');
                     audioStream.getTracks().forEach(track => {
                         console.log(`   - ${track.kind} track: stopped`);
                         try {
                             track.stop();
                         } catch (trackError) {
-                            console.warn(`   âš ï¸ Fehler beim Stoppen: ${trackError.message}`);
+                            console.warn(`   ⚠️ Fehler beim Stoppen: ${trackError.message}`);
                         }
                     });
-                    audioStream = null;  // ðŸŽ¯ WICHTIG: Stream-Referenz nullifizieren
-                    console.log('âœ… Alle Audio Tracks gestoppt und freigegeben');
+                    audioStream = null;  // 🎯 WICHTIG: Stream-Referenz nullifizieren
+                    console.log('✅ Alle Audio Tracks gestoppt und freigegeben');
                 }
 
                 isRecording = false;
 
             } catch (err) {
-                console.error('ðŸ”´ Fehler beim Audio-Cleanup:', err.message);
+                console.error('🔴 Fehler beim Audio-Cleanup:', err.message);
             }
         }
 
         // ============================================
-        // ðŸ§¹ HELPER: Gebe ALLE Audio-Ressourcen frei
+        // 🧹 HELPER: Gebe ALLE Audio-Ressourcen frei
         // ============================================
         function releaseAudioResources() {
-            console.log('ðŸ”„ Gebe alle Audio-Ressourcen frei...');
+            console.log('🔄 Gebe alle Audio-Ressourcen frei...');
             try {
-                // Entferne Event-Listener fÃ¼r Audio-Tracks
+                // Entferne Event-Listener für Audio-Tracks
                 if (audioStream && audioStream.getTracks) {
                     audioStream.getTracks().forEach(track => {
                         try {
@@ -1224,20 +1702,20 @@
                 audioStream = null;
                 audioChunks = [];
 
-                // ðŸ” iOS FIX: Nullifiziere Recognition und erstelle neues Objekt
+                // 🔐 iOS FIX: Nullifiziere Recognition und erstelle neues Objekt
                 // Das hilft iOS das Mikrofon komplett freizugeben
                 recognition = null;
-                console.log('ðŸ”§ Re-initialisiere Recognition fÃ¼r iOS-KompatibilitÃ¤t...');
+                console.log('🔧 Re-initialisiere Recognition für iOS-Kompatibilität...');
                 initializeRecognition();
 
-                console.log('âœ… Alle Audio-Ressourcen freigegeben');
+                console.log('✅ Alle Audio-Ressourcen freigegeben');
             } catch (err) {
-                console.error('âš ï¸ Fehler beim Freigeben von Ressourcen:', err);
+                console.error('⚠️ Fehler beim Freigeben von Ressourcen:', err);
             }
         }
 
-        // ðŸ” iOS SPEZIFISCH: Timeout-Cleanup fÃ¼r wenn Device gesperrt wird
-        // iOS sendet visibilitychange nicht zuverlÃ¤ssig beim Sperren
+        // 🔐 iOS SPEZIFISCH: Timeout-Cleanup für wenn Device gesperrt wird
+        // iOS sendet visibilitychange nicht zuverlässig beim Sperren
         let microphoneTimeoutId = null;
         function startMicrophoneWatchdog() {
             // Stoppe alten Timeout falls vorhanden
@@ -1245,47 +1723,47 @@
                 clearTimeout(microphoneTimeoutId);
             }
 
-            // Starte neuen Timeout: Nach 5 Sekunden InaktivitÃ¤t â†’ Cleanup
+            // Starte neuen Timeout: Nach 5 Sekunden Inaktivität → Cleanup
             microphoneTimeoutId = setTimeout(() => {
-                console.log('â° iOS Watchdog: Stoppe Mikrofon nach InaktivitÃ¤t');
+                console.log('⏰ iOS Watchdog: Stoppe Mikrofon nach Inaktivität');
                 stopAllAudio();
             }, 5000);
         }
 
-        // ðŸ“µ Event 1: Wenn Handy gesperrt / App minimiert wird
+        // 📵 Event 1: Wenn Handy gesperrt / App minimiert wird
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
-                console.log('ðŸ“µ App in Hintergrund - cleanup Audio');
-                // âœ… CHROME FIX: Stoppe IMMER, nicht nur wenn isRecording
+                console.log('📵 App in Hintergrund - cleanup Audio');
+                // ✅ CHROME FIX: Stoppe IMMER, nicht nur wenn isRecording
                 stopAllAudio();
             } else {
-                // App kommt zurÃ¼ck: Starte Watchdog
-                console.log('ðŸ‘ï¸ App zurÃ¼ck - starte Mikrofon-Watchdog');
+                // App kommt zurück: Starte Watchdog
+                console.log('👁️ App zurück - starte Mikrofon-Watchdog');
                 startMicrophoneWatchdog();
             }
         });
 
-        // ðŸ‘‹ Event 2: Wenn Benutzer Seite verlÃ¤sst / Browser-Tab schlieÃŸt
+        // 👋 Event 2: Wenn Benutzer Seite verlässt / Browser-Tab schließt
         window.addEventListener('pagehide', () => {
-            console.log('ðŸ‘‹ Seite wird verlassen - cleanup Microphone');
-            // âœ… CHROME FIX: Stoppe IMMER
+            console.log('👋 Seite wird verlassen - cleanup Microphone');
+            // ✅ CHROME FIX: Stoppe IMMER
             stopAllAudio();
         });
 
-        // ðŸ”„ Event 3: Wenn Browser-Tab aktualisiert wird
+        // 🔄 Event 3: Wenn Browser-Tab aktualisiert wird
         window.addEventListener('beforeunload', () => {
             if (recognition) recognition.stop();
             stopAllAudio();
         });
 
-        // ðŸ“± Event 4: iOS-spezifisch - beim Fokus verlieren
+        // 📱 Event 4: iOS-spezifisch - beim Fokus verlieren
         window.addEventListener('blur', () => {
-            console.log('ðŸ’¤ Window blur - iOS Watchdog startet');
+            console.log('💤 Window blur - iOS Watchdog startet');
             startMicrophoneWatchdog();
         });
 
         window.addEventListener('focus', () => {
-            console.log('ðŸ‘ï¸ Window focus - iOS Watchdog gestoppt');
+            console.log('👁️ Window focus - iOS Watchdog gestoppt');
             if (microphoneTimeoutId) {
                 clearTimeout(microphoneTimeoutId);
                 microphoneTimeoutId = null;
@@ -1298,7 +1776,7 @@
                 isRecording = false;
 
                 const btn = document.getElementById("recordingButton");
-                btn.textContent = "ðŸŽ¤ Aufnahme starten";
+                btn.textContent = "🎤 Aufnahme starten";
                 btn.classList.remove("recording");
                 btn.disabled = true;
 
@@ -1309,22 +1787,22 @@
         }
 
         // ============================================
-        // ðŸ§¹ TEXT MIT GROQ STRUKTURIEREN (nicht Audio!)
+        // 🧹 TEXT MIT GROQ STRUKTURIEREN (nicht Audio!)
         // ============================================
         async function processWithGroq(rohText) {
-            console.log('ðŸ§¹ processWithGroq() aufgerufen mit:', rohText);
+            console.log('🧹 processWithGroq() aufgerufen mit:', rohText);
 
-            // âœ… CHROME FIX: Gebe Mikrofon SOFORT frei sobald Verarbeitung startet!
-            console.log('ðŸŽ¤ Gebe Mikrofon frei nach Aufnahme...');
+            // ✅ CHROME FIX: Gebe Mikrofon SOFORT frei sobald Verarbeitung startet!
+            console.log('🎤 Gebe Mikrofon frei nach Aufnahme...');
             stopAllAudio();
 
             const status = document.getElementById("status");
-            status.textContent = "ðŸ§¹ Strukturiere mit Backend...";
+            status.textContent = "🧹 Strukturiere mit Backend...";
 
             try {
-                console.log('ðŸ“¤ Sende Text zum Backend-Proxy: ' + rohText.substring(0, 100));
+                console.log('📤 Sende Text zum Backend-Proxy: ' + rohText.substring(0, 100));
 
-                // ðŸ” NUTZE BACKEND-PROXY STATT DIREKTER GROQ-AUFRUF (sicherer!)
+                // 🔐 NUTZE BACKEND-PROXY STATT DIREKTER GROQ-AUFRUF (sicherer!)
                 const backendRes = await fetch("/api/structure-text", {
                     method: "POST",
                     headers: {
@@ -1335,39 +1813,39 @@
                     })
                 });
 
-                console.log('ðŸ“¨ Backend Response Status:', backendRes.status);
+                console.log('📨 Backend Response Status:', backendRes.status);
 
                 const backendData = await backendRes.json();
-                console.log('ðŸ“¨ Backend Response:', backendData);
+                console.log('📨 Backend Response:', backendData);
 
                 if (!backendRes.ok || !backendData.success) {
                     const errorMsg = backendData.error || 'Unbekannter Fehler';
-                    console.error('ðŸ”´ Backend Fehler:', errorMsg);
+                    console.error('🔴 Backend Fehler:', errorMsg);
                     throw new Error(errorMsg);
                 }
 
                 recognizedText = backendData.text;
-                console.log('âœ… Backend strukturiert:', recognizedText.substring(0, 150));
+                console.log('✅ Backend strukturiert:', recognizedText.substring(0, 150));
 
                 // Zeige Review-Phase
-                console.log('ðŸ“‹ Rufe showReviewPhase auf');
+                console.log('📋 Rufe showReviewPhase auf');
                 showReviewPhase(recognizedText);
 
             } catch (err) {
-                console.error('âŒ processWithGroq Fehler:', err);
+                console.error('❌ processWithGroq Fehler:', err);
                 console.error('   Message:', err.message);
                 console.error('   Stack:', err.stack);
 
-                // ðŸ”´ ZEIGE FEHLER DIREKT AUF BILDSCHIRM FÃœR DEBUGGING
+                // 🔴 ZEIGE FEHLER DIREKT AUF BILDSCHIRM FÜR DEBUGGING
                 const errorMsg = `
-âŒ GROQ FEHLER:
+❌ GROQ FEHLER:
 
 ${err.message}
 
-ðŸ“ Erkannter Text war:
+📝 Erkannter Text war:
 "${rohText}"
 
-ðŸ’¡ MÃ¶gliche LÃ¶sung:
+💡 Mögliche Lösung:
 - Refresh die Seite (F5)
 - Versuche es nochmal
 - Sprich langsamer/deutlicher
@@ -1386,7 +1864,7 @@ ${err.message}
 
                 const btn = document.getElementById("recordingButton");
                 if (btn) {
-                    btn.textContent = "ðŸŽ¤ Aufnahme starten";
+                    btn.textContent = "🎤 Aufnahme starten";
                     btn.disabled = false;
                     btn.classList.remove("recording");
                 }
@@ -1414,7 +1892,7 @@ ${err.message}
                     aktion = line.replace('Aktion:', '').trim();
                     normalisierterText += line + '\n';
                 } else if (line.startsWith('Palettenart:')) {
-                    // ðŸŽ¯ NORMALISIERE PALETTENART
+                    // 🎯 NORMALISIERE PALETTENART
                     const palettenartRaw = line.replace('Palettenart:', '').trim();
                     const erkennungsResult = normalisierePalette(palettenartRaw);
 
@@ -1439,7 +1917,7 @@ ${err.message}
             document.querySelectorAll(".phase").forEach(p => p.classList.remove("active"));
             document.getElementById("reviewPhase").classList.add("active");
 
-            // ðŸŽ¯ ZEIGE NORMALISIERTEN TEXT MIT KORREKTEN PALETTENNAMEN
+            // 🎯 ZEIGE NORMALISIERTEN TEXT MIT KORREKTEN PALETTENNAMEN
             const normalisierterText = erstelleNormalisierthenText(text);
             document.getElementById("textDisplay").textContent = normalisierterText;
             document.getElementById("errorBox").style.display = "none";
@@ -1457,37 +1935,37 @@ ${err.message}
                 }
             }
 
-            // FÃ¼lle die bearbeitbaren Felder
+            // Fülle die bearbeitbaren Felder
             document.getElementById("editCustomerName").value = kundenname;
             document.getElementById("editCustomerNumber").value = kundennummer;
 
             const saveBtn = document.getElementById("saveBtn");
             saveBtn.disabled = false;
-            saveBtn.textContent = "âœ… Speichern";
+            saveBtn.textContent = "✅ Speichern";
         }
 
         function discardAndRestart() {
-            console.log('ðŸ”„ discardAndRestart() gestartet');
+            console.log('🔄 discardAndRestart() gestartet');
 
             try {
-                // âœ… WICHTIG: Stoppe Mikrofon SOFORT bevor alles zurÃ¼ckgesetzt wird!
+                // ✅ WICHTIG: Stoppe Mikrofon SOFORT bevor alles zurückgesetzt wird!
                 stopAllAudio();
                 releaseAudioResources();
 
-                // ðŸ“± iOS FIX: Starte Watchdog fÃ¼r Hintergrund-Cleanup
-                console.log('â° Watchdog wird nach Verwerfen gestartet');
+                // 📱 iOS FIX: Starte Watchdog für Hintergrund-Cleanup
+                console.log('⏰ Watchdog wird nach Verwerfen gestartet');
                 try {
                     if (typeof startMicrophoneWatchdog === 'function') {
                         startMicrophoneWatchdog();
                     } else {
-                        console.warn('âš ï¸ startMicrophoneWatchdog ist keine Funktion');
+                        console.warn('⚠️ startMicrophoneWatchdog ist keine Funktion');
                     }
                 } catch (watchdogErr) {
-                    console.warn('âš ï¸ Fehler beim Starten des Watchdog:', watchdogErr.message);
+                    console.warn('⚠️ Fehler beim Starten des Watchdog:', watchdogErr.message);
                     // Nicht kritisch - weiter gehts
                 }
             } catch (cleanupErr) {
-                console.error('âš ï¸ Fehler beim Cleanup:', cleanupErr.message);
+                console.error('⚠️ Fehler beim Cleanup:', cleanupErr.message);
                 // Weiter gehts trotz Fehler
             }
 
@@ -1495,7 +1973,7 @@ ${err.message}
             audioChunks = [];
             isRecording = false;
 
-            // ðŸ›‘ RESET ALLE AUSWAHL-VARIABLEN fÃ¼r nÃ¤chste Aufnahme
+            // 🛑 RESET ALLE AUSWAHL-VARIABLEN für nächste Aufnahme
             erkannteAuswahlPaletten = [];
             wartendeAuswahlPaletten = [];
             aktuelleAuswahlPalette = null;
@@ -1503,7 +1981,7 @@ ${err.message}
 
             const btn = document.getElementById("recordingButton");
             if (btn) {
-                btn.textContent = "ðŸŽ¤ Aufnahme starten";
+                btn.textContent = "🎤 Aufnahme starten";
                 btn.disabled = false;
                 btn.classList.remove("recording");
             }
@@ -1514,15 +1992,15 @@ ${err.message}
                 status.className = "";
             }
 
-            // âœ… WICHTIG: Nutze setPhase() um Logout-Button zu zeigen!
-            console.log('ðŸ”„ Kehre zur recordingPhase zurÃ¼ck mit setPhase()');
+            // ✅ WICHTIG: Nutze setPhase() um Logout-Button zu zeigen!
+            console.log('🔄 Kehre zur recordingPhase zurück mit setPhase()');
             try {
                 setPhase('recordingPhase');
-                console.log('âœ… setPhase("recordingPhase") erfolgreich aufgerufen');
+                console.log('✅ setPhase("recordingPhase") erfolgreich aufgerufen');
             } catch (phaseErr) {
-                console.error('âŒ Fehler beim Setzen der Phase:', phaseErr.message);
+                console.error('❌ Fehler beim Setzen der Phase:', phaseErr.message);
                 // Fallback: Zeige Phase manuell an
-                console.log('ðŸ”§ Fallback: Zeige Phase manuell an');
+                console.log('🔧 Fallback: Zeige Phase manuell an');
                 document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
                 const recordingPhase = document.getElementById('recordingPhase');
                 if (recordingPhase) {
@@ -1539,20 +2017,20 @@ ${err.message}
         // APP BEENDEN FUNKTION
         // ============================================
         function beendenApp() {
-            console.log('ðŸ›‘ App wird beendet...');
+            console.log('🛑 App wird beendet...');
 
             // 1. STOPPLE UND GEBE MIKROFON FREI
             try {
                 // Stoppe Web Speech API Recognition
                 if (recognition && isRecording) {
-                    console.log('ðŸŽ¤ Stoppe Speech Recognition');
+                    console.log('🎤 Stoppe Speech Recognition');
                     recognition.stop();
                     isRecording = false;
                 }
 
                 // Stopppe Audio Stream (falls noch aktiv)
                 if (audioStream) {
-                    console.log('ðŸŽ¤ Stoppe Audio Stream Tracks');
+                    console.log('🎤 Stoppe Audio Stream Tracks');
                     audioStream.getTracks().forEach(track => {
                         track.stop();
                     });
@@ -1561,20 +2039,20 @@ ${err.message}
 
                 // MediaRecorder stoppen (falls noch aktiv)
                 if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                    console.log('ðŸŽ¤ Stoppe MediaRecorder');
+                    console.log('🎤 Stoppe MediaRecorder');
                     mediaRecorder.stop();
                 }
 
-                console.log('âœ… Mikrofon komplett freigegeben');
+                console.log('✅ Mikrofon komplett freigegeben');
             } catch (err) {
-                console.error('âš ï¸ Fehler beim Stoppen des Mikrofons:', err);
+                console.error('⚠️ Fehler beim Stoppen des Mikrofons:', err);
             }
 
             // 2. SEITE NEU LADEN
-            console.log('ðŸ”„ Lade Seite neu...');
+            console.log('🔄 Lade Seite neu...');
             setTimeout(() => {
                 location.reload();
-            }, 500); // Kurze VerzÃ¶gerung um Logs zu sehen
+            }, 500); // Kurze Verzögerung um Logs zu sehen
         }
 
         function restartRecording() {
@@ -1621,7 +2099,7 @@ ${err.message}
                 }
 
                 if (palettenartRaw && menge) {
-                    // ðŸŽ¯ NORMALISIERE PALETTENART
+                    // 🎯 NORMALISIERE PALETTENART
                     const erkennungsResult = normalisierePalette(palettenartRaw);
 
                     if (!erkennungsResult.gefunden) {
@@ -1645,18 +2123,18 @@ ${err.message}
                                 menge: parseInt(menge),
                                 aktion
                             };
-                            // ðŸ›‘ NUR zu aktuelleAuswahlPalette, NICHT zu wartendeAuswahlPaletten!
-                            // (wartendeAuswahlPaletten ist fÃ¼r Paletten mit Kandidaten, nicht fÃ¼r nicht erkannte)
-                            aktuelleAuswahlPalette = palettenData;  // ðŸŽ¯ WICHTIG: Speichere fÃ¼r Modal
+                            // 🛑 NUR zu aktuelleAuswahlPalette, NICHT zu wartendeAuswahlPaletten!
+                            // (wartendeAuswahlPaletten ist für Paletten mit Kandidaten, nicht für nicht erkannte)
+                            aktuelleAuswahlPalette = palettenData;  // 🎯 WICHTIG: Speichere für Modal
 
-                            // ðŸŽ¯ SPEICHERE ERKANNTE PALETTEN JETZT, BEVOR ERROR GEWORFEN WIRD!
-                            console.log('ðŸ” DEBUG: Speichere erkannteAuswahlPaletten vor Error');
+                            // 🎯 SPEICHERE ERKANNTE PALETTEN JETZT, BEVOR ERROR GEWORFEN WIRD!
+                            console.log('🔍 DEBUG: Speichere erkannteAuswahlPaletten vor Error');
                             console.log('   palettenListe vor speichern:', palettenListe);
                             erkannteAuswahlPaletten = palettenListe;
-                            console.log('âœ… Erkannte Paletten vor Error gespeichert:', erkannteAuswahlPaletten);
+                            console.log('✅ Erkannte Paletten vor Error gespeichert:', erkannteAuswahlPaletten);
 
                             showPaletteSelectionAllPalettes(palettenartRaw);
-                            throw new Error(`âš ï¸ Palette nicht erkannt: "${palettenartRaw}" â€“ bitte auswÃ¤hlen`);
+                            throw new Error(`⚠️ Palette nicht erkannt: "${palettenartRaw}" – bitte auswählen`);
                         }
                     } else {
                         // Eindeutige Palette erkannt
@@ -1671,33 +2149,33 @@ ${err.message}
                 }
             }
 
-            // ðŸŽ¯ SPEICHERE ERKANNTE PALETTEN SOFORT, BEVOR ERROR GEWORFEN WIRD!
+            // 🎯 SPEICHERE ERKANNTE PALETTEN SOFORT, BEVOR ERROR GEWORFEN WIRD!
             // Das ist KRITISCH: Wenn unten eine Error geworfen wird, brauchen wir diese Daten noch
-            console.log('ðŸ” DEBUG: Speichere erkannteAuswahlPaletten nach Schleife');
+            console.log('🔍 DEBUG: Speichere erkannteAuswahlPaletten nach Schleife');
             console.log('   palettenListe vor speichern:', palettenListe);
             erkannteAuswahlPaletten = palettenListe;
-            console.log('âœ… Erkannte Paletten gespeichert:', erkannteAuswahlPaletten);
+            console.log('✅ Erkannte Paletten gespeichert:', erkannteAuswahlPaletten);
 
             // Wenn wartende Auswahl existiert, unterbreche und zeige Dialog
             if (wartendeAuswahlPaletten.length > 0) {
                 showPaletteSelectionForCandidates(wartendeAuswahlPaletten[0]);
-                throw new Error(`âš ï¸ Palette nicht eindeutig erkannt â€“ bitte auswÃ¤hlen`);
+                throw new Error(`⚠️ Palette nicht eindeutig erkannt – bitte auswählen`);
             }
 
             // Validierung
             if (!kundenname && !kundennummer) {
-                throw new Error("âš ï¸ Kundenname oder Kundennummer erforderlich");
+                throw new Error("⚠️ Kundenname oder Kundennummer erforderlich");
             }
             if (palettenListe.length === 0) {
-                throw new Error("âš ï¸ Keine Palettenarten erkannt!");
+                throw new Error("⚠️ Keine Palettenarten erkannt!");
             }
 
             for (let p of palettenListe) {
                 if (!p.palettenart) {
-                    throw new Error("âš ï¸ Palettenart fehlt!");
+                    throw new Error("⚠️ Palettenart fehlt!");
                 }
                 if (!p.menge || isNaN(p.menge)) {
-                    throw new Error("âš ï¸ Menge fehlt oder ist ungÃ¼ltig!");
+                    throw new Error("⚠️ Menge fehlt oder ist ungültig!");
                 }
             }
 
@@ -1712,7 +2190,7 @@ ${err.message}
             const container = document.getElementById('paletteButtonsContainer');
             container.innerHTML = '';
 
-            // ðŸŽ¯ SPEICHERE DIE AKTUELLEN DATEN, BEVOR SIE AUS DEM ARRAY GELÃ–SCHT WERDEN
+            // 🎯 SPEICHERE DIE AKTUELLEN DATEN, BEVOR SIE AUS DEM ARRAY GELÖSCHT WERDEN
             aktuelleAuswahlPalette = palettenData;
 
             // Zeige nur die Kandidaten
@@ -1740,9 +2218,9 @@ ${err.message}
         function showPaletteSelectionAllPalettes(unerkannterText) {
             const modal = document.getElementById('paletteSelectionModal');
             const container = document.getElementById('paletteButtonsContainer');
-            container.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #666; font-size: 14px;">Unbekannt: "${unerkannterText}"<br>Bitte wÃ¤hle eine Palette:</p>`;
+            container.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #666; font-size: 14px;">Unbekannt: "${unerkannterText}"<br>Bitte wähle eine Palette:</p>`;
 
-            // ðŸŽ¯ WICHTIG: Speichere die aktuellen Daten wenn noch vorhanden
+            // 🎯 WICHTIG: Speichere die aktuellen Daten wenn noch vorhanden
             // Wenn aktuelleAuswahlPalette noch null ist, nutze wartendeAuswahlPaletten[0]
             if (!aktuelleAuswahlPalette && wartendeAuswahlPaletten.length > 0) {
                 aktuelleAuswahlPalette = wartendeAuswahlPaletten[0];
@@ -1774,28 +2252,28 @@ ${err.message}
             document.getElementById('paletteSelectionModal').style.display = 'none';
             selectedPalette = palette;
 
-            console.log('ðŸŽ¯ Palette ausgewÃ¤hlt:', palette);
+            console.log('🎯 Palette ausgewählt:', palette);
             console.log('   aktuelleAuswahlPalette:', aktuelleAuswahlPalette);
             console.log('   wartendeAuswahlPaletten:', wartendeAuswahlPaletten);
 
-            // ðŸŽ¯ VERWENDE aktuelleAuswahlPalette ALS PRIMÃ„R-QUELLE
+            // 🎯 VERWENDE aktuelleAuswahlPalette ALS PRIMÄR-QUELLE
             if (aktuelleAuswahlPalette) {
-                console.log('âœ… Nutze aktuelleAuswahlPalette');
+                console.log('✅ Nutze aktuelleAuswahlPalette');
                 aktuelleAuswahlPalette.palettenart = palette;
 
-                // ðŸ›‘ WICHTIG: Entferne diese Palette auch aus wartendeAuswahlPaletten
+                // 🛑 WICHTIG: Entferne diese Palette auch aus wartendeAuswahlPaletten
                 // damit sie nicht doppelt gespeichert wird!
                 wartendeAuswahlPaletten = wartendeAuswahlPaletten.filter(item =>
                     item.palettenartRaw !== aktuelleAuswahlPalette.palettenartRaw
                 );
-                console.log('ðŸ›‘ Entferne Palette aus Warteschlange um Duplikat zu vermeiden');
+                console.log('🛑 Entferne Palette aus Warteschlange um Duplikat zu vermeiden');
             } else if (wartendeAuswahlPaletten.length > 0) {
                 // Fallback nur wenn aktuelleAuswahlPalette nicht vorhanden
-                console.log('âœ… Nutze wartendeAuswahlPaletten als Fallback');
+                console.log('✅ Nutze wartendeAuswahlPaletten als Fallback');
                 wartendeAuswahlPaletten[0].palettenart = palette;
                 wartendeAuswahlPaletten.shift();
             } else {
-                console.error('âŒ Fehler: Keine Palette-Daten vorhanden!');
+                console.error('❌ Fehler: Keine Palette-Daten vorhanden!');
                 showError('Fehler bei Palette-Auswahl. Bitte versuche es erneut.');
                 return;
             }
@@ -1813,13 +2291,13 @@ ${err.message}
         }
 
         // ============================================
-        // KUNDENBESTÃ„TIGUNG FUNKTIONEN
+        // KUNDENBESTÄTIGUNG FUNKTIONEN
         // ============================================
         async function pruefeAhnlicheKunden(kundenname) {
             if (!kundenname) return null;
 
             try {
-                console.log('ðŸ” PrÃ¼fe Ã¤hnliche Kunden fÃ¼r:', kundenname);
+                console.log('🔍 Prüfe ähnliche Kunden für:', kundenname);
 
                 const response = await fetch('/api/find-similar-customers', {
                     method: 'POST',
@@ -1828,23 +2306,23 @@ ${err.message}
                 });
 
                 const result = await response.json();
-                console.log('ðŸ” API-Antwort:', JSON.stringify(result));
+                console.log('🔍 API-Antwort:', JSON.stringify(result));
 
                 if (result.found && result.candidates && result.candidates.length > 0) {
-                    console.log('âœ… Ã„hnlicher Kunde gefunden:', result.candidates[0]);
+                    console.log('✅ Ähnlicher Kunde gefunden:', result.candidates[0]);
                     return result.candidates[0];
                 }
 
-                console.log('âŒ Kein Ã¤hnlicher Kunde gefunden');
+                console.log('❌ Kein ähnlicher Kunde gefunden');
                 return null;
 
             } catch (err) {
-                console.error('âŒ Fehler beim PrÃ¼fen Ã¤hnlicher Kunden:', err);
+                console.error('❌ Fehler beim Prüfen ähnlicher Kunden:', err);
                 return null;
             }
         }
 
-        // Ã„hnlichkeitsprÃ¼fung im Frontend (wie Backend, aber mit vollstÃ¤ndiger Levenshtein-Logik)
+        // Ähnlichkeitsprüfung im Frontend (wie Backend, aber mit vollständiger Levenshtein-Logik)
         function berechneStringAhnlichkeit(s1, s2) {
             const str1 = s1.toLowerCase().trim();
             const str2 = s2.toLowerCase().trim();
@@ -1858,16 +2336,16 @@ ${err.message}
 
             if (str1Clean === str2Clean) return 95;
 
-            // 3. SUBSTRING-MATCH: Wenn ein Name vollstÃ¤ndig im anderen enthalten ist
+            // 3. SUBSTRING-MATCH: Wenn ein Name vollständig im anderen enthalten ist
             if (str1.includes(str2) || str2.includes(str1)) {
                 return 90;
             }
 
-            // 4. WORT-BASIERTE Ã„HNLICHKEIT
+            // 4. WORT-BASIERTE ÄHNLICHKEIT
             const woerter1 = str1.split(/[\s\-]+/).filter(w => w.length > 0);
             const woerter2 = str2.split(/[\s\-]+/).filter(w => w.length > 0);
 
-            // ZÃ¤hle gemeinsame WÃ¶rter
+            // Zähle gemeinsame Wörter
             const gemeinsameListe = [];
             for (let w1 of woerter1) {
                 if (woerter2.includes(w1) && w1.length >= 3) {
@@ -1875,12 +2353,12 @@ ${err.message}
                 }
             }
 
-            // Wenn WÃ¶rter gemeinsam sind
+            // Wenn Wörter gemeinsam sind
             if (gemeinsameListe.length > 0) {
-                return 85;  // Starker Match fÃ¼r gemeinsame WÃ¶rter
+                return 85;  // Starker Match für gemeinsame Wörter
             }
 
-            // 5. LEVENSHTEIN-Ã„HNLICHE DISTANZ (Zeichenmatches)
+            // 5. LEVENSHTEIN-ÄHNLICHE DISTANZ (Zeichenmatches)
             let matches = 0;
             for (let char of str1Clean) {
                 if (str2Clean.includes(char)) matches++;
@@ -1901,7 +2379,7 @@ ${err.message}
                 if (!response.ok) return null;
 
                 const allCustomers = await response.json();
-                console.log('ðŸ“‹ Alle Kunden:', allCustomers);
+                console.log('📋 Alle Kunden:', allCustomers);
 
                 let besterMatch = null;
                 let besteAhnlichkeit = 60;  // Schwellenwert
@@ -1962,7 +2440,7 @@ ${err.message}
             try {
                 const palettenListe = validateText(recognizedText);
 
-                // Verwende die vom Modal ausgewÃ¤hlte Kundennummer
+                // Verwende die vom Modal ausgewählte Kundennummer
                 const korrigierteKundennummer = document.getElementById("editCustomerNumber").value.trim();
 
                 for (let item of palettenListe) {
@@ -1979,7 +2457,7 @@ ${err.message}
 
             } catch (err) {
                 const errorBox = document.getElementById("errorBox");
-                document.getElementById("errorMessage").textContent = "âŒ " + err.message;
+                document.getElementById("errorMessage").textContent = "❌ " + err.message;
                 errorBox.style.display = "block";
             }
         }
@@ -2014,7 +2492,7 @@ ${err.message}
 
                 erfolgreich++;
 
-                // Speichere fÃ¼r Zusammenfassung
+                // Speichere für Zusammenfassung
                 gespeichertePaletten.push({
                     menge: palettenData.menge,
                     palettenart: palettenData.palettenart,
@@ -2049,21 +2527,21 @@ ${err.message}
 
             // Baue die Zusammenfassung
             for (let kundenname in gruppiert) {
-                summaryHTML += `<strong style="color: #333; display: block; margin-top: 12px; margin-bottom: 6px;">ðŸ“¦ ${kundenname}:</strong>`;
+                summaryHTML += `<strong style="color: #333; display: block; margin-top: 12px; margin-bottom: 6px;">📦 ${kundenname}:</strong>`;
 
                 for (let p of gruppiert[kundenname]) {
                     const mengeText = p.menge === 1 ? 'Palette' : 'Paletten';
 
                     // Bestimme Aktion und Symbol
                     let aktion = 'mitgenommen';
-                    let symbol = 'âž•';
+                    let symbol = '➕';
 
                     if (p.aktion) {
                         const aktionLower = p.aktion.toLowerCase();
-                        if (aktionLower.includes('zurÃ¼ck') || aktionLower.includes('zuruck') ||
+                        if (aktionLower.includes('zurück') || aktionLower.includes('zuruck') ||
                             aktionLower.includes('erhalten') || aktionLower.includes('abgegeben')) {
-                            aktion = 'zurÃ¼ckgebracht';
-                            symbol = 'âž–';
+                            aktion = 'zurückgebracht';
+                            symbol = '➖';
                         }
                     }
 
@@ -2078,85 +2556,85 @@ ${err.message}
         async function saveToSupabase() {
             const saveBtn = document.getElementById("saveBtn");
             saveBtn.disabled = true;
-            saveBtn.textContent = "â³ Wird gespeichert...";
+            saveBtn.textContent = "⏳ Wird gespeichert...";
 
             try {
                 const palettenListe = validateText(recognizedText);
-                console.log('ðŸ“‹ Erkannte Palettengruppen:', palettenListe.length);
+                console.log('📋 Erkannte Palettengruppen:', palettenListe.length);
 
-                // ðŸŽ¯ ÃœBERSCHREIBE MIT KORRIGIERTEN WERTEN VOM USER
+                // 🎯 ÜBERSCHREIBE MIT KORRIGIERTEN WERTEN VOM USER
                 const korrigierterKundenname = document.getElementById("editCustomerName").value.trim();
                 const korrigierteKundennummer = document.getElementById("editCustomerNumber").value.trim();
 
-                console.log('âœï¸ Korrigierte Kundeninformationen:');
+                console.log('✏️ Korrigierte Kundeninformationen:');
                 console.log('   Kundenname:', korrigierterKundenname);
                 console.log('   Kundennummer:', korrigierteKundennummer);
 
-                // Ãœberschreibe Kundenname und Kundennummer in allen Palettengruppen
+                // Überschreibe Kundenname und Kundennummer in allen Palettengruppen
                 for (let item of palettenListe) {
                     if (korrigierterKundenname) item.kundenname = korrigierterKundenname;
                     if (korrigierteKundennummer) item.kundennummer = korrigierteKundennummer;
                 }
 
-                // ðŸŽ¯ KUNDENPRÃœFUNG: Sind Ã¤hnliche Kunden vorhanden?
+                // 🎯 KUNDENPRÜFUNG: Sind ähnliche Kunden vorhanden?
                 if (palettenListe.length > 0 && palettenListe[0].kundenname) {
                     const kundenname = palettenListe[0].kundenname;
-                    console.log('ðŸ‘¤ Erkannter Kundenname:', kundenname);
+                    console.log('👤 Erkannter Kundenname:', kundenname);
 
-                    // PrÃ¼fe auf Ã¤hnliche bereits existierende Kunden
+                    // Prüfe auf ähnliche bereits existierende Kunden
                     let ahnlicherKunde = await pruefeAhnlicheKunden(kundenname);
 
-                    // Falls API fehlschlÃ¤gt, verwende Alternative
+                    // Falls API fehlschlägt, verwende Alternative
                     if (!ahnlicherKunde) {
-                        console.log('ðŸ”„ API fehlgeschlagen, versuche Alternative...');
+                        console.log('🔄 API fehlgeschlagen, versuche Alternative...');
                         ahnlicherKunde = await pruefeAhnlicheKundenAlternativ(kundenname);
                     }
 
                     if (ahnlicherKunde) {
-                        console.log('âœ…âœ… Zeige KundenbestÃ¤tigung-Modal');
-                        // Ã„hnlicher Kunde gefunden - zeige BestÃ¤tigungsdialog
+                        console.log('✅✅ Zeige Kundenbestätigung-Modal');
+                        // Ähnlicher Kunde gefunden - zeige Bestätigungsdialog
                         showCustomerConfirmModal(kundenname, ahnlicherKunde.name);
                         saveBtn.disabled = false;
-                        saveBtn.textContent = "âœ… Speichern";
-                        return;  // Warte auf BenutzerbestÃ¤tigung
+                        saveBtn.textContent = "✅ Speichern";
+                        return;  // Warte auf Benutzerbestätigung
                     }
 
-                    console.log('âž¡ï¸ Kein Ã¤hnlicher Kunde - speichere direkt ab');
+                    console.log('➡️ Kein ähnlicher Kunde - speichere direkt ab');
                 }
 
-                // Kein Ã¤hnlicher Kunde gefunden - speichere direkt
+                // Kein ähnlicher Kunde gefunden - speichere direkt
                 await speichereZeilen(palettenListe);
 
             } catch (err) {
-                console.error('âŒ Fehler in saveToSupabase:', err);
+                console.error('❌ Fehler in saveToSupabase:', err);
                 const errorBox = document.getElementById("errorBox");
                 document.getElementById("errorMessage").textContent = err.message;
                 errorBox.style.display = "block";
 
                 const saveBtn = document.getElementById("saveBtn");
                 saveBtn.disabled = false;
-                saveBtn.textContent = "âœ… Speichern";
+                saveBtn.textContent = "✅ Speichern";
             }
         }
 
         async function saveToSupabaseWithSelected() {
             // Diese Funktion wird nach der Palettenauswahl aufgerufen
             try {
-                console.log('ðŸ” DEBUG saveToSupabaseWithSelected()');
+                console.log('🔍 DEBUG saveToSupabaseWithSelected()');
                 console.log('   erkannteAuswahlPaletten:', erkannteAuswahlPaletten);
                 console.log('   aktuelleAuswahlPalette:', aktuelleAuswahlPalette);
                 console.log('   wartendeAuswahlPaletten:', wartendeAuswahlPaletten);
 
-                // ðŸŽ¯ ÃœBERSCHREIBE MIT KORRIGIERTEN WERTEN VOM USER
+                // 🎯 ÜBERSCHREIBE MIT KORRIGIERTEN WERTEN VOM USER
                 const korrigierterKundenname = document.getElementById("editCustomerName").value.trim();
                 const korrigierteKundennummer = document.getElementById("editCustomerNumber").value.trim();
 
-                // ðŸŽ¯ STARTE MIT DEN BEREITS ERKANNTEN PALETTEN!
+                // 🎯 STARTE MIT DEN BEREITS ERKANNTEN PALETTEN!
                 // Das verhindert, dass erkannte Paletten ignoriert werden, wenn eine unbekannte Palette auswahl kommt
                 const palettenListe = [...erkannteAuswahlPaletten];
-                console.log('ðŸ“‹ palettenListe nach erkannteAuswahlPaletten:', palettenListe);
+                console.log('📋 palettenListe nach erkannteAuswahlPaletten:', palettenListe);
 
-                // ðŸŽ¯ SPEICHERE AKTUELLE PALETTE (mit Benutzer-Auswahl korrigiert)
+                // 🎯 SPEICHERE AKTUELLE PALETTE (mit Benutzer-Auswahl korrigiert)
                 if (aktuelleAuswahlPalette) {
                     palettenListe.push({
                         kundenname: korrigierterKundenname || aktuelleAuswahlPalette.kundenname,
@@ -2165,17 +2643,17 @@ ${err.message}
                         menge: aktuelleAuswahlPalette.menge,
                         aktion: aktuelleAuswahlPalette.aktion
                     });
-                    console.log('âœ… Verwende aktuelleAuswahlPalette:', aktuelleAuswahlPalette);
+                    console.log('✅ Verwende aktuelleAuswahlPalette:', aktuelleAuswahlPalette);
 
-                    // ðŸ›‘ WICHTIG: Entferne diese Palette aus wartendeAuswahlPaletten um Doppel-Speicherung zu verhindern!
+                    // 🛑 WICHTIG: Entferne diese Palette aus wartendeAuswahlPaletten um Doppel-Speicherung zu verhindern!
                     // Nutze palettenartRaw zum Vergleichen, da wartendeAuswahlPaletten dieses Feld hat
                     wartendeAuswahlPaletten = wartendeAuswahlPaletten.filter(item =>
                         item.palettenartRaw !== aktuelleAuswahlPalette.palettenartRaw
                     );
-                    console.log('ðŸ›‘ Entferne Palette aus Warteschlange um Duplikat zu vermeiden');
+                    console.log('🛑 Entferne Palette aus Warteschlange um Duplikat zu vermeiden');
                 }
 
-                // ðŸŽ¯ WICHTIG: AUCH DIE WARTENDEN PALETTEN SPEICHERN (die bereits korrekt erkannt wurden!)
+                // 🎯 WICHTIG: AUCH DIE WARTENDEN PALETTEN SPEICHERN (die bereits korrekt erkannt wurden!)
                 for (let item of wartendeAuswahlPaletten) {
                     palettenListe.push({
                         kundenname: korrigierterKundenname || item.kundenname,
@@ -2184,11 +2662,11 @@ ${err.message}
                         menge: item.menge,
                         aktion: item.aktion
                     });
-                    console.log('âœ… Speichere wartende Palette:', item.palettenart);
+                    console.log('✅ Speichere wartende Palette:', item.palettenart);
                 }
 
                 if (palettenListe.length > 0) {
-                    console.log('ðŸ“Š Speichere insgesamt', palettenListe.length, 'Paletten');
+                    console.log('📊 Speichere insgesamt', palettenListe.length, 'Paletten');
                     await speichereZeilen(palettenListe);
                     wartendeAuswahlPaletten = [];
                     erkannteAuswahlPaletten = [];
@@ -2200,24 +2678,24 @@ ${err.message}
 
             } catch (err) {
                 const errorBox = document.getElementById("errorBox");
-                document.getElementById("errorMessage").textContent = "âŒ " + err.message;
+                document.getElementById("errorMessage").textContent = "❌ " + err.message;
                 errorBox.style.display = "block";
             }
         }
 
         function showError(message) {
             const errorBox = document.getElementById("errorBox");
-            document.getElementById("errorMessage").textContent = "âš ï¸ " + message;
+            document.getElementById("errorMessage").textContent = "⚠️ " + message;
             errorBox.style.display = "block";
 
             const status = document.getElementById("status");
-            status.textContent = "âŒ Fehler aufgetreten";
+            status.textContent = "❌ Fehler aufgetreten";
             status.className = "status-error";
         }
 
-        // ========== DREISTUFIGE ÃœBERSICHT FUNKTIONEN ==========
-        let currentCustomer = null;  // Speichere aktuell ausgewÃ¤hlten Kunden
-        let currentPalette = null;   // Speichere aktuell ausgewÃ¤hlte Palettenart
+        // ========== DREISTUFIGE ÜBERSICHT FUNKTIONEN ==========
+        let currentCustomer = null;  // Speichere aktuell ausgewählten Kunden
+        let currentPalette = null;   // Speichere aktuell ausgewählte Palettenart
 
         function showOverview() {
             // Ebene 1: Zeige Kundenliste
@@ -2246,7 +2724,7 @@ ${err.message}
                 phase.classList.remove('active');
             });
 
-            // Zeige die gewÃ¼nschte Phase
+            // Zeige die gewünschte Phase
             const targetPhase = document.getElementById(phaseName);
             if (targetPhase) {
                 targetPhase.classList.add('active');
@@ -2254,16 +2732,16 @@ ${err.message}
 
             // Zeige Logout-Button nur in recordingPhase
             const logoutContainer = document.getElementById('logoutContainer');
-            if (logoutContainer) {  // âœ… Sicherer Null-Check
+            if (logoutContainer) {  // ✅ Sicherer Null-Check
                 if (phaseName === 'recordingPhase') {
                     logoutContainer.style.display = 'block';
-                    console.log('âœ… Logout-Button angezeigt (recordingPhase)');
+                    console.log('✅ Logout-Button angezeigt (recordingPhase)');
                 } else {
                     logoutContainer.style.display = 'none';
-                    console.log('âŒ Logout-Button versteckt (nicht recordingPhase)');
+                    console.log('❌ Logout-Button versteckt (nicht recordingPhase)');
                 }
             } else {
-                console.warn('âš ï¸ logoutContainer nicht gefunden!');
+                console.warn('⚠️ logoutContainer nicht gefunden!');
             }
         }
 
@@ -2278,24 +2756,24 @@ ${err.message}
         function kapitalisiereName(text) {
             if (!text) return text;
 
-            // Teile den Text in WÃ¶rter und kapitalisiere jeden ersten Buchstaben
+            // Teile den Text in Wörter und kapitalisiere jeden ersten Buchstaben
             return text
                 .toLowerCase()  // Alles zuerst klein
-                .split(' ')     // Teile in WÃ¶rter
+                .split(' ')     // Teile in Wörter
                 .map(word => {
-                    // Ersten Buchstabe groÃŸschreiben, Rest klein
+                    // Ersten Buchstabe großschreiben, Rest klein
                     return word.charAt(0).toUpperCase() + word.slice(1);
                 })
                 .join(' ');     // Zusammensetzen
         }
 
-        // ðŸ“¦ Alle Palettenarten (Neue + Bestehende aus PALETTENLISTE)
+        // 📦 Alle Palettenarten (Neue + Bestehende aus PALETTENLISTE)
         const ALLE_PALETTENARTEN = [
             // Neue Palettenarten
             'Grafepalette',
             'Steinzeug Gitterbox',
             'Steinzeugpalette klein',
-            'Steinzeugpalette groÃŸ',
+            'Steinzeugpalette groß',
             'Europalette 2',
             'Europalette 3',
             'Spezialpalette',
@@ -2317,7 +2795,7 @@ ${err.message}
         ].sort();  // Alphabetisch sortiert
 
         async function openManualInput() {
-            console.log('ðŸ”“ Ã–ffne manuelle Eingabe...');
+            console.log('🔓 Öffne manuelle Eingabe...');
 
             let palettenarten = [...ALLE_PALETTENARTEN];  // Standard-Liste verwenden
 
@@ -2328,16 +2806,16 @@ ${err.message}
                     const dbPalettenarten = await response.json();
                     if (dbPalettenarten && dbPalettenarten.length > 0) {
                         palettenarten = dbPalettenarten;
-                        console.log('âœ… Palettenarten vom Backend geladen:', palettenarten.length);
+                        console.log('✅ Palettenarten vom Backend geladen:', palettenarten.length);
                     }
                 }
             } catch (err) {
-                console.warn('âš ï¸ Backend nicht verfÃ¼gbar, verwende lokale Liste:', err.message);
+                console.warn('⚠️ Backend nicht verfügbar, verwende lokale Liste:', err.message);
             }
 
-            // FÃ¼lle Dropdown mit Palettenarten
+            // Fülle Dropdown mit Palettenarten
             const select = document.getElementById('manualPaletteType');
-            select.innerHTML = '<option value="">-- Palettenart auswÃ¤hlen --</option>';
+            select.innerHTML = '<option value="">-- Palettenart auswählen --</option>';
 
             palettenarten.forEach(art => {
                 const option = document.createElement('option');
@@ -2346,7 +2824,7 @@ ${err.message}
                 select.appendChild(option);
             });
 
-            console.log('ðŸ“¦ Palettenarten verfÃ¼gbar:', palettenarten.length);
+            console.log('📦 Palettenarten verfügbar:', palettenarten.length);
 
             // Reset Felder
             document.getElementById('manualPaletteType').value = '';
@@ -2366,7 +2844,7 @@ ${err.message}
 
         function setManualAction(action) {
             manualAction = action;
-            console.log('âš¡ Setze Aktion:', action);
+            console.log('⚡ Setze Aktion:', action);
 
             const addBtn = document.getElementById('manualActionAdd');
             const removeBtn = document.getElementById('manualActionRemove');
@@ -2385,52 +2863,52 @@ ${err.message}
         }
 
         function cancelManualInput() {
-            console.log('âŒ Abbrechen - ZurÃ¼ck zur Aufnahme');
+            console.log('❌ Abbrechen - Zurück zur Aufnahme');
             manualAction = null;
             setPhase('recordingPhase');
         }
 
         async function saveManualInput() {
-            console.log('ðŸ’¾ Speichere manuelle Eingabe...');
+            console.log('💾 Speichere manuelle Eingabe...');
 
             const paletteType = document.getElementById('manualPaletteType').value;
-            // âœ… KAPITALISIERE Namen: "jens meier" â†’ "Jens Meier"
+            // ✅ KAPITALISIERE Namen: "jens meier" → "Jens Meier"
             const customerName = kapitalisiereName(document.getElementById('manualCustomerName').value.trim());
             const customerNumber = document.getElementById('manualCustomerNumber').value.trim();
             const quantityInput = document.getElementById('manualQuantity').value;
             const quantity = quantityInput ? parseInt(quantityInput) : 1;
 
-            console.log('ðŸ“‹ Eingaben gelesen:', {
+            console.log('📋 Eingaben gelesen:', {
                 paletteType: paletteType || '(leer)',
                 customerName: customerName || '(leer)',
                 customerNumber: customerNumber || '(keine)',
                 quantityInput: quantityInput || '(leer)',
                 quantity: quantity,
-                manualAction: manualAction || '(nicht gewÃ¤hlt)'
+                manualAction: manualAction || '(nicht gewählt)'
             });
 
             // Validierung
             if (!paletteType) {
-                console.warn('âš ï¸ Palettenart nicht gewÃ¤hlt');
-                showError('âŒ Bitte Palettenart wÃ¤hlen!');
+                console.warn('⚠️ Palettenart nicht gewählt');
+                showError('❌ Bitte Palettenart wählen!');
                 return;
             }
 
             if (!customerName) {
-                console.warn('âš ï¸ Kundenname nicht eingegeben');
-                showError('âŒ Bitte Kundenname eingeben!');
+                console.warn('⚠️ Kundenname nicht eingegeben');
+                showError('❌ Bitte Kundenname eingeben!');
                 return;
             }
 
             if (!manualAction) {
-                console.warn('âš ï¸ Aktion nicht gewÃ¤hlt');
-                showError('âŒ Bitte Aktion (Zugang/Abgang) wÃ¤hlen!');
+                console.warn('⚠️ Aktion nicht gewählt');
+                showError('❌ Bitte Aktion (Zugang/Abgang) wählen!');
                 return;
             }
 
             if (quantity <= 0) {
-                console.warn('âš ï¸ Anzahl ungÃ¼ltig:', quantity);
-                showError('âŒ Anzahl muss grÃ¶ÃŸer als 0 sein!');
+                console.warn('⚠️ Anzahl ungültig:', quantity);
+                showError('❌ Anzahl muss größer als 0 sein!');
                 return;
             }
 
@@ -2438,7 +2916,7 @@ ${err.message}
             const finalQuantity = manualAction === 'add' ? quantity : -quantity;
             const mitarbeiter = mitarbeiterName || 'System';
 
-            console.log('ðŸ“Š Manuelle Eingabe validiert:', {
+            console.log('📊 Manuelle Eingabe validiert:', {
                 paletteType,
                 customerName,
                 customerNumber,
@@ -2448,8 +2926,8 @@ ${err.message}
             });
 
             try {
-                // Erstelle text_content fÃ¼r den API-Endpoint
-                const textContent = `${customerName} hat ${finalQuantity > 0 ? finalQuantity : Math.abs(finalQuantity)} ${paletteType} ${finalQuantity > 0 ? 'mitgenommen' : 'zurÃ¼ckgebracht'}${customerNumber ? ' (' + customerNumber + ')' : ''}`;
+                // Erstelle text_content für den API-Endpoint
+                const textContent = `${customerName} hat ${finalQuantity > 0 ? finalQuantity : Math.abs(finalQuantity)} ${paletteType} ${finalQuantity > 0 ? 'mitgenommen' : 'zurückgebracht'}${customerNumber ? ' (' + customerNumber + ')' : ''}`;
 
                 // Speichere zu Supabase - Backend erwartet EINZELNE Werte, nicht Arrays!
                 const payload = {
@@ -2458,11 +2936,11 @@ ${err.message}
                     kundennummer: customerNumber || null,
                     palettenart: paletteType,   // Einzelner Wert, nicht Array!
                     menge: finalQuantity,       // Einzelner Wert, nicht Array!
-                    aktion: finalQuantity > 0 ? 'mitgenommen' : 'zurÃ¼ckgebracht',
+                    aktion: finalQuantity > 0 ? 'mitgenommen' : 'zurückgebracht',
                     mitarbeiter: mitarbeiter
                 };
 
-                console.log('ðŸ“¤ Sende Payload zum Backend:', payload);
+                console.log('📤 Sende Payload zum Backend:', payload);
 
                 const response = await fetch('/api/save', {
                     method: 'POST',
@@ -2472,30 +2950,30 @@ ${err.message}
                     body: JSON.stringify(payload)
                 });
 
-                console.log('ðŸ“¨ Response Status:', response.status, response.statusText);
+                console.log('📨 Response Status:', response.status, response.statusText);
 
                 if (!response.ok) {
                     const errorText = await response.text();
-                    console.error('ðŸ”´ Backend Fehler:', errorText);
+                    console.error('🔴 Backend Fehler:', errorText);
                     throw new Error(`Server Fehler (${response.status}): ${errorText}`);
                 }
 
                 const result = await response.json();
-                console.log('âœ… Manuelle Eingabe gespeichert:', result);
+                console.log('✅ Manuelle Eingabe gespeichert:', result);
 
                 // Zeige Zusammenfassung in der Erfolgsseite
                 const summaryHtml = `
                     <div style="margin: 20px 0;">
-                        <h3 style="color: #333; margin-top: 0;">ðŸ“‹ Gespeicherte Daten:</h3>
+                        <h3 style="color: #333; margin-top: 0;">📋 Gespeicherte Daten:</h3>
 
                         <div style="background: white; border-left: 4px solid #51cf66; padding: 15px; margin: 10px 0; border-radius: 8px;">
                             <div style="display: flex; justify-content: space-between; margin: 8px 0;">
-                                <span style="font-weight: bold; color: #666;">ðŸ‘¤ Kundenname:</span>
+                                <span style="font-weight: bold; color: #666;">👤 Kundenname:</span>
                                 <span style="color: #333; font-size: 16px; font-weight: 600;">${escapeHtml(customerName)}</span>
                             </div>
                             ${customerNumber ? `
                             <div style="display: flex; justify-content: space-between; margin: 8px 0;">
-                                <span style="font-weight: bold; color: #666;">ðŸ”¢ Kundennummer:</span>
+                                <span style="font-weight: bold; color: #666;">🔢 Kundennummer:</span>
                                 <span style="color: #333; font-size: 16px; font-weight: 600;">${escapeHtml(customerNumber)}</span>
                             </div>
                             ` : ''}
@@ -2503,22 +2981,22 @@ ${err.message}
 
                         <div style="background: white; border-left: 4px solid #667eea; padding: 15px; margin: 10px 0; border-radius: 8px;">
                             <div style="display: flex; justify-content: space-between; margin: 8px 0;">
-                                <span style="font-weight: bold; color: #666;">ðŸ“¦ Palettenart:</span>
+                                <span style="font-weight: bold; color: #666;">📦 Palettenart:</span>
                                 <span style="color: #333; font-size: 16px; font-weight: 600;">${escapeHtml(paletteType)}</span>
                             </div>
                             <div style="display: flex; justify-content: space-between; margin: 8px 0;">
-                                <span style="font-weight: bold; color: #666;">ðŸ“Š Menge:</span>
+                                <span style="font-weight: bold; color: #666;">📊 Menge:</span>
                                 <span style="color: #333; font-size: 16px; font-weight: 600;">${Math.abs(finalQuantity)}x</span>
                             </div>
                             <div style="display: flex; justify-content: space-between; margin: 8px 0;">
-                                <span style="font-weight: bold; color: #666;">âš¡ Aktion:</span>
-                                <span style="color: #333; font-size: 16px; font-weight: 600;">${finalQuantity > 0 ? 'âž• Zugang' : 'âž– Abgang'}</span>
+                                <span style="font-weight: bold; color: #666;">⚡ Aktion:</span>
+                                <span style="color: #333; font-size: 16px; font-weight: 600;">${finalQuantity > 0 ? '➕ Zugang' : '➖ Abgang'}</span>
                             </div>
                         </div>
 
                         <div style="background: white; border-left: 4px solid #ff9800; padding: 15px; margin: 10px 0; border-radius: 8px;">
                             <div style="display: flex; justify-content: space-between; margin: 8px 0;">
-                                <span style="font-weight: bold; color: #666;">ðŸ‘¤ Mitarbeiter:</span>
+                                <span style="font-weight: bold; color: #666;">👤 Mitarbeiter:</span>
                                 <span style="color: #333; font-size: 16px; font-weight: 600;">${escapeHtml(mitarbeiter)}</span>
                             </div>
                         </div>
@@ -2528,14 +3006,14 @@ ${err.message}
                 document.getElementById('successSummary').innerHTML = summaryHtml;
 
                 // Zeige Erfolgsseite
-                // âœ… WICHTIG: BLEIBT BESTEHEN - Benutzer muss manuell "ZurÃ¼ck" klicken
+                // ✅ WICHTIG: BLEIBT BESTEHEN - Benutzer muss manuell "Zurück" klicken
                 setPhase('successPhase');
 
             } catch (err) {
-                console.error('ðŸ”´ Fehler beim Speichern:', err);
+                console.error('🔴 Fehler beim Speichern:', err);
                 console.error('   Message:', err.message);
                 console.error('   Stack:', err.stack);
-                showError('âŒ Fehler beim Speichern: ' + err.message);
+                showError('❌ Fehler beim Speichern: ' + err.message);
             }
         }
 
@@ -2545,12 +3023,12 @@ ${err.message}
                 const response = await fetch('/api/get-all-saldos');
                 const customers = await response.json();
 
-                console.log('ðŸ“Š Kundenliste geladen:', customers.length);
+                console.log('📊 Kundenliste geladen:', customers.length);
 
                 const container = document.getElementById('kundenlisteContainer');
 
                 if (!customers || customers.length === 0) {
-                    container.innerHTML = '<div class="palettehistorie-empty">ðŸ“­ Noch keine Kunden</div>';
+                    container.innerHTML = '<div class="palettehistorie-empty">📭 Noch keine Kunden</div>';
                     return;
                 }
 
@@ -2561,7 +3039,7 @@ ${err.message}
                 for (let customer of customers) {
                     const gesamtSaldo = customer.paletten.reduce((sum, p) => sum + p.saldo, 0);
 
-                    // ðŸ”¥ FILTER: Zeige nur Kunden mit Gesamtsaldo > 0
+                    // 🔥 FILTER: Zeige nur Kunden mit Gesamtsaldo > 0
                     if (gesamtSaldo === 0) continue;
 
                     gezeigtKunden++;
@@ -2575,27 +3053,27 @@ ${err.message}
                 }
 
                 if (gezeigtKunden === 0) {
-                    container.innerHTML = '<div class="palettehistorie-empty">ðŸ“­ Noch keine Kunden mit Paletten</div>';
+                    container.innerHTML = '<div class="palettehistorie-empty">📭 Noch keine Kunden mit Paletten</div>';
                     return;
                 }
 
                 container.innerHTML = html;
 
-                // ðŸ”¥ WICHTIG: Event Listener hinzufÃ¼gen NACHDEM HTML eingefÃ¼gt wurde
+                // 🔥 WICHTIG: Event Listener hinzufügen NACHDEM HTML eingefügt wurde
                 const items = container.querySelectorAll('.kundenliste-item');
                 items.forEach(item => {
                     item.addEventListener('click', function() {
                         const kundenname = this.getAttribute('data-kundenname');
-                        console.log('ðŸ–±ï¸ Klick auf Kunde:', kundenname);
+                        console.log('🖱️ Klick auf Kunde:', kundenname);
                         showCustomerDetail(kundenname);
                     });
                 });
 
-                console.log('âœ… Kundenliste angezeigt mit', gezeigtKunden, 'Kunden');
+                console.log('✅ Kundenliste angezeigt mit', gezeigtKunden, 'Kunden');
             } catch (err) {
-                console.error('âŒ Fehler beim Laden der Kundenliste:', err);
+                console.error('❌ Fehler beim Laden der Kundenliste:', err);
                 const container = document.getElementById('kundenlisteContainer');
-                container.innerHTML = `<div class="palettehistorie-empty">âŒ Fehler: ${err.message}</div>`;
+                container.innerHTML = `<div class="palettehistorie-empty">❌ Fehler: ${err.message}</div>`;
             }
         }
 
@@ -2603,10 +3081,10 @@ ${err.message}
         async function showCustomerDetail(kundenname) {
             try {
                 currentCustomer = kundenname;
-                console.log('ðŸ‘¤ Lade Details fÃ¼r:', kundenname);
+                console.log('👤 Lade Details für:', kundenname);
 
                 // Update Title
-                document.getElementById('detailCustomerTitle').textContent = `ðŸ“¦ ${kundenname}`;
+                document.getElementById('detailCustomerTitle').textContent = `📦 ${kundenname}`;
 
                 const response = await fetch(`/api/customer-detail/${encodeURIComponent(kundenname)}`);
                 const data = await response.json();
@@ -2629,7 +3107,7 @@ ${err.message}
                                     ${displayPalette}
                                 </div>
                                 <div class="kundendetail-saldo" data-kundenname="${escapeHtml(kundenname)}" data-palettenart="${displayPalette}" data-saldo="${palette.saldo}" style="cursor: pointer;">
-                                    <span>${palette.saldo}</span> âœï¸
+                                    <span>${palette.saldo}</span> ✏️
                                 </div>
                             </div>
                         `;
@@ -2638,13 +3116,13 @@ ${err.message}
 
                 container.innerHTML = html;
 
-                // ðŸ”¥ WICHTIG: Event Listener hinzufÃ¼gen NACHDEM HTML eingefÃ¼gt wurde
+                // 🔥 WICHTIG: Event Listener hinzufügen NACHDEM HTML eingefügt wurde
                 const paletteItems = container.querySelectorAll('.kundendetail-palettenart');
                 paletteItems.forEach(item => {
                     item.addEventListener('click', function() {
                         const kname = this.getAttribute('data-kundenname');
                         const pname = this.getAttribute('data-palettenart');
-                        console.log('ðŸ–±ï¸ Klick auf Palette:', pname);
+                        console.log('🖱️ Klick auf Palette:', pname);
                         showPaletteHistory(kname, pname);
                     });
                 });
@@ -2655,17 +3133,17 @@ ${err.message}
                         const kname = this.getAttribute('data-kundenname');
                         const pname = this.getAttribute('data-palettenart');
                         const saldo = parseInt(this.getAttribute('data-saldo'));
-                        console.log('ðŸ–±ï¸ Klick auf Saldo:', kname, pname, saldo);
+                        console.log('🖱️ Klick auf Saldo:', kname, pname, saldo);
                         editSaldo(kname, pname, saldo);
                     });
                 });
 
                 setPhase('kundendetailPhase');
-                console.log('âœ… Kundendetails angezeigt');
+                console.log('✅ Kundendetails angezeigt');
             } catch (err) {
-                console.error('âŒ Fehler beim Laden der Details:', err);
+                console.error('❌ Fehler beim Laden der Details:', err);
                 const container = document.getElementById('kundendetailContainer');
-                container.innerHTML = `<div class="palettehistorie-empty">âŒ Fehler: ${err.message}</div>`;
+                container.innerHTML = `<div class="palettehistorie-empty">❌ Fehler: ${err.message}</div>`;
             }
         }
 
@@ -2673,10 +3151,10 @@ ${err.message}
         async function showPaletteHistory(kundenname, palettenart) {
             try {
                 currentPalette = palettenart;
-                console.log('â±ï¸ Lade Historie fÃ¼r:', kundenname, '-', palettenart);
+                console.log('⏱️ Lade Historie für:', kundenname, '-', palettenart);
 
                 // Update Title
-                document.getElementById('historieTitle').textContent = `â±ï¸ ${palettenart}`;
+                document.getElementById('historieTitle').textContent = `⏱️ ${palettenart}`;
 
                 const response = await fetch(`/api/palette-history/${encodeURIComponent(kundenname)}/${encodeURIComponent(palettenart)}`);
                 const data = await response.json();
@@ -2689,16 +3167,16 @@ ${err.message}
                 let html = '';
 
                 if (!data.history || data.history.length === 0) {
-                    html = '<div class="palettehistorie-empty">ðŸ“­ Keine Transaktionen</div>';
+                    html = '<div class="palettehistorie-empty">📭 Keine Transaktionen</div>';
                 } else {
                     for (let transaction of data.history) {
                         // Bestimme Symbol basierend auf Aktion
                         const aktion = transaction.aktion ? transaction.aktion.toLowerCase() : '';
-                        let symbol = 'â“';
-                        if (aktion.includes('mitgenommen') || aktion.includes('zurÃ¼ck') === false) {
-                            symbol = 'âž•';
-                        } else if (aktion.includes('zurÃ¼ck') || aktion.includes('zuruck') || aktion.includes('erhalten') || aktion.includes('abgegeben')) {
-                            symbol = 'âž–';
+                        let symbol = '❓';
+                        if (aktion.includes('mitgenommen') || aktion.includes('zurück') === false) {
+                            symbol = '➕';
+                        } else if (aktion.includes('zurück') || aktion.includes('zuruck') || aktion.includes('erhalten') || aktion.includes('abgegeben')) {
+                            symbol = '➖';
                         }
 
                         html += `
@@ -2714,45 +3192,45 @@ ${err.message}
 
                 container.innerHTML = html;
                 setPhase('paletteHistoriePhase');
-                console.log('âœ… Palettenhistorie angezeigt');
+                console.log('✅ Palettenhistorie angezeigt');
             } catch (err) {
-                console.error('âŒ Fehler beim Laden der Historie:', err);
+                console.error('❌ Fehler beim Laden der Historie:', err);
                 const container = document.getElementById('paletteHistorieContainer');
-                container.innerHTML = `<div class="palettehistorie-empty">âŒ Fehler: ${err.message}</div>`;
+                container.innerHTML = `<div class="palettehistorie-empty">❌ Fehler: ${err.message}</div>`;
             }
         }
 
-        // ========== SALDO BEARBEITEN (Manuelle Ã„nderung mit Transaktion) ==========
+        // ========== SALDO BEARBEITEN (Manuelle Änderung mit Transaktion) ==========
         async function editSaldo(kundenname, palettenart, aktuellerSaldo) {
-            const neuerSaldo = prompt(`Neuer Saldo fÃ¼r ${palettenart}?\n(Aktuell: ${aktuellerSaldo})`, aktuellerSaldo);
+            const neuerSaldo = prompt(`Neuer Saldo für ${palettenart}?\n(Aktuell: ${aktuellerSaldo})`, aktuellerSaldo);
 
             if (neuerSaldo === null) return;  // Benutzer hat Abbrechen geklickt
 
             const saldoZahl = parseInt(neuerSaldo);
             if (isNaN(saldoZahl) || saldoZahl < 0) {
-                alert('âš ï¸ Bitte geben Sie eine gÃ¼ltige Zahl ein (>= 0)');
+                alert('⚠️ Bitte geben Sie eine gültige Zahl ein (>= 0)');
                 return;
             }
 
-            // Wenn sich nichts geÃ¤ndert hat, abbrechen
+            // Wenn sich nichts geändert hat, abbrechen
             if (saldoZahl === aktuellerSaldo) {
-                console.log('â„¹ï¸ Saldo gleich geblieben, keine Ã„nderung');
+                console.log('ℹ️ Saldo gleich geblieben, keine Änderung');
                 return;
             }
 
             try {
-                console.log('ðŸ’¾ Manuelle Saldo-Ã„nderung:', kundenname, palettenart, aktuellerSaldo, 'â†’', saldoZahl);
+                console.log('💾 Manuelle Saldo-Änderung:', kundenname, palettenart, aktuellerSaldo, '→', saldoZahl);
 
-                // ðŸ”¥ WICHTIG: Sende alterSaldo und Mitarbeiter
+                // 🔥 WICHTIG: Sende alterSaldo und Mitarbeiter
                 const response = await fetch('/api/update-saldo', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         kundenname,
                         palettenart,
-                        alterSaldo: aktuellerSaldo,      // ðŸ”¥ NEUER PARAMETER
+                        alterSaldo: aktuellerSaldo,      // 🔥 NEUER PARAMETER
                         neuerSaldo: saldoZahl,
-                        mitarbeiter: mitarbeiterName      // ðŸ”¥ NEUER PARAMETER
+                        mitarbeiter: mitarbeiterName      // 🔥 NEUER PARAMETER
                     })
                 });
 
@@ -2762,19 +3240,19 @@ ${err.message}
                     throw new Error(result.error || 'Fehler beim Speichern');
                 }
 
-                // ðŸ”¥ ZEIGE TRANSAKTION DETAILS
+                // 🔥 ZEIGE TRANSAKTION DETAILS
                 const differenz = result.differenz;
                 const menge = result.menge;
-                const symbol = differenz > 0 ? 'âž•' : 'âž–';
+                const symbol = differenz > 0 ? '➕' : '➖';
 
-                console.log(`âœ… Transaktion erstellt: ${symbol} ${menge}x ${palettenart} (${result.aktion})`);
-                alert(`âœ… Saldo aktualisiert: ${aktuellerSaldo} â†’ ${saldoZahl}\n\n${symbol} ${menge}x ${palettenart} ${result.aktion}\nðŸ“ Eintrag erstellt fÃ¼r: ${mitarbeiterName}`);
+                console.log(`✅ Transaktion erstellt: ${symbol} ${menge}x ${palettenart} (${result.aktion})`);
+                alert(`✅ Saldo aktualisiert: ${aktuellerSaldo} → ${saldoZahl}\n\n${symbol} ${menge}x ${palettenart} ${result.aktion}\n📝 Eintrag erstellt für: ${mitarbeiterName}`);
 
                 // Aktualisiere die Kundendetails
                 await showCustomerDetail(kundenname);
             } catch (err) {
-                console.error('âŒ Fehler beim Speichern:', err);
-                alert('âŒ Fehler: ' + err.message);
+                console.error('❌ Fehler beim Speichern:', err);
+                alert('❌ Fehler: ' + err.message);
             }
         }
 
@@ -2793,21 +3271,21 @@ ${err.message}
                     const session = JSON.parse(sessionData);
                     if (isSessionValid(session)) {
                         mitarbeiterName = session.mitarbeiter;
-                        console.log('âœ… Session gÃ¼ltig, Mitarbeiter:', mitarbeiterName);
+                        console.log('✅ Session gültig, Mitarbeiter:', mitarbeiterName);
                         document.getElementById('mitarbeiterDisplay').textContent = mitarbeiterName;
                         setPhase('recordingPhase');
                         return;
                     } else {
-                        console.log('â° Session abgelaufen');
+                        console.log('⏰ Session abgelaufen');
                         localStorage.removeItem('palettenSession');
                     }
                 } catch (err) {
-                    console.error('âŒ Fehler beim Parsen der Session:', err);
+                    console.error('❌ Fehler beim Parsen der Session:', err);
                     localStorage.removeItem('palettenSession');
                 }
             }
 
-            // Keine gÃ¼ltige Session: Zeige Login
+            // Keine gültige Session: Zeige Login
             setPhase('loginPhase');
         }
 
@@ -2823,10 +3301,10 @@ ${err.message}
             const mitarbeitername = document.getElementById('loginMitarbeiter').value.trim();
             const passwort = document.getElementById('loginPassword').value;
 
-            console.log('ðŸ” Login-Versuch:', mitarbeitername);
+            console.log('🔐 Login-Versuch:', mitarbeitername);
 
             if (!mitarbeitername || !passwort) {
-                showLoginError('âŒ Mitarbeitername und Passwort erforderlich');
+                showLoginError('❌ Mitarbeitername und Passwort erforderlich');
                 return;
             }
 
@@ -2851,7 +3329,7 @@ ${err.message}
                     localStorage.setItem('palettenSession', JSON.stringify(sessionData));
                     mitarbeiterName = mitarbeitername;
 
-                    console.log('âœ… Login erfolgreich:', mitarbeitername);
+                    console.log('✅ Login erfolgreich:', mitarbeitername);
                     document.getElementById('mitarbeiterDisplay').textContent = mitarbeitername;
 
                     // Zeige Error-Box verstecken
@@ -2861,19 +3339,19 @@ ${err.message}
                     setPhase('recordingPhase');
                 } else if (result.firstTime) {
                     // Mitarbeiter existiert, aber Passwort muss noch gesetzt werden
-                    showLoginError(`âš ï¸ ${result.error}\n\nBitte setzen Sie ein Passwort.`);
+                    showLoginError(`⚠️ ${result.error}\n\nBitte setzen Sie ein Passwort.`);
 
                     // Automatisch Passwort-Dialog anzeigen
-                    const newPassword = prompt(`Passwort fÃ¼r "${mitarbeitername}" setzen:\n\n(mind. 4 Zeichen)`, '');
+                    const newPassword = prompt(`Passwort für "${mitarbeitername}" setzen:\n\n(mind. 4 Zeichen)`, '');
                     if (newPassword && newPassword.length >= 4) {
                         await setPassword(mitarbeitername, newPassword);
                     }
                 } else {
-                    showLoginError('âŒ ' + result.error);
+                    showLoginError('❌ ' + result.error);
                 }
             } catch (err) {
-                console.error('âŒ Fehler beim Login:', err);
-                showLoginError('âŒ Fehler: ' + err.message);
+                console.error('❌ Fehler beim Login:', err);
+                showLoginError('❌ Fehler: ' + err.message);
             }
         }
 
@@ -2892,16 +3370,16 @@ ${err.message}
                 const result = await response.json();
 
                 if (result.success) {
-                    alert('âœ… Passwort gesetzt! Melden Sie sich jetzt an.');
+                    alert('✅ Passwort gesetzt! Melden Sie sich jetzt an.');
                     // Versuche erneut zu loggen
                     document.getElementById('loginPassword').value = passwort;
                     handleLoginNew();
                 } else {
-                    showLoginError('âŒ ' + result.error);
+                    showLoginError('❌ ' + result.error);
                 }
             } catch (err) {
-                console.error('âŒ Fehler beim Setzen des Passworts:', err);
-                showLoginError('âŒ Fehler: ' + err.message);
+                console.error('❌ Fehler beim Setzen des Passworts:', err);
+                showLoginError('❌ Fehler: ' + err.message);
             }
         }
 
@@ -2926,7 +3404,7 @@ ${err.message}
             const adminPassword = document.getElementById('adminPassword').value;
 
             if (!name) {
-                showAdminError('âŒ Mitarbeitername erforderlich');
+                showAdminError('❌ Mitarbeitername erforderlich');
                 return;
             }
 
@@ -2943,7 +3421,7 @@ ${err.message}
                 const result = await response.json();
 
                 if (result.success) {
-                    showAdminSuccess(`âœ… ${result.message}`);
+                    showAdminSuccess(`✅ ${result.message}`);
                     document.getElementById('adminMitarbeitername').value = '';
                     document.getElementById('adminPassword').value = '';
 
@@ -2951,17 +3429,17 @@ ${err.message}
                         backToLogin();
                     }, 2000);
                 } else {
-                    showAdminError('âŒ ' + result.error);
+                    showAdminError('❌ ' + result.error);
                 }
             } catch (err) {
-                console.error('âŒ Fehler beim HinzufÃ¼gen des Mitarbeiters:', err);
-                showAdminError('âŒ Fehler: ' + err.message);
+                console.error('❌ Fehler beim Hinzufügen des Mitarbeiters:', err);
+                showAdminError('❌ Fehler: ' + err.message);
             }
         }
 
         // ========== LOGOUT ==========
         function logoutUser() {
-            console.log('ðŸ‘‹ Logout');
+            console.log('👋 Logout');
             localStorage.removeItem('palettenSession');
             mitarbeiterName = null;
 
@@ -3006,10 +3484,9 @@ ${err.message}
                 });
             }
 
-            // Initialisiere App (Ã¼berprÃ¼fe Session)
+            // Initialisiere App (überprüfe Session)
             initializeApp();
         });
     </script>
 </body>
 </html>
-
