@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paletten Übersicht</title>
+    <title>Paletten Ãœbersicht</title>
     <style>
         /* ===== CSS CUSTOM PROPERTIES (Light Mode Default) ===== */
         :root {
@@ -386,7 +386,7 @@
             font-style: italic;
         }
 
-        /* ========== DREISTUFIGE ÜBERSICHT STYLES ========== */
+        /* ========== DREISTUFIGE ÃœBERSICHT STYLES ========== */
 
         .kundenliste-section, .kundendetail-section, .palettehistorie-section {
             padding: 0;
@@ -896,10 +896,10 @@
     <div class="container" style="position: relative;">
         <!-- Logout Button oben -->
         <div id="logoutContainer" style="display: none; text-align: right; margin-bottom: 15px;">
-            <button onclick="logoutUser()" style="padding: 10px 16px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap;">👋 Logout (<span id="mitarbeiterDisplay">Marcel</span>)</button>
+            <button onclick="logoutUser()" style="padding: 10px 16px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap;">ðŸ‘‹ Logout (<span id="mitarbeiterDisplay">Marcel</span>)</button>
         </div>
 
-        <!-- <h1>Paletten Übersicht</h1>
+        <!-- <h1>Paletten Ãœbersicht</h1>
         <p class="subtitle">Spracherkennung mit Saldo-Tracking</p> -->
 
         <!-- LOGIN PHASE -->
@@ -907,15 +907,15 @@
         <div id="loginPhase" class="phase">
             <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 40px 20px;">
                 <div style="background: white; border-radius: 20px; padding: 40px; max-width: 400px; width: 100%; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);">
-                    <h2 style="text-align: center; color: #333; margin-bottom: 30px; font-size: 24px;">🔐 Anmeldung</h2>
+                    <h2 style="text-align: center; color: #333; margin-bottom: 30px; font-size: 24px;">ðŸ” Anmeldung</h2>
 
                     <div style="margin-bottom: 20px;">
-                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">👤 Mitarbeitername</label>
+                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">ðŸ‘¤ Mitarbeitername</label>
                         <input type="text" id="loginMitarbeiter" placeholder="z.B. Vorname" style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
                     </div>
 
                     <div style="margin-bottom: 25px;">
-                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">🔑 Passwort</label>
+                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">ðŸ”‘ Passwort</label>
                         <input type="password" id="loginPassword" placeholder="Passwort eingeben..." style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
                     </div>
 
@@ -925,7 +925,7 @@
 
                     <button onclick="handleLoginNew()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; margin-bottom: 12px;">Anmelden</button>
 
-                    <button onclick="showAdminPanel()" style="width: 100%; padding: 12px; background: #ff9500; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">⚙️ Mitarbeiter hinzufügen</button>
+                    <button onclick="showAdminPanel()" style="width: 100%; padding: 12px; background: #ff9500; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">âš™ï¸ Mitarbeiter hinzufÃ¼gen</button>
                 </div>
             </div>
         </div>
@@ -934,15 +934,15 @@
         <div id="adminPanelPhase" class="phase">
             <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 40px 20px;">
                 <div style="background: white; border-radius: 20px; padding: 40px; max-width: 400px; width: 100%; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);">
-                    <h2 style="text-align: center; color: #333; margin-bottom: 30px; font-size: 24px;">⚙️ Mitarbeiter hinzufügen</h2>
+                    <h2 style="text-align: center; color: #333; margin-bottom: 30px; font-size: 24px;">âš™ï¸ Mitarbeiter hinzufÃ¼gen</h2>
 
                     <div style="margin-bottom: 20px;">
-                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">📝 Mitarbeitername</label>
+                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">ðŸ“ Mitarbeitername</label>
                         <input type="text" id="adminMitarbeitername" placeholder="z.B. Klaus" style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
                     </div>
 
                     <div style="margin-bottom: 25px;">
-                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">🔑 Admin-Passwort</label>
+                        <label style="display: block; font-size: 14px; color: #666; font-weight: bold; margin-bottom: 8px;">ðŸ”‘ Admin-Passwort</label>
                         <input type="password" id="adminPassword" placeholder="Admin-Passwort..." style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
                     </div>
 
@@ -954,9 +954,9 @@
                         <span id="adminSuccessMessage"></span>
                     </div>
 
-                    <button onclick="addNewEmployee()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; margin-bottom: 12px;">✅ Mitarbeiter erstellen</button>
+                    <button onclick="addNewEmployee()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; margin-bottom: 12px;">âœ… Mitarbeiter erstellen</button>
 
-                    <button onclick="backToLogin()" style="width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">← Zurück</button>
+                    <button onclick="backToLogin()" style="width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">â† ZurÃ¼ck</button>
                 </div>
             </div>
         </div>
@@ -965,38 +965,38 @@
             <div class="recording-section" style="position: relative;">
                 <!-- Hauptinhalt mittig -->
                 <p>Klicke auf den Button und sprich die Palette ein</p>
-                <button id="recordingButton" onclick="toggleRecording()">🎤 Aufnahme starten</button>
+                <button id="recordingButton" onclick="toggleRecording()">ðŸŽ¤ Aufnahme starten</button>
                 <p id="status"></p>
 
                 <!-- Manuelle Eingabe Button -->
-                <button onclick="openManualInput()" style="margin-top: 15px; padding: 15px 40px; background: #ff9800; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; max-width: 300px;">✏️ Manuell eingeben</button>
+                <button onclick="openManualInput()" style="margin-top: 15px; padding: 15px 40px; background: #ff9800; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; max-width: 300px;">âœï¸ Manuell eingeben</button>
 
-                <!-- Übersicht-Button unten mittig -->
-                <button onclick="showOverview()" style="margin-top: 15px; margin-bottom: 30px; padding: 15px 40px; background: #51cf66; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; max-width: 300px;">📊 Übersicht</button>
+                <!-- Ãœbersicht-Button unten mittig -->
+                <button onclick="showOverview()" style="margin-top: 15px; margin-bottom: 30px; padding: 15px 40px; background: #51cf66; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; max-width: 300px;">ðŸ“Š Ãœbersicht</button>
 
-                <!-- V1.381 schwarz, fett, unten in der mitte UNTER Übersicht Button -->
+                <!-- V1.381 schwarz, fett, unten in der mitte UNTER Ãœbersicht Button -->
                 <span style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); font-size: 14px; color: #000; font-weight: bold;">V1.381</span>
             </div>
         </div>
 
         <div id="reviewPhase" class="phase">
             <div class="review-section">
-                <p class="review-label">📝 Erkannter Text - Bitte überprüfen und korrigieren:</p>
+                <p class="review-label">ðŸ“ Erkannter Text - Bitte Ã¼berprÃ¼fen und korrigieren:</p>
 
                 <!-- EDITIERBARE KUNDENINFORMATIONEN -->
                 <div style="background: #f0f4ff; border: 2px solid #667eea; border-radius: 12px; padding: 20px; margin: 20px 0;">
                     <div style="margin-bottom: 15px;">
-                        <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 8px;">👤 Kundenname:</label>
+                        <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 8px;">ðŸ‘¤ Kundenname:</label>
                         <input type="text" id="editCustomerName" placeholder="Kundenname eingeben..." style="width: 100%; padding: 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
                     </div>
 
                     <div>
-                        <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 8px;">🔢 Kundennummer (optional):</label>
+                        <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 8px;">ðŸ”¢ Kundennummer (optional):</label>
                         <input type="text" id="editCustomerNumber" placeholder="Kundennummer eingeben..." style="width: 100%; padding: 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
                     </div>
                 </div>
 
-                <p class="review-label" style="margin-top: 20px;">📋 Erkannter Volltext:</p>
+                <p class="review-label" style="margin-top: 20px;">ðŸ“‹ Erkannter Volltext:</p>
                 <div id="textDisplay" class="text-display"></div>
 
                 <div id="errorBox" style="display: none;" class="error-box">
@@ -1004,23 +1004,23 @@
                 </div>
 
                 <div class="button-group">
-                    <button class="btn btn-save" onclick="saveToSupabase()" id="saveBtn">✅ Speichern</button>
-                    <button class="btn btn-discard" onclick="discardAndRestart()">❌ Verwerfen</button>
+                    <button class="btn btn-save" onclick="saveToSupabase()" id="saveBtn">âœ… Speichern</button>
+                    <button class="btn btn-discard" onclick="discardAndRestart()">âŒ Verwerfen</button>
                 </div>
             </div>
         </div>
 
         <div id="successPhase" class="phase">
             <div class="success-section">
-                <div class="success-icon">✅</div>
+                <div class="success-icon">âœ…</div>
                 <p class="success-message">Erfolgreich gespeichert!</p>
 
                 <!-- ZUSAMMENFASSUNG -->
                 <div id="successSummary" style="background: #f0f9ff; border: 2px solid #51cf66; border-radius: 12px; padding: 20px; margin: 20px 0; text-align: left;">
-                    <!-- wird dynamisch gefüllt -->
+                    <!-- wird dynamisch gefÃ¼llt -->
                 </div>
 
-                <button id="newRecordingButton" onclick="restartRecording()">← Zurück</button>
+                <button id="newRecordingButton" onclick="restartRecording()">â† ZurÃ¼ck</button>
             </div>
         </div>
 
@@ -1028,11 +1028,11 @@
         <div id="kundenlistePhase" class="phase">
             <div class="kundenliste-section">
                 <div class="kundenliste-header">
-                    <h2>📊 Kundenliste</h2>
-                    <button class="nav-back-btn" onclick="backToRecording()">← Zurück</button>
+                    <h2>ðŸ“Š Kundenliste</h2>
+                    <button class="nav-back-btn" onclick="backToRecording()">â† ZurÃ¼ck</button>
                 </div>
                 <div id="kundenlisteContainer" class="kundenliste-grid">
-                    <!-- wird dynamisch gefüllt -->
+                    <!-- wird dynamisch gefÃ¼llt -->
                 </div>
             </div>
         </div>
@@ -1041,11 +1041,11 @@
         <div id="kundendetailPhase" class="phase">
             <div class="kundendetail-section">
                 <div class="kundendetail-header">
-                    <h2 id="detailCustomerTitle">📦 Kundendetails</h2>
-                    <button class="nav-back-btn" onclick="backToCustomerList()">← Zurück</button>
+                    <h2 id="detailCustomerTitle">ðŸ“¦ Kundendetails</h2>
+                    <button class="nav-back-btn" onclick="backToCustomerList()">â† ZurÃ¼ck</button>
                 </div>
                 <div id="kundendetailContainer" class="kundendetail-list">
-                    <!-- wird dynamisch gefüllt -->
+                    <!-- wird dynamisch gefÃ¼llt -->
                 </div>
             </div>
         </div>
@@ -1054,11 +1054,11 @@
         <div id="paletteHistoriePhase" class="phase">
             <div class="palettehistorie-section">
                 <div class="palettehistorie-header">
-                    <h2 id="historieTitle">⏱️ Palettenhistorie</h2>
-                    <button class="nav-back-btn" onclick="backToCustomerDetail()">← Zurück</button>
+                    <h2 id="historieTitle">â±ï¸ Palettenhistorie</h2>
+                    <button class="nav-back-btn" onclick="backToCustomerDetail()">â† ZurÃ¼ck</button>
                 </div>
                 <div id="paletteHistorieContainer" class="palettehistorie-list">
-                    <!-- wird dynamisch gefüllt -->
+                    <!-- wird dynamisch gefÃ¼llt -->
                 </div>
             </div>
         </div>
@@ -1066,61 +1066,61 @@
         <!-- MANUELLE EINGABE PHASE -->
         <div id="manualInputPhase" class="phase">
             <div class="recording-section">
-                <h2>✏️ Manuelle Eingabe</h2>
+                <h2>âœï¸ Manuelle Eingabe</h2>
                 <p style="color: #666; font-size: 14px; margin-bottom: 20px;">Geben Sie die Palettenart und Anzahl ein</p>
 
                 <!-- PALETTENART DROPDOWN -->
                 <div style="margin-bottom: 25px;">
-                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">📦 Palettenart:</label>
+                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">ðŸ“¦ Palettenart:</label>
                     <select id="manualPaletteType" style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box; background: white; cursor: pointer;">
-                        <option value="">-- Palettenart auswählen --</option>
+                        <option value="">-- Palettenart auswÃ¤hlen --</option>
                     </select>
                 </div>
 
                 <!-- KUNDENNAME -->
                 <div style="margin-bottom: 25px;">
-                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">👤 Kundenname:</label>
+                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">ðŸ‘¤ Kundenname:</label>
                     <input type="text" id="manualCustomerName" placeholder="Kundenname eingeben..." style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
                 </div>
 
                 <!-- KUNDENNUMMER (OPTIONAL) -->
                 <div style="margin-bottom: 25px;">
-                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">🔢 Kundennummer (optional):</label>
+                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">ðŸ”¢ Kundennummer (optional):</label>
                     <input type="text" id="manualCustomerNumber" placeholder="Kundennummer eingeben..." style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
                 </div>
 
                 <!-- AKTION (Zu-/Abgang) -->
                 <div style="margin-bottom: 25px;">
-                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">⚡ Aktion:</label>
+                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">âš¡ Aktion:</label>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <button id="manualActionAdd" onclick="setManualAction('add')" style="padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; background: white; color: #667eea; transition: all 0.3s;">➕ Zugang</button>
-                        <button id="manualActionRemove" onclick="setManualAction('remove')" style="padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; background: white; color: #667eea; transition: all 0.3s;">➖ Abgang</button>
+                        <button id="manualActionAdd" onclick="setManualAction('add')" style="padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; background: white; color: #667eea; transition: all 0.3s;">âž• Zugang</button>
+                        <button id="manualActionRemove" onclick="setManualAction('remove')" style="padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; background: white; color: #667eea; transition: all 0.3s;">âž– Abgang</button>
                     </div>
                 </div>
 
                 <!-- ANZAHL -->
                 <div style="margin-bottom: 30px;">
-                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">📊 Anzahl:</label>
+                    <label style="display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 10px;">ðŸ“Š Anzahl:</label>
                     <input type="number" id="manualQuantity" placeholder="z.B. 5" min="1" value="1" style="width: 100%; padding: 15px; border: 2px solid #667eea; border-radius: 10px; font-size: 16px; box-sizing: border-box;">
                 </div>
 
                 <!-- BUTTONS -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 30px;">
-                    <button onclick="saveManualInput()" style="padding: 15px; background: #51cf66; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s;">✅ Speichern</button>
-                    <button onclick="cancelManualInput()" style="padding: 15px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s;">❌ Abbrechen</button>
+                    <button onclick="saveManualInput()" style="padding: 15px; background: #51cf66; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s;">âœ… Speichern</button>
+                    <button onclick="cancelManualInput()" style="padding: 15px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s;">âŒ Abbrechen</button>
                 </div>
             </div>
         </div>
 
-        <!-- KUNDE BESTÄTIGUNG MODAL -->
+        <!-- KUNDE BESTÃ„TIGUNG MODAL -->
         <div id="customerConfirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
             <div style="background: white; border-radius: 20px; padding: 30px; max-width: 500px; text-align: center;">
-                <h2 style="margin-bottom: 20px; color: #333;">👤 Ist das der gleiche Kunde?</h2>
+                <h2 style="margin-bottom: 20px; color: #333;">ðŸ‘¤ Ist das der gleiche Kunde?</h2>
                 <p id="customerConfirmQuestion" style="font-size: 18px; color: #666; margin-bottom: 30px;"></p>
 
                 <div style="display: flex; gap: 15px; justify-content: center;">
-                    <button onclick="confirmSameCustomer()" style="flex: 1; padding: 15px; background: #51cf66; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">✅ Ja, gleicher Kunde</button>
-                    <button onclick="rejectSameCustomer()" style="flex: 1; padding: 15px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">❌ Nein, neuer Kunde</button>
+                    <button onclick="confirmSameCustomer()" style="flex: 1; padding: 15px; background: #51cf66; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">âœ… Ja, gleicher Kunde</button>
+                    <button onclick="rejectSameCustomer()" style="flex: 1; padding: 15px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">âŒ Nein, neuer Kunde</button>
                 </div>
             </div>
         </div>
@@ -1128,11 +1128,11 @@
         <!-- PALETTE AUSWAHL MODAL -->
         <div id="paletteSelectionModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
             <div style="background: white; border-radius: 20px; padding: 30px; max-width: 90%; max-height: 90vh; overflow-y: auto;">
-                <h2 style="text-align: center; margin-bottom: 20px; color: #333;">🎯 Bitte wähle die Palettenart:</h2>
+                <h2 style="text-align: center; margin-bottom: 20px; color: #333;">ðŸŽ¯ Bitte wÃ¤hle die Palettenart:</h2>
                 <div id="paletteButtonsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
                     <!-- Buttons werden dynamisch generiert -->
                 </div>
-                <button onclick="cancelPaletteSelection()" style="width: 100%; padding: 15px; margin-top: 20px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">❌ Verwerfen</button>
+                <button onclick="cancelPaletteSelection()" style="width: 100%; padding: 15px; margin-top: 20px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">âŒ Verwerfen</button>
             </div>
         </div>
 
@@ -1140,7 +1140,7 @@
 
     <script>
         // GROQ API Key wird von Backend bereitgestellt (sicherer als hardcodiert!)
-        // 🔐 GROQ API wird jetzt über Backend-Proxy aufgerufen (sicherer!)
+        // ðŸ” GROQ API wird jetzt Ã¼ber Backend-Proxy aufgerufen (sicherer!)
         // const GROQ_API_KEY wird NICHT mehr im Frontend genutzt
 
         // ============================================
@@ -1151,7 +1151,7 @@
             'Grafepalette': ['grafe', 'grafe-palette', 'grafepalette'],
             'Steinzeug Gitterbox': ['steinzeug gitterbox', 'steinzeug-gitterbox', 'stg gitterbox'],
             'Steinzeugpalette klein': ['steinzeugpalette klein', 'steinzeug klein', 'stg klein'],
-            'Steinzeugpalette groß': ['steinzeugpalette groß', 'steinzeug groß', 'stg groß'],
+            'Steinzeugpalette groÃŸ': ['steinzeugpalette groÃŸ', 'steinzeug groÃŸ', 'stg groÃŸ'],
             'Europalette 2': ['europalette zwei', 'euro zwei', 'europalette 2'],
             'Europalette 3': ['europalette drei', 'euro drei', 'europalette 3'],
             'Spezialpalette': ['spezial', 'spezialpalette', 'spezial-palette'],
@@ -1191,7 +1191,7 @@
             const kandidaten = [];
             for (let [standard, synonyme] of Object.entries(PALETTENLISTE)) {
                 for (let synonym of synonyme) {
-                    // Prüfe ob Synonym als ganzes Wort im Text vorkommt
+                    // PrÃ¼fe ob Synonym als ganzes Wort im Text vorkommt
                     if (normalized.includes(synonym)) {
                         if (!kandidaten.find(k => k === standard)) {
                             kandidaten.push(standard);
@@ -1223,10 +1223,10 @@
         let audioStream = null;
         let wartendeAuswahlPaletten = [];
         let selectedPalette = null;
-        let aktuelleAuswahlPalette = null;  // 🎯 SPEICHERE DIE AKTUELLEN DATEN VOR DEM LÖSCHEN
-        let erkannteAuswahlPaletten = [];   // 🎯 SPEICHERE BEREITS ERKANNTE PALETTEN aus validateText()
+        let aktuelleAuswahlPalette = null;  // ðŸŽ¯ SPEICHERE DIE AKTUELLEN DATEN VOR DEM LÃ–SCHEN
+        let erkannteAuswahlPaletten = [];   // ðŸŽ¯ SPEICHERE BEREITS ERKANNTE PALETTEN aus validateText()
 
-        // Kundenbestätigung
+        // KundenbestÃ¤tigung
         let wartendeKundenZuBestaetigung = null;
         let selectedCustomerName = null;
 
@@ -1234,7 +1234,7 @@
         let mitarbeiterName = null;
 
         // ============================================
-        // 📱 DEVICE-DETECTION FÜR MOBILE-KOMPATIBILITÄT
+        // ðŸ“± DEVICE-DETECTION FÃœR MOBILE-KOMPATIBILITÃ„T
         // ============================================
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
         const isAndroid = /Android/.test(navigator.userAgent);
@@ -1242,8 +1242,8 @@
         const hasGetUserMedia = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
         const isHTTPS = location.protocol === 'https:';
 
-        // Zeige Device-Info in Console für Debugging
-        console.log('📱 Device-Info:', {
+        // Zeige Device-Info in Console fÃ¼r Debugging
+        console.log('ðŸ“± Device-Info:', {
             device: isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop',
             isMobile,
             hasGetUserMedia,
@@ -1252,14 +1252,14 @@
         });
 
         // ============================================
-        // 🎤 WEB SPEECH API INITIALISIERUNG
+        // ðŸŽ¤ WEB SPEECH API INITIALISIERUNG
         // ============================================
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let recognition = null;
 
-        // 🔧 iOS FIX: Funktion zum Neu-Initialisieren der Recognition
+        // ðŸ”§ iOS FIX: Funktion zum Neu-Initialisieren der Recognition
         function initializeRecognition() {
-            console.log('🔧 Initialisiere Recognition-Objekt neu...');
+            console.log('ðŸ”§ Initialisiere Recognition-Objekt neu...');
             try {
                 // Stoppe alte Recognition falls noch aktiv
                 if (recognition) {
@@ -1275,43 +1275,43 @@
                     recognition.continuous = false;
                     recognition.interimResults = true;
                     recognition.lang = 'de-DE';
-                    console.log('✅ Neues Recognition-Objekt erstellt');
+                    console.log('âœ… Neues Recognition-Objekt erstellt');
                 } else {
-                    console.warn('⚠️ SpeechRecognition nicht verfügbar');
+                    console.warn('âš ï¸ SpeechRecognition nicht verfÃ¼gbar');
                 }
             } catch (err) {
-                console.error('🔴 Fehler beim Initialisieren von Recognition:', err);
+                console.error('ðŸ”´ Fehler beim Initialisieren von Recognition:', err);
             }
         }
 
         if (SpeechRecognition) {
             initializeRecognition();
-            console.log('✅ Web Speech API verfügbar');
+            console.log('âœ… Web Speech API verfÃ¼gbar');
         } else {
-            console.warn('⚠️ Web Speech API nicht verfügbar - Fallback zu MediaRecorder');
+            console.warn('âš ï¸ Web Speech API nicht verfÃ¼gbar - Fallback zu MediaRecorder');
         }
 
-        // 🔐 OPTIONAL: Microphone-Berechtigung pre-check für iOS
+        // ðŸ” OPTIONAL: Microphone-Berechtigung pre-check fÃ¼r iOS
         async function ensureMicrophonePermission() {
             if (!hasGetUserMedia) {
-                console.warn('⚠️ getUserMedia nicht verfügbar');
+                console.warn('âš ï¸ getUserMedia nicht verfÃ¼gbar');
                 return false;
             }
 
             try {
-                console.log('🔐 Prüfe Mikrophon-Berechtigung...');
+                console.log('ðŸ” PrÃ¼fe Mikrophon-Berechtigung...');
                 const testStream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
                 // Sofort alle Tracks stoppen - wir brauchen nur die Permission
                 testStream.getTracks().forEach(track => {
-                    console.log('✅ Track gestoppt:', track.kind);
+                    console.log('âœ… Track gestoppt:', track.kind);
                     track.stop();
                 });
 
-                console.log('✅ Mikrophon-Berechtigung erteilt');
+                console.log('âœ… Mikrophon-Berechtigung erteilt');
                 return true;
             } catch (err) {
-                console.warn('⚠️ Mikrophon-Berechtigung verweigert:', err.message);
+                console.warn('âš ï¸ Mikrophon-Berechtigung verweigert:', err.message);
                 return false;
             }
         }
@@ -1323,8 +1323,8 @@
 
         async function startRecording() {
             try {
-                // 📱 DEBUG: Zeige Device-Info für Debugging
-                console.log('🎤 Starte Aufnahme mit folgenden Bedingungen:', {
+                // ðŸ“± DEBUG: Zeige Device-Info fÃ¼r Debugging
+                console.log('ðŸŽ¤ Starte Aufnahme mit folgenden Bedingungen:', {
                     device: isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop',
                     browser: /Safari/.test(navigator.userAgent) ? 'Safari' : /Chrome/.test(navigator.userAgent) ? 'Chrome' : 'Andere',
                     isHTTPS: location.protocol === 'https:',
@@ -1332,44 +1332,44 @@
                     recognitionAvailable: !!recognition
                 });
 
-                // 📱 iOS FIX: Stoppe Watchdog wenn Aufnahme startet
+                // ðŸ“± iOS FIX: Stoppe Watchdog wenn Aufnahme startet
                 if (microphoneTimeoutId) {
                     clearTimeout(microphoneTimeoutId);
                     microphoneTimeoutId = null;
-                    console.log('⏰ Watchdog gestoppt - Aufnahme startet');
+                    console.log('â° Watchdog gestoppt - Aufnahme startet');
                 }
 
-                // 🎤 NUTZE WEB SPEECH API (Browser-native, beste Compatibility auf Mobile)
+                // ðŸŽ¤ NUTZE WEB SPEECH API (Browser-native, beste Compatibility auf Mobile)
                 if (!recognition) {
-                    showError("⚠️ Spracherkennung wird von deinem Browser nicht unterstützt! Nutze Safari auf iOS oder Chrome auf Android.");
+                    showError("âš ï¸ Spracherkennung wird von deinem Browser nicht unterstÃ¼tzt! Nutze Safari auf iOS oder Chrome auf Android.");
                     return;
                 }
 
-                // 🛑 Stoppe evtl. alte Recognition bevor neue startet
+                // ðŸ›‘ Stoppe evtl. alte Recognition bevor neue startet
                 try {
                     recognition.stop();
                 } catch (e) {}
 
-                console.log('🎤 Starte Web Speech API auf:', isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop');
+                console.log('ðŸŽ¤ Starte Web Speech API auf:', isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop');
 
                 isRecording = true;
                 let finalTranscript = '';
 
                 const btn = document.getElementById("recordingButton");
-                btn.textContent = "🔴 Aufnahme läuft - jetzt sprechen!";
+                btn.textContent = "ðŸ”´ Aufnahme lÃ¤uft - jetzt sprechen!";
                 btn.classList.add("recording");
 
                 const status = document.getElementById("status");
-                status.textContent = "🎧 Höre zu...";
+                status.textContent = "ðŸŽ§ HÃ¶re zu...";
                 status.className = "status-recording";
 
-                // 🎤 EVENT: Wenn Spracherkennung startet
+                // ðŸŽ¤ EVENT: Wenn Spracherkennung startet
                 recognition.onstart = () => {
-                    console.log('✅ Web Speech API aktiviert');
-                    status.textContent = "🎧 Höre zu...";
+                    console.log('âœ… Web Speech API aktiviert');
+                    status.textContent = "ðŸŽ§ HÃ¶re zu...";
                 };
 
-                // 🎤 EVENT: Text erkannt (inkl. Zwischenergebnisse)
+                // ðŸŽ¤ EVENT: Text erkannt (inkl. Zwischenergebnisse)
                 recognition.onresult = (event) => {
                     let interimTranscript = '';
 
@@ -1378,78 +1378,78 @@
 
                         if (event.results[i].isFinal) {
                             finalTranscript += transcript + ' ';
-                            console.log('✅ Final Text:', transcript);
+                            console.log('âœ… Final Text:', transcript);
                         } else {
                             interimTranscript += transcript;
-                            console.log('🔄 Interim Text:', transcript);
+                            console.log('ðŸ”„ Interim Text:', transcript);
                         }
                     }
 
                     // Zeige Zwischenergebnis + Final
                     const displayText = interimTranscript || finalTranscript;
-                    console.log('📝 Zeige:', displayText);
-                    status.textContent = `🎧 Erkannt: ${displayText}`;
+                    console.log('ðŸ“ Zeige:', displayText);
+                    status.textContent = `ðŸŽ§ Erkannt: ${displayText}`;
                 };
 
-                // 🔴 EVENT: Fehler bei Spracherkennung
+                // ðŸ”´ EVENT: Fehler bei Spracherkennung
                 recognition.onerror = (event) => {
-                    console.error('🔴 Speech Recognition Fehler:', event.error);
+                    console.error('ðŸ”´ Speech Recognition Fehler:', event.error);
                     console.error('   Device:', isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop');
 
-                    // 🔐 iOS FIX: Gebe Mikrofon auch bei Fehler frei!
-                    console.log('🎤 Gebe Mikrofon frei nach Fehler...');
+                    // ðŸ” iOS FIX: Gebe Mikrofon auch bei Fehler frei!
+                    console.log('ðŸŽ¤ Gebe Mikrofon frei nach Fehler...');
                     stopAllAudio();
                     releaseAudioResources();
 
                     let errorMsg = `Fehler: ${event.error}`;
 
                     if (event.error === 'no-speech') {
-                        errorMsg = '❌ Keine Sprache erkannt - bitte laut und deutlich sprechen!';
+                        errorMsg = 'âŒ Keine Sprache erkannt - bitte laut und deutlich sprechen!';
                     } else if (event.error === 'audio-capture') {
-                        // 🎙️ Device-spezifische Hinweise für audio-capture Fehler
+                        // ðŸŽ™ï¸ Device-spezifische Hinweise fÃ¼r audio-capture Fehler
                         if (isIOS) {
-                            errorMsg = '🎙️ iOS Mikrofon-Fehler: Probiere die Aufnahme neu oder nutze eine andere App.';
+                            errorMsg = 'ðŸŽ™ï¸ iOS Mikrofon-Fehler: Probiere die Aufnahme neu oder nutze eine andere App.';
                         } else if (isAndroid) {
-                            errorMsg = '🎙️ Android Mikrofon-Fehler: Überprüfe die App-Berechtigung in den Einstellungen.';
+                            errorMsg = 'ðŸŽ™ï¸ Android Mikrofon-Fehler: ÃœberprÃ¼fe die App-Berechtigung in den Einstellungen.';
                         } else {
-                            errorMsg = '🎙️ Mikrophon-Fehler - Berechtigung erteilt? Probiere neu!';
+                            errorMsg = 'ðŸŽ™ï¸ Mikrophon-Fehler - Berechtigung erteilt? Probiere neu!';
                         }
                     } else if (event.error === 'network') {
-                        errorMsg = '🌐 Netzwerk-Fehler - überprüfe deine Internet-Verbindung';
+                        errorMsg = 'ðŸŒ Netzwerk-Fehler - Ã¼berprÃ¼fe deine Internet-Verbindung';
                     } else if (event.error === 'bad-grammar') {
-                        errorMsg = '🎤 Sprache nicht verstanden - bitte deutlich sprechen';
+                        errorMsg = 'ðŸŽ¤ Sprache nicht verstanden - bitte deutlich sprechen';
                     } else if (event.error === 'service-not-allowed') {
-                        errorMsg = '⚠️ Speech Recognition ist nicht verfügbar - bitte später erneut versuchen';
+                        errorMsg = 'âš ï¸ Speech Recognition ist nicht verfÃ¼gbar - bitte spÃ¤ter erneut versuchen';
                     }
 
-                    console.error('🔴 Zeige Error:', errorMsg);
+                    console.error('ðŸ”´ Zeige Error:', errorMsg);
                     showError(errorMsg);
                     isRecording = false;
-                    btn.textContent = "🎤 Aufnahme starten";
+                    btn.textContent = "ðŸŽ¤ Aufnahme starten";
                     btn.classList.remove("recording");
                     btn.disabled = false;
                 };
 
-                // ✅ EVENT: Spracherkennung beendet - WICHTIG!
+                // âœ… EVENT: Spracherkennung beendet - WICHTIG!
                 recognition.onend = () => {
-                    console.log('✅ Recognition onend() aufgerufen');
+                    console.log('âœ… Recognition onend() aufgerufen');
                     console.log('   finalTranscript =', finalTranscript);
                     console.log('   trimmed =', finalTranscript.trim());
 
-                    // 🔐 iOS FIX: Gebe Mikrofon SOFORT frei wenn Aufnahme endet!
+                    // ðŸ” iOS FIX: Gebe Mikrofon SOFORT frei wenn Aufnahme endet!
                     // NICHT WARTEN auf processWithGroq()
-                    console.log('🎤 Gebe Mikrofon SOFORT frei nach Aufnahmeende...');
+                    console.log('ðŸŽ¤ Gebe Mikrofon SOFORT frei nach Aufnahmeende...');
                     stopAllAudio();
                     releaseAudioResources();
 
                     if (finalTranscript.trim() && finalTranscript.trim().length > 0) {
-                        console.log('📤 Rufe processWithGroq auf mit:', finalTranscript.trim());
-                        // Schicke erkannten Text zu Groq für Strukturierung
+                        console.log('ðŸ“¤ Rufe processWithGroq auf mit:', finalTranscript.trim());
+                        // Schicke erkannten Text zu Groq fÃ¼r Strukturierung
                         processWithGroq(finalTranscript.trim());
                     } else {
-                        console.warn('⚠️ Kein Text erkannt - finalTranscript ist leer');
-                        showError('❌ Keine Sprache erkannt - versuche es nochmal!');
-                        btn.textContent = "🎤 Aufnahme starten";
+                        console.warn('âš ï¸ Kein Text erkannt - finalTranscript ist leer');
+                        showError('âŒ Keine Sprache erkannt - versuche es nochmal!');
+                        btn.textContent = "ðŸŽ¤ Aufnahme starten";
                         btn.classList.remove("recording");
                         btn.disabled = false;
                     }
@@ -1457,12 +1457,12 @@
                     isRecording = false;
                 };
 
-                // 🚀 STARTE SPRACHERKENNUNG
-                console.log('🚀 Starte recognition.start()');
+                // ðŸš€ STARTE SPRACHERKENNUNG
+                console.log('ðŸš€ Starte recognition.start()');
                 recognition.start();
 
             } catch (err) {
-                console.error('🔴 Fehler beim Starten der Aufnahme:', err);
+                console.error('ðŸ”´ Fehler beim Starten der Aufnahme:', err);
                 console.error('   Error name:', err.name);
                 console.error('   Device:', isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop');
 
@@ -1471,40 +1471,40 @@
                 const errorName = err.name || "";
                 const errorMsg = err.message ? err.message.toLowerCase() : "";
 
-                // 🔐 Bessere Fehlerbehandlung für verschiedene Geräte
+                // ðŸ” Bessere Fehlerbehandlung fÃ¼r verschiedene GerÃ¤te
                 if (errorName === "NotAllowedError" || errorMsg.includes("permission")) {
                     if (isIOS) {
-                        userMsg = "🔐 iOS: Bitte erteile Mikrophon-Zugriff in Einstellungen > Safari > Mikrophon";
+                        userMsg = "ðŸ” iOS: Bitte erteile Mikrophon-Zugriff in Einstellungen > Safari > Mikrophon";
                     } else if (isAndroid) {
-                        userMsg = "🔐 Android: Bitte erteile Mikrophon-Berechtigung in App-Einstellungen";
+                        userMsg = "ðŸ” Android: Bitte erteile Mikrophon-Berechtigung in App-Einstellungen";
                     } else {
-                        userMsg = "🔐 Mikrophon-Berechtigung benötigt - bitte im Berechtigungsdialog 'Erlauben' klicken";
+                        userMsg = "ðŸ” Mikrophon-Berechtigung benÃ¶tigt - bitte im Berechtigungsdialog 'Erlauben' klicken";
                     }
                 } else if (errorName === "NotFoundError" || errorMsg.includes("notfound")) {
-                    userMsg = "🎙️ Kein Mikrophon erkannt - bitte verbinde ein externes Gerät";
+                    userMsg = "ðŸŽ™ï¸ Kein Mikrophon erkannt - bitte verbinde ein externes GerÃ¤t";
                 } else if (errorName === "NotSupportedError") {
-                    userMsg = "⚠️ Dein Browser unterstützt Sprachaufnahme nicht (nutze Safari auf iOS oder Chrome auf Android)";
+                    userMsg = "âš ï¸ Dein Browser unterstÃ¼tzt Sprachaufnahme nicht (nutze Safari auf iOS oder Chrome auf Android)";
                 } else if (errorName === "SecurityError") {
-                    userMsg = "🔒 Sicherheitsfehler - HTTPS ist erforderlich";
+                    userMsg = "ðŸ”’ Sicherheitsfehler - HTTPS ist erforderlich";
                 }
 
-                console.error('🔴 Zeige Error:', userMsg);
+                console.error('ðŸ”´ Zeige Error:', userMsg);
                 showError(userMsg);
                 isRecording = false;
             }
         }
 
         // ============================================
-        // 🛑 ERWEITERTE MICROPHONE-CLEANUP (V1.378+)
-        // ✅ SAUBER: Explizite Nullifizierung, besseres Logging
-        // ✅ CHROME FIX: recognition.stop() IMMER aufrufen (nicht nur wenn isRecording)
+        // ðŸ›‘ ERWEITERTE MICROPHONE-CLEANUP (V1.378+)
+        // âœ… SAUBER: Explizite Nullifizierung, besseres Logging
+        // âœ… CHROME FIX: recognition.stop() IMMER aufrufen (nicht nur wenn isRecording)
         // ============================================
         function stopAllAudio() {
-            console.log('🛑 stopAllAudio() aufgerufen');
+            console.log('ðŸ›‘ stopAllAudio() aufgerufen');
             try {
                 // 1. Stop MediaRecorder (falls vorhanden)
                 if (mediaRecorder) {
-                    console.log('⏹️ Stoppe MediaRecorder...');
+                    console.log('â¹ï¸ Stoppe MediaRecorder...');
                     if (mediaRecorder.state !== 'inactive') {
                         mediaRecorder.stop();
                     }
@@ -1512,45 +1512,45 @@
                 }
 
                 // 2. Stop Web Speech API (IMMER aufrufen, nicht nur wenn isRecording!)
-                // ✅ FIX: recognition.stop() muss IMMER aufgerufen werden
+                // âœ… FIX: recognition.stop() muss IMMER aufgerufen werden
                 if (recognition) {
                     try {
-                        console.log('🎤 Stoppe Web Speech Recognition...');
+                        console.log('ðŸŽ¤ Stoppe Web Speech Recognition...');
                         recognition.stop();
                     } catch (e) {
-                        console.warn('⚠️ Recognition.stop() Fehler:', e.message);
+                        console.warn('âš ï¸ Recognition.stop() Fehler:', e.message);
                     }
                 }
 
                 // 3. Stop alle Audio Tracks EXPLIZIT
                 if (audioStream) {
-                    console.log('🎧 Stoppe Audio Stream Tracks...');
+                    console.log('ðŸŽ§ Stoppe Audio Stream Tracks...');
                     audioStream.getTracks().forEach(track => {
                         console.log(`   - ${track.kind} track: stopped`);
                         try {
                             track.stop();
                         } catch (trackError) {
-                            console.warn(`   ⚠️ Fehler beim Stoppen: ${trackError.message}`);
+                            console.warn(`   âš ï¸ Fehler beim Stoppen: ${trackError.message}`);
                         }
                     });
-                    audioStream = null;  // 🎯 WICHTIG: Stream-Referenz nullifizieren
-                    console.log('✅ Alle Audio Tracks gestoppt und freigegeben');
+                    audioStream = null;  // ðŸŽ¯ WICHTIG: Stream-Referenz nullifizieren
+                    console.log('âœ… Alle Audio Tracks gestoppt und freigegeben');
                 }
 
                 isRecording = false;
 
             } catch (err) {
-                console.error('🔴 Fehler beim Audio-Cleanup:', err.message);
+                console.error('ðŸ”´ Fehler beim Audio-Cleanup:', err.message);
             }
         }
 
         // ============================================
-        // 🧹 HELPER: Gebe ALLE Audio-Ressourcen frei
+        // ðŸ§¹ HELPER: Gebe ALLE Audio-Ressourcen frei
         // ============================================
         function releaseAudioResources() {
-            console.log('🔄 Gebe alle Audio-Ressourcen frei...');
+            console.log('ðŸ”„ Gebe alle Audio-Ressourcen frei...');
             try {
-                // Entferne Event-Listener für Audio-Tracks
+                // Entferne Event-Listener fÃ¼r Audio-Tracks
                 if (audioStream && audioStream.getTracks) {
                     audioStream.getTracks().forEach(track => {
                         try {
@@ -1571,20 +1571,20 @@
                 audioStream = null;
                 audioChunks = [];
 
-                // 🔐 iOS FIX: Nullifiziere Recognition und erstelle neues Objekt
+                // ðŸ” iOS FIX: Nullifiziere Recognition und erstelle neues Objekt
                 // Das hilft iOS das Mikrofon komplett freizugeben
                 recognition = null;
-                console.log('🔧 Re-initialisiere Recognition für iOS-Kompatibilität...');
+                console.log('ðŸ”§ Re-initialisiere Recognition fÃ¼r iOS-KompatibilitÃ¤t...');
                 initializeRecognition();
 
-                console.log('✅ Alle Audio-Ressourcen freigegeben');
+                console.log('âœ… Alle Audio-Ressourcen freigegeben');
             } catch (err) {
-                console.error('⚠️ Fehler beim Freigeben von Ressourcen:', err);
+                console.error('âš ï¸ Fehler beim Freigeben von Ressourcen:', err);
             }
         }
 
-        // 🔐 iOS SPEZIFISCH: Timeout-Cleanup für wenn Device gesperrt wird
-        // iOS sendet visibilitychange nicht zuverlässig beim Sperren
+        // ðŸ” iOS SPEZIFISCH: Timeout-Cleanup fÃ¼r wenn Device gesperrt wird
+        // iOS sendet visibilitychange nicht zuverlÃ¤ssig beim Sperren
         let microphoneTimeoutId = null;
         function startMicrophoneWatchdog() {
             // Stoppe alten Timeout falls vorhanden
@@ -1592,47 +1592,47 @@
                 clearTimeout(microphoneTimeoutId);
             }
 
-            // Starte neuen Timeout: Nach 5 Sekunden Inaktivität → Cleanup
+            // Starte neuen Timeout: Nach 5 Sekunden InaktivitÃ¤t â†’ Cleanup
             microphoneTimeoutId = setTimeout(() => {
-                console.log('⏰ iOS Watchdog: Stoppe Mikrofon nach Inaktivität');
+                console.log('â° iOS Watchdog: Stoppe Mikrofon nach InaktivitÃ¤t');
                 stopAllAudio();
             }, 5000);
         }
 
-        // 📵 Event 1: Wenn Handy gesperrt / App minimiert wird
+        // ðŸ“µ Event 1: Wenn Handy gesperrt / App minimiert wird
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
-                console.log('📵 App in Hintergrund - cleanup Audio');
-                // ✅ CHROME FIX: Stoppe IMMER, nicht nur wenn isRecording
+                console.log('ðŸ“µ App in Hintergrund - cleanup Audio');
+                // âœ… CHROME FIX: Stoppe IMMER, nicht nur wenn isRecording
                 stopAllAudio();
             } else {
-                // App kommt zurück: Starte Watchdog
-                console.log('👁️ App zurück - starte Mikrofon-Watchdog');
+                // App kommt zurÃ¼ck: Starte Watchdog
+                console.log('ðŸ‘ï¸ App zurÃ¼ck - starte Mikrofon-Watchdog');
                 startMicrophoneWatchdog();
             }
         });
 
-        // 👋 Event 2: Wenn Benutzer Seite verlässt / Browser-Tab schließt
+        // ðŸ‘‹ Event 2: Wenn Benutzer Seite verlÃ¤sst / Browser-Tab schlieÃŸt
         window.addEventListener('pagehide', () => {
-            console.log('👋 Seite wird verlassen - cleanup Microphone');
-            // ✅ CHROME FIX: Stoppe IMMER
+            console.log('ðŸ‘‹ Seite wird verlassen - cleanup Microphone');
+            // âœ… CHROME FIX: Stoppe IMMER
             stopAllAudio();
         });
 
-        // 🔄 Event 3: Wenn Browser-Tab aktualisiert wird
+        // ðŸ”„ Event 3: Wenn Browser-Tab aktualisiert wird
         window.addEventListener('beforeunload', () => {
             if (recognition) recognition.stop();
             stopAllAudio();
         });
 
-        // 📱 Event 4: iOS-spezifisch - beim Fokus verlieren
+        // ðŸ“± Event 4: iOS-spezifisch - beim Fokus verlieren
         window.addEventListener('blur', () => {
-            console.log('💤 Window blur - iOS Watchdog startet');
+            console.log('ðŸ’¤ Window blur - iOS Watchdog startet');
             startMicrophoneWatchdog();
         });
 
         window.addEventListener('focus', () => {
-            console.log('👁️ Window focus - iOS Watchdog gestoppt');
+            console.log('ðŸ‘ï¸ Window focus - iOS Watchdog gestoppt');
             if (microphoneTimeoutId) {
                 clearTimeout(microphoneTimeoutId);
                 microphoneTimeoutId = null;
@@ -1645,7 +1645,7 @@
                 isRecording = false;
 
                 const btn = document.getElementById("recordingButton");
-                btn.textContent = "🎤 Aufnahme starten";
+                btn.textContent = "ðŸŽ¤ Aufnahme starten";
                 btn.classList.remove("recording");
                 btn.disabled = true;
 
@@ -1656,22 +1656,22 @@
         }
 
         // ============================================
-        // 🧹 TEXT MIT GROQ STRUKTURIEREN (nicht Audio!)
+        // ðŸ§¹ TEXT MIT GROQ STRUKTURIEREN (nicht Audio!)
         // ============================================
         async function processWithGroq(rohText) {
-            console.log('🧹 processWithGroq() aufgerufen mit:', rohText);
+            console.log('ðŸ§¹ processWithGroq() aufgerufen mit:', rohText);
 
-            // ✅ CHROME FIX: Gebe Mikrofon SOFORT frei sobald Verarbeitung startet!
-            console.log('🎤 Gebe Mikrofon frei nach Aufnahme...');
+            // âœ… CHROME FIX: Gebe Mikrofon SOFORT frei sobald Verarbeitung startet!
+            console.log('ðŸŽ¤ Gebe Mikrofon frei nach Aufnahme...');
             stopAllAudio();
 
             const status = document.getElementById("status");
-            status.textContent = "🧹 Strukturiere mit Backend...";
+            status.textContent = "ðŸ§¹ Strukturiere mit Backend...";
 
             try {
-                console.log('📤 Sende Text zum Backend-Proxy: ' + rohText.substring(0, 100));
+                console.log('ðŸ“¤ Sende Text zum Backend-Proxy: ' + rohText.substring(0, 100));
 
-                // 🔐 NUTZE BACKEND-PROXY STATT DIREKTER GROQ-AUFRUF (sicherer!)
+                // ðŸ” NUTZE BACKEND-PROXY STATT DIREKTER GROQ-AUFRUF (sicherer!)
                 const backendRes = await fetch("/api/structure-text", {
                     method: "POST",
                     headers: {
@@ -1682,39 +1682,39 @@
                     })
                 });
 
-                console.log('📨 Backend Response Status:', backendRes.status);
+                console.log('ðŸ“¨ Backend Response Status:', backendRes.status);
 
                 const backendData = await backendRes.json();
-                console.log('📨 Backend Response:', backendData);
+                console.log('ðŸ“¨ Backend Response:', backendData);
 
                 if (!backendRes.ok || !backendData.success) {
                     const errorMsg = backendData.error || 'Unbekannter Fehler';
-                    console.error('🔴 Backend Fehler:', errorMsg);
+                    console.error('ðŸ”´ Backend Fehler:', errorMsg);
                     throw new Error(errorMsg);
                 }
 
                 recognizedText = backendData.text;
-                console.log('✅ Backend strukturiert:', recognizedText.substring(0, 150));
+                console.log('âœ… Backend strukturiert:', recognizedText.substring(0, 150));
 
                 // Zeige Review-Phase
-                console.log('📋 Rufe showReviewPhase auf');
+                console.log('ðŸ“‹ Rufe showReviewPhase auf');
                 showReviewPhase(recognizedText);
 
             } catch (err) {
-                console.error('❌ processWithGroq Fehler:', err);
+                console.error('âŒ processWithGroq Fehler:', err);
                 console.error('   Message:', err.message);
                 console.error('   Stack:', err.stack);
 
-                // 🔴 ZEIGE FEHLER DIREKT AUF BILDSCHIRM FÜR DEBUGGING
+                // ðŸ”´ ZEIGE FEHLER DIREKT AUF BILDSCHIRM FÃœR DEBUGGING
                 const errorMsg = `
-❌ GROQ FEHLER:
+âŒ GROQ FEHLER:
 
 ${err.message}
 
-📝 Erkannter Text war:
+ðŸ“ Erkannter Text war:
 "${rohText}"
 
-💡 Mögliche Lösung:
+ðŸ’¡ MÃ¶gliche LÃ¶sung:
 - Refresh die Seite (F5)
 - Versuche es nochmal
 - Sprich langsamer/deutlicher
@@ -1733,7 +1733,7 @@ ${err.message}
 
                 const btn = document.getElementById("recordingButton");
                 if (btn) {
-                    btn.textContent = "🎤 Aufnahme starten";
+                    btn.textContent = "ðŸŽ¤ Aufnahme starten";
                     btn.disabled = false;
                     btn.classList.remove("recording");
                 }
@@ -1761,7 +1761,7 @@ ${err.message}
                     aktion = line.replace('Aktion:', '').trim();
                     normalisierterText += line + '\n';
                 } else if (line.startsWith('Palettenart:')) {
-                    // 🎯 NORMALISIERE PALETTENART
+                    // ðŸŽ¯ NORMALISIERE PALETTENART
                     const palettenartRaw = line.replace('Palettenart:', '').trim();
                     const erkennungsResult = normalisierePalette(palettenartRaw);
 
@@ -1786,7 +1786,7 @@ ${err.message}
             document.querySelectorAll(".phase").forEach(p => p.classList.remove("active"));
             document.getElementById("reviewPhase").classList.add("active");
 
-            // 🎯 ZEIGE NORMALISIERTEN TEXT MIT KORREKTEN PALETTENNAMEN
+            // ðŸŽ¯ ZEIGE NORMALISIERTEN TEXT MIT KORREKTEN PALETTENNAMEN
             const normalisierterText = erstelleNormalisierthenText(text);
             document.getElementById("textDisplay").textContent = normalisierterText;
             document.getElementById("errorBox").style.display = "none";
@@ -1804,37 +1804,37 @@ ${err.message}
                 }
             }
 
-            // Fülle die bearbeitbaren Felder
+            // FÃ¼lle die bearbeitbaren Felder
             document.getElementById("editCustomerName").value = kundenname;
             document.getElementById("editCustomerNumber").value = kundennummer;
 
             const saveBtn = document.getElementById("saveBtn");
             saveBtn.disabled = false;
-            saveBtn.textContent = "✅ Speichern";
+            saveBtn.textContent = "âœ… Speichern";
         }
 
         function discardAndRestart() {
-            console.log('🔄 discardAndRestart() gestartet');
+            console.log('ðŸ”„ discardAndRestart() gestartet');
 
             try {
-                // ✅ WICHTIG: Stoppe Mikrofon SOFORT bevor alles zurückgesetzt wird!
+                // âœ… WICHTIG: Stoppe Mikrofon SOFORT bevor alles zurÃ¼ckgesetzt wird!
                 stopAllAudio();
                 releaseAudioResources();
 
-                // 📱 iOS FIX: Starte Watchdog für Hintergrund-Cleanup
-                console.log('⏰ Watchdog wird nach Verwerfen gestartet');
+                // ðŸ“± iOS FIX: Starte Watchdog fÃ¼r Hintergrund-Cleanup
+                console.log('â° Watchdog wird nach Verwerfen gestartet');
                 try {
                     if (typeof startMicrophoneWatchdog === 'function') {
                         startMicrophoneWatchdog();
                     } else {
-                        console.warn('⚠️ startMicrophoneWatchdog ist keine Funktion');
+                        console.warn('âš ï¸ startMicrophoneWatchdog ist keine Funktion');
                     }
                 } catch (watchdogErr) {
-                    console.warn('⚠️ Fehler beim Starten des Watchdog:', watchdogErr.message);
+                    console.warn('âš ï¸ Fehler beim Starten des Watchdog:', watchdogErr.message);
                     // Nicht kritisch - weiter gehts
                 }
             } catch (cleanupErr) {
-                console.error('⚠️ Fehler beim Cleanup:', cleanupErr.message);
+                console.error('âš ï¸ Fehler beim Cleanup:', cleanupErr.message);
                 // Weiter gehts trotz Fehler
             }
 
@@ -1842,7 +1842,7 @@ ${err.message}
             audioChunks = [];
             isRecording = false;
 
-            // 🛑 RESET ALLE AUSWAHL-VARIABLEN für nächste Aufnahme
+            // ðŸ›‘ RESET ALLE AUSWAHL-VARIABLEN fÃ¼r nÃ¤chste Aufnahme
             erkannteAuswahlPaletten = [];
             wartendeAuswahlPaletten = [];
             aktuelleAuswahlPalette = null;
@@ -1850,7 +1850,7 @@ ${err.message}
 
             const btn = document.getElementById("recordingButton");
             if (btn) {
-                btn.textContent = "🎤 Aufnahme starten";
+                btn.textContent = "ðŸŽ¤ Aufnahme starten";
                 btn.disabled = false;
                 btn.classList.remove("recording");
             }
@@ -1861,15 +1861,15 @@ ${err.message}
                 status.className = "";
             }
 
-            // ✅ WICHTIG: Nutze setPhase() um Logout-Button zu zeigen!
-            console.log('🔄 Kehre zur recordingPhase zurück mit setPhase()');
+            // âœ… WICHTIG: Nutze setPhase() um Logout-Button zu zeigen!
+            console.log('ðŸ”„ Kehre zur recordingPhase zurÃ¼ck mit setPhase()');
             try {
                 setPhase('recordingPhase');
-                console.log('✅ setPhase("recordingPhase") erfolgreich aufgerufen');
+                console.log('âœ… setPhase("recordingPhase") erfolgreich aufgerufen');
             } catch (phaseErr) {
-                console.error('❌ Fehler beim Setzen der Phase:', phaseErr.message);
+                console.error('âŒ Fehler beim Setzen der Phase:', phaseErr.message);
                 // Fallback: Zeige Phase manuell an
-                console.log('🔧 Fallback: Zeige Phase manuell an');
+                console.log('ðŸ”§ Fallback: Zeige Phase manuell an');
                 document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
                 const recordingPhase = document.getElementById('recordingPhase');
                 if (recordingPhase) {
@@ -1886,20 +1886,20 @@ ${err.message}
         // APP BEENDEN FUNKTION
         // ============================================
         function beendenApp() {
-            console.log('🛑 App wird beendet...');
+            console.log('ðŸ›‘ App wird beendet...');
 
             // 1. STOPPLE UND GEBE MIKROFON FREI
             try {
                 // Stoppe Web Speech API Recognition
                 if (recognition && isRecording) {
-                    console.log('🎤 Stoppe Speech Recognition');
+                    console.log('ðŸŽ¤ Stoppe Speech Recognition');
                     recognition.stop();
                     isRecording = false;
                 }
 
                 // Stopppe Audio Stream (falls noch aktiv)
                 if (audioStream) {
-                    console.log('🎤 Stoppe Audio Stream Tracks');
+                    console.log('ðŸŽ¤ Stoppe Audio Stream Tracks');
                     audioStream.getTracks().forEach(track => {
                         track.stop();
                     });
@@ -1908,20 +1908,20 @@ ${err.message}
 
                 // MediaRecorder stoppen (falls noch aktiv)
                 if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                    console.log('🎤 Stoppe MediaRecorder');
+                    console.log('ðŸŽ¤ Stoppe MediaRecorder');
                     mediaRecorder.stop();
                 }
 
-                console.log('✅ Mikrofon komplett freigegeben');
+                console.log('âœ… Mikrofon komplett freigegeben');
             } catch (err) {
-                console.error('⚠️ Fehler beim Stoppen des Mikrofons:', err);
+                console.error('âš ï¸ Fehler beim Stoppen des Mikrofons:', err);
             }
 
             // 2. SEITE NEU LADEN
-            console.log('🔄 Lade Seite neu...');
+            console.log('ðŸ”„ Lade Seite neu...');
             setTimeout(() => {
                 location.reload();
-            }, 500); // Kurze Verzögerung um Logs zu sehen
+            }, 500); // Kurze VerzÃ¶gerung um Logs zu sehen
         }
 
         function restartRecording() {
@@ -1968,7 +1968,7 @@ ${err.message}
                 }
 
                 if (palettenartRaw && menge) {
-                    // 🎯 NORMALISIERE PALETTENART
+                    // ðŸŽ¯ NORMALISIERE PALETTENART
                     const erkennungsResult = normalisierePalette(palettenartRaw);
 
                     if (!erkennungsResult.gefunden) {
@@ -1992,18 +1992,18 @@ ${err.message}
                                 menge: parseInt(menge),
                                 aktion
                             };
-                            // 🛑 NUR zu aktuelleAuswahlPalette, NICHT zu wartendeAuswahlPaletten!
-                            // (wartendeAuswahlPaletten ist für Paletten mit Kandidaten, nicht für nicht erkannte)
-                            aktuelleAuswahlPalette = palettenData;  // 🎯 WICHTIG: Speichere für Modal
+                            // ðŸ›‘ NUR zu aktuelleAuswahlPalette, NICHT zu wartendeAuswahlPaletten!
+                            // (wartendeAuswahlPaletten ist fÃ¼r Paletten mit Kandidaten, nicht fÃ¼r nicht erkannte)
+                            aktuelleAuswahlPalette = palettenData;  // ðŸŽ¯ WICHTIG: Speichere fÃ¼r Modal
 
-                            // 🎯 SPEICHERE ERKANNTE PALETTEN JETZT, BEVOR ERROR GEWORFEN WIRD!
-                            console.log('🔍 DEBUG: Speichere erkannteAuswahlPaletten vor Error');
+                            // ðŸŽ¯ SPEICHERE ERKANNTE PALETTEN JETZT, BEVOR ERROR GEWORFEN WIRD!
+                            console.log('ðŸ” DEBUG: Speichere erkannteAuswahlPaletten vor Error');
                             console.log('   palettenListe vor speichern:', palettenListe);
                             erkannteAuswahlPaletten = palettenListe;
-                            console.log('✅ Erkannte Paletten vor Error gespeichert:', erkannteAuswahlPaletten);
+                            console.log('âœ… Erkannte Paletten vor Error gespeichert:', erkannteAuswahlPaletten);
 
                             showPaletteSelectionAllPalettes(palettenartRaw);
-                            throw new Error(`⚠️ Palette nicht erkannt: "${palettenartRaw}" – bitte auswählen`);
+                            throw new Error(`âš ï¸ Palette nicht erkannt: "${palettenartRaw}" â€“ bitte auswÃ¤hlen`);
                         }
                     } else {
                         // Eindeutige Palette erkannt
@@ -2018,33 +2018,33 @@ ${err.message}
                 }
             }
 
-            // 🎯 SPEICHERE ERKANNTE PALETTEN SOFORT, BEVOR ERROR GEWORFEN WIRD!
+            // ðŸŽ¯ SPEICHERE ERKANNTE PALETTEN SOFORT, BEVOR ERROR GEWORFEN WIRD!
             // Das ist KRITISCH: Wenn unten eine Error geworfen wird, brauchen wir diese Daten noch
-            console.log('🔍 DEBUG: Speichere erkannteAuswahlPaletten nach Schleife');
+            console.log('ðŸ” DEBUG: Speichere erkannteAuswahlPaletten nach Schleife');
             console.log('   palettenListe vor speichern:', palettenListe);
             erkannteAuswahlPaletten = palettenListe;
-            console.log('✅ Erkannte Paletten gespeichert:', erkannteAuswahlPaletten);
+            console.log('âœ… Erkannte Paletten gespeichert:', erkannteAuswahlPaletten);
 
             // Wenn wartende Auswahl existiert, unterbreche und zeige Dialog
             if (wartendeAuswahlPaletten.length > 0) {
                 showPaletteSelectionForCandidates(wartendeAuswahlPaletten[0]);
-                throw new Error(`⚠️ Palette nicht eindeutig erkannt – bitte auswählen`);
+                throw new Error(`âš ï¸ Palette nicht eindeutig erkannt â€“ bitte auswÃ¤hlen`);
             }
 
             // Validierung
             if (!kundenname && !kundennummer) {
-                throw new Error("⚠️ Kundenname oder Kundennummer erforderlich");
+                throw new Error("âš ï¸ Kundenname oder Kundennummer erforderlich");
             }
             if (palettenListe.length === 0) {
-                throw new Error("⚠️ Keine Palettenarten erkannt!");
+                throw new Error("âš ï¸ Keine Palettenarten erkannt!");
             }
 
             for (let p of palettenListe) {
                 if (!p.palettenart) {
-                    throw new Error("⚠️ Palettenart fehlt!");
+                    throw new Error("âš ï¸ Palettenart fehlt!");
                 }
                 if (!p.menge || isNaN(p.menge)) {
-                    throw new Error("⚠️ Menge fehlt oder ist ungültig!");
+                    throw new Error("âš ï¸ Menge fehlt oder ist ungÃ¼ltig!");
                 }
             }
 
@@ -2059,7 +2059,7 @@ ${err.message}
             const container = document.getElementById('paletteButtonsContainer');
             container.innerHTML = '';
 
-            // 🎯 SPEICHERE DIE AKTUELLEN DATEN, BEVOR SIE AUS DEM ARRAY GELÖSCHT WERDEN
+            // ðŸŽ¯ SPEICHERE DIE AKTUELLEN DATEN, BEVOR SIE AUS DEM ARRAY GELÃ–SCHT WERDEN
             aktuelleAuswahlPalette = palettenData;
 
             // Zeige nur die Kandidaten
@@ -2087,9 +2087,9 @@ ${err.message}
         function showPaletteSelectionAllPalettes(unerkannterText) {
             const modal = document.getElementById('paletteSelectionModal');
             const container = document.getElementById('paletteButtonsContainer');
-            container.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #666; font-size: 14px;">Unbekannt: "${unerkannterText}"<br>Bitte wähle eine Palette:</p>`;
+            container.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #666; font-size: 14px;">Unbekannt: "${unerkannterText}"<br>Bitte wÃ¤hle eine Palette:</p>`;
 
-            // 🎯 WICHTIG: Speichere die aktuellen Daten wenn noch vorhanden
+            // ðŸŽ¯ WICHTIG: Speichere die aktuellen Daten wenn noch vorhanden
             // Wenn aktuelleAuswahlPalette noch null ist, nutze wartendeAuswahlPaletten[0]
             if (!aktuelleAuswahlPalette && wartendeAuswahlPaletten.length > 0) {
                 aktuelleAuswahlPalette = wartendeAuswahlPaletten[0];
@@ -2121,28 +2121,28 @@ ${err.message}
             document.getElementById('paletteSelectionModal').style.display = 'none';
             selectedPalette = palette;
 
-            console.log('🎯 Palette ausgewählt:', palette);
+            console.log('ðŸŽ¯ Palette ausgewÃ¤hlt:', palette);
             console.log('   aktuelleAuswahlPalette:', aktuelleAuswahlPalette);
             console.log('   wartendeAuswahlPaletten:', wartendeAuswahlPaletten);
 
-            // 🎯 VERWENDE aktuelleAuswahlPalette ALS PRIMÄR-QUELLE
+            // ðŸŽ¯ VERWENDE aktuelleAuswahlPalette ALS PRIMÃ„R-QUELLE
             if (aktuelleAuswahlPalette) {
-                console.log('✅ Nutze aktuelleAuswahlPalette');
+                console.log('âœ… Nutze aktuelleAuswahlPalette');
                 aktuelleAuswahlPalette.palettenart = palette;
 
-                // 🛑 WICHTIG: Entferne diese Palette auch aus wartendeAuswahlPaletten
+                // ðŸ›‘ WICHTIG: Entferne diese Palette auch aus wartendeAuswahlPaletten
                 // damit sie nicht doppelt gespeichert wird!
                 wartendeAuswahlPaletten = wartendeAuswahlPaletten.filter(item =>
                     item.palettenartRaw !== aktuelleAuswahlPalette.palettenartRaw
                 );
-                console.log('🛑 Entferne Palette aus Warteschlange um Duplikat zu vermeiden');
+                console.log('ðŸ›‘ Entferne Palette aus Warteschlange um Duplikat zu vermeiden');
             } else if (wartendeAuswahlPaletten.length > 0) {
                 // Fallback nur wenn aktuelleAuswahlPalette nicht vorhanden
-                console.log('✅ Nutze wartendeAuswahlPaletten als Fallback');
+                console.log('âœ… Nutze wartendeAuswahlPaletten als Fallback');
                 wartendeAuswahlPaletten[0].palettenart = palette;
                 wartendeAuswahlPaletten.shift();
             } else {
-                console.error('❌ Fehler: Keine Palette-Daten vorhanden!');
+                console.error('âŒ Fehler: Keine Palette-Daten vorhanden!');
                 showError('Fehler bei Palette-Auswahl. Bitte versuche es erneut.');
                 return;
             }
@@ -2160,13 +2160,13 @@ ${err.message}
         }
 
         // ============================================
-        // KUNDENBESTÄTIGUNG FUNKTIONEN
+        // KUNDENBESTÃ„TIGUNG FUNKTIONEN
         // ============================================
         async function pruefeAhnlicheKunden(kundenname) {
             if (!kundenname) return null;
 
             try {
-                console.log('🔍 Prüfe ähnliche Kunden für:', kundenname);
+                console.log('ðŸ” PrÃ¼fe Ã¤hnliche Kunden fÃ¼r:', kundenname);
 
                 const response = await fetch('/api/find-similar-customers', {
                     method: 'POST',
@@ -2175,23 +2175,23 @@ ${err.message}
                 });
 
                 const result = await response.json();
-                console.log('🔍 API-Antwort:', JSON.stringify(result));
+                console.log('ðŸ” API-Antwort:', JSON.stringify(result));
 
                 if (result.found && result.candidates && result.candidates.length > 0) {
-                    console.log('✅ Ähnlicher Kunde gefunden:', result.candidates[0]);
+                    console.log('âœ… Ã„hnlicher Kunde gefunden:', result.candidates[0]);
                     return result.candidates[0];
                 }
 
-                console.log('❌ Kein ähnlicher Kunde gefunden');
+                console.log('âŒ Kein Ã¤hnlicher Kunde gefunden');
                 return null;
 
             } catch (err) {
-                console.error('❌ Fehler beim Prüfen ähnlicher Kunden:', err);
+                console.error('âŒ Fehler beim PrÃ¼fen Ã¤hnlicher Kunden:', err);
                 return null;
             }
         }
 
-        // Ähnlichkeitsprüfung im Frontend (wie Backend, aber mit vollständiger Levenshtein-Logik)
+        // Ã„hnlichkeitsprÃ¼fung im Frontend (wie Backend, aber mit vollstÃ¤ndiger Levenshtein-Logik)
         function berechneStringAhnlichkeit(s1, s2) {
             const str1 = s1.toLowerCase().trim();
             const str2 = s2.toLowerCase().trim();
@@ -2205,16 +2205,16 @@ ${err.message}
 
             if (str1Clean === str2Clean) return 95;
 
-            // 3. SUBSTRING-MATCH: Wenn ein Name vollständig im anderen enthalten ist
+            // 3. SUBSTRING-MATCH: Wenn ein Name vollstÃ¤ndig im anderen enthalten ist
             if (str1.includes(str2) || str2.includes(str1)) {
                 return 90;
             }
 
-            // 4. WORT-BASIERTE ÄHNLICHKEIT
+            // 4. WORT-BASIERTE Ã„HNLICHKEIT
             const woerter1 = str1.split(/[\s\-]+/).filter(w => w.length > 0);
             const woerter2 = str2.split(/[\s\-]+/).filter(w => w.length > 0);
 
-            // Zähle gemeinsame Wörter
+            // ZÃ¤hle gemeinsame WÃ¶rter
             const gemeinsameListe = [];
             for (let w1 of woerter1) {
                 if (woerter2.includes(w1) && w1.length >= 3) {
@@ -2222,12 +2222,12 @@ ${err.message}
                 }
             }
 
-            // Wenn Wörter gemeinsam sind
+            // Wenn WÃ¶rter gemeinsam sind
             if (gemeinsameListe.length > 0) {
-                return 85;  // Starker Match für gemeinsame Wörter
+                return 85;  // Starker Match fÃ¼r gemeinsame WÃ¶rter
             }
 
-            // 5. LEVENSHTEIN-ÄHNLICHE DISTANZ (Zeichenmatches)
+            // 5. LEVENSHTEIN-Ã„HNLICHE DISTANZ (Zeichenmatches)
             let matches = 0;
             for (let char of str1Clean) {
                 if (str2Clean.includes(char)) matches++;
@@ -2248,7 +2248,7 @@ ${err.message}
                 if (!response.ok) return null;
 
                 const allCustomers = await response.json();
-                console.log('📋 Alle Kunden:', allCustomers);
+                console.log('ðŸ“‹ Alle Kunden:', allCustomers);
 
                 let besterMatch = null;
                 let besteAhnlichkeit = 60;  // Schwellenwert
@@ -2309,7 +2309,7 @@ ${err.message}
             try {
                 const palettenListe = validateText(recognizedText);
 
-                // Verwende die vom Modal ausgewählte Kundennummer
+                // Verwende die vom Modal ausgewÃ¤hlte Kundennummer
                 const korrigierteKundennummer = document.getElementById("editCustomerNumber").value.trim();
 
                 for (let item of palettenListe) {
@@ -2326,7 +2326,7 @@ ${err.message}
 
             } catch (err) {
                 const errorBox = document.getElementById("errorBox");
-                document.getElementById("errorMessage").textContent = "❌ " + err.message;
+                document.getElementById("errorMessage").textContent = "âŒ " + err.message;
                 errorBox.style.display = "block";
             }
         }
@@ -2361,7 +2361,7 @@ ${err.message}
 
                 erfolgreich++;
 
-                // Speichere für Zusammenfassung
+                // Speichere fÃ¼r Zusammenfassung
                 gespeichertePaletten.push({
                     menge: palettenData.menge,
                     palettenart: palettenData.palettenart,
@@ -2396,21 +2396,21 @@ ${err.message}
 
             // Baue die Zusammenfassung
             for (let kundenname in gruppiert) {
-                summaryHTML += `<strong style="color: #333; display: block; margin-top: 12px; margin-bottom: 6px;">📦 ${kundenname}:</strong>`;
+                summaryHTML += `<strong style="color: #333; display: block; margin-top: 12px; margin-bottom: 6px;">ðŸ“¦ ${kundenname}:</strong>`;
 
                 for (let p of gruppiert[kundenname]) {
                     const mengeText = p.menge === 1 ? 'Palette' : 'Paletten';
 
                     // Bestimme Aktion und Symbol
                     let aktion = 'mitgenommen';
-                    let symbol = '➕';
+                    let symbol = 'âž•';
 
                     if (p.aktion) {
                         const aktionLower = p.aktion.toLowerCase();
-                        if (aktionLower.includes('zurück') || aktionLower.includes('zuruck') ||
+                        if (aktionLower.includes('zurÃ¼ck') || aktionLower.includes('zuruck') ||
                             aktionLower.includes('erhalten') || aktionLower.includes('abgegeben')) {
-                            aktion = 'zurückgebracht';
-                            symbol = '➖';
+                            aktion = 'zurÃ¼ckgebracht';
+                            symbol = 'âž–';
                         }
                     }
 
@@ -2425,85 +2425,85 @@ ${err.message}
         async function saveToSupabase() {
             const saveBtn = document.getElementById("saveBtn");
             saveBtn.disabled = true;
-            saveBtn.textContent = "⏳ Wird gespeichert...";
+            saveBtn.textContent = "â³ Wird gespeichert...";
 
             try {
                 const palettenListe = validateText(recognizedText);
-                console.log('📋 Erkannte Palettengruppen:', palettenListe.length);
+                console.log('ðŸ“‹ Erkannte Palettengruppen:', palettenListe.length);
 
-                // 🎯 ÜBERSCHREIBE MIT KORRIGIERTEN WERTEN VOM USER
+                // ðŸŽ¯ ÃœBERSCHREIBE MIT KORRIGIERTEN WERTEN VOM USER
                 const korrigierterKundenname = document.getElementById("editCustomerName").value.trim();
                 const korrigierteKundennummer = document.getElementById("editCustomerNumber").value.trim();
 
-                console.log('✏️ Korrigierte Kundeninformationen:');
+                console.log('âœï¸ Korrigierte Kundeninformationen:');
                 console.log('   Kundenname:', korrigierterKundenname);
                 console.log('   Kundennummer:', korrigierteKundennummer);
 
-                // Überschreibe Kundenname und Kundennummer in allen Palettengruppen
+                // Ãœberschreibe Kundenname und Kundennummer in allen Palettengruppen
                 for (let item of palettenListe) {
                     if (korrigierterKundenname) item.kundenname = korrigierterKundenname;
                     if (korrigierteKundennummer) item.kundennummer = korrigierteKundennummer;
                 }
 
-                // 🎯 KUNDENPRÜFUNG: Sind ähnliche Kunden vorhanden?
+                // ðŸŽ¯ KUNDENPRÃœFUNG: Sind Ã¤hnliche Kunden vorhanden?
                 if (palettenListe.length > 0 && palettenListe[0].kundenname) {
                     const kundenname = palettenListe[0].kundenname;
-                    console.log('👤 Erkannter Kundenname:', kundenname);
+                    console.log('ðŸ‘¤ Erkannter Kundenname:', kundenname);
 
-                    // Prüfe auf ähnliche bereits existierende Kunden
+                    // PrÃ¼fe auf Ã¤hnliche bereits existierende Kunden
                     let ahnlicherKunde = await pruefeAhnlicheKunden(kundenname);
 
-                    // Falls API fehlschlägt, verwende Alternative
+                    // Falls API fehlschlÃ¤gt, verwende Alternative
                     if (!ahnlicherKunde) {
-                        console.log('🔄 API fehlgeschlagen, versuche Alternative...');
+                        console.log('ðŸ”„ API fehlgeschlagen, versuche Alternative...');
                         ahnlicherKunde = await pruefeAhnlicheKundenAlternativ(kundenname);
                     }
 
                     if (ahnlicherKunde) {
-                        console.log('✅✅ Zeige Kundenbestätigung-Modal');
-                        // Ähnlicher Kunde gefunden - zeige Bestätigungsdialog
+                        console.log('âœ…âœ… Zeige KundenbestÃ¤tigung-Modal');
+                        // Ã„hnlicher Kunde gefunden - zeige BestÃ¤tigungsdialog
                         showCustomerConfirmModal(kundenname, ahnlicherKunde.name);
                         saveBtn.disabled = false;
-                        saveBtn.textContent = "✅ Speichern";
-                        return;  // Warte auf Benutzerbestätigung
+                        saveBtn.textContent = "âœ… Speichern";
+                        return;  // Warte auf BenutzerbestÃ¤tigung
                     }
 
-                    console.log('➡️ Kein ähnlicher Kunde - speichere direkt ab');
+                    console.log('âž¡ï¸ Kein Ã¤hnlicher Kunde - speichere direkt ab');
                 }
 
-                // Kein ähnlicher Kunde gefunden - speichere direkt
+                // Kein Ã¤hnlicher Kunde gefunden - speichere direkt
                 await speichereZeilen(palettenListe);
 
             } catch (err) {
-                console.error('❌ Fehler in saveToSupabase:', err);
+                console.error('âŒ Fehler in saveToSupabase:', err);
                 const errorBox = document.getElementById("errorBox");
                 document.getElementById("errorMessage").textContent = err.message;
                 errorBox.style.display = "block";
 
                 const saveBtn = document.getElementById("saveBtn");
                 saveBtn.disabled = false;
-                saveBtn.textContent = "✅ Speichern";
+                saveBtn.textContent = "âœ… Speichern";
             }
         }
 
         async function saveToSupabaseWithSelected() {
             // Diese Funktion wird nach der Palettenauswahl aufgerufen
             try {
-                console.log('🔍 DEBUG saveToSupabaseWithSelected()');
+                console.log('ðŸ” DEBUG saveToSupabaseWithSelected()');
                 console.log('   erkannteAuswahlPaletten:', erkannteAuswahlPaletten);
                 console.log('   aktuelleAuswahlPalette:', aktuelleAuswahlPalette);
                 console.log('   wartendeAuswahlPaletten:', wartendeAuswahlPaletten);
 
-                // 🎯 ÜBERSCHREIBE MIT KORRIGIERTEN WERTEN VOM USER
+                // ðŸŽ¯ ÃœBERSCHREIBE MIT KORRIGIERTEN WERTEN VOM USER
                 const korrigierterKundenname = document.getElementById("editCustomerName").value.trim();
                 const korrigierteKundennummer = document.getElementById("editCustomerNumber").value.trim();
 
-                // 🎯 STARTE MIT DEN BEREITS ERKANNTEN PALETTEN!
+                // ðŸŽ¯ STARTE MIT DEN BEREITS ERKANNTEN PALETTEN!
                 // Das verhindert, dass erkannte Paletten ignoriert werden, wenn eine unbekannte Palette auswahl kommt
                 const palettenListe = [...erkannteAuswahlPaletten];
-                console.log('📋 palettenListe nach erkannteAuswahlPaletten:', palettenListe);
+                console.log('ðŸ“‹ palettenListe nach erkannteAuswahlPaletten:', palettenListe);
 
-                // 🎯 SPEICHERE AKTUELLE PALETTE (mit Benutzer-Auswahl korrigiert)
+                // ðŸŽ¯ SPEICHERE AKTUELLE PALETTE (mit Benutzer-Auswahl korrigiert)
                 if (aktuelleAuswahlPalette) {
                     palettenListe.push({
                         kundenname: korrigierterKundenname || aktuelleAuswahlPalette.kundenname,
@@ -2512,17 +2512,17 @@ ${err.message}
                         menge: aktuelleAuswahlPalette.menge,
                         aktion: aktuelleAuswahlPalette.aktion
                     });
-                    console.log('✅ Verwende aktuelleAuswahlPalette:', aktuelleAuswahlPalette);
+                    console.log('âœ… Verwende aktuelleAuswahlPalette:', aktuelleAuswahlPalette);
 
-                    // 🛑 WICHTIG: Entferne diese Palette aus wartendeAuswahlPaletten um Doppel-Speicherung zu verhindern!
+                    // ðŸ›‘ WICHTIG: Entferne diese Palette aus wartendeAuswahlPaletten um Doppel-Speicherung zu verhindern!
                     // Nutze palettenartRaw zum Vergleichen, da wartendeAuswahlPaletten dieses Feld hat
                     wartendeAuswahlPaletten = wartendeAuswahlPaletten.filter(item =>
                         item.palettenartRaw !== aktuelleAuswahlPalette.palettenartRaw
                     );
-                    console.log('🛑 Entferne Palette aus Warteschlange um Duplikat zu vermeiden');
+                    console.log('ðŸ›‘ Entferne Palette aus Warteschlange um Duplikat zu vermeiden');
                 }
 
-                // 🎯 WICHTIG: AUCH DIE WARTENDEN PALETTEN SPEICHERN (die bereits korrekt erkannt wurden!)
+                // ðŸŽ¯ WICHTIG: AUCH DIE WARTENDEN PALETTEN SPEICHERN (die bereits korrekt erkannt wurden!)
                 for (let item of wartendeAuswahlPaletten) {
                     palettenListe.push({
                         kundenname: korrigierterKundenname || item.kundenname,
@@ -2531,11 +2531,11 @@ ${err.message}
                         menge: item.menge,
                         aktion: item.aktion
                     });
-                    console.log('✅ Speichere wartende Palette:', item.palettenart);
+                    console.log('âœ… Speichere wartende Palette:', item.palettenart);
                 }
 
                 if (palettenListe.length > 0) {
-                    console.log('📊 Speichere insgesamt', palettenListe.length, 'Paletten');
+                    console.log('ðŸ“Š Speichere insgesamt', palettenListe.length, 'Paletten');
                     await speichereZeilen(palettenListe);
                     wartendeAuswahlPaletten = [];
                     erkannteAuswahlPaletten = [];
@@ -2547,24 +2547,24 @@ ${err.message}
 
             } catch (err) {
                 const errorBox = document.getElementById("errorBox");
-                document.getElementById("errorMessage").textContent = "❌ " + err.message;
+                document.getElementById("errorMessage").textContent = "âŒ " + err.message;
                 errorBox.style.display = "block";
             }
         }
 
         function showError(message) {
             const errorBox = document.getElementById("errorBox");
-            document.getElementById("errorMessage").textContent = "⚠️ " + message;
+            document.getElementById("errorMessage").textContent = "âš ï¸ " + message;
             errorBox.style.display = "block";
 
             const status = document.getElementById("status");
-            status.textContent = "❌ Fehler aufgetreten";
+            status.textContent = "âŒ Fehler aufgetreten";
             status.className = "status-error";
         }
 
-        // ========== DREISTUFIGE ÜBERSICHT FUNKTIONEN ==========
-        let currentCustomer = null;  // Speichere aktuell ausgewählten Kunden
-        let currentPalette = null;   // Speichere aktuell ausgewählte Palettenart
+        // ========== DREISTUFIGE ÃœBERSICHT FUNKTIONEN ==========
+        let currentCustomer = null;  // Speichere aktuell ausgewÃ¤hlten Kunden
+        let currentPalette = null;   // Speichere aktuell ausgewÃ¤hlte Palettenart
 
         function showOverview() {
             // Ebene 1: Zeige Kundenliste
@@ -2593,7 +2593,7 @@ ${err.message}
                 phase.classList.remove('active');
             });
 
-            // Zeige die gewünschte Phase
+            // Zeige die gewÃ¼nschte Phase
             const targetPhase = document.getElementById(phaseName);
             if (targetPhase) {
                 targetPhase.classList.add('active');
@@ -2601,16 +2601,16 @@ ${err.message}
 
             // Zeige Logout-Button nur in recordingPhase
             const logoutContainer = document.getElementById('logoutContainer');
-            if (logoutContainer) {  // ✅ Sicherer Null-Check
+            if (logoutContainer) {  // âœ… Sicherer Null-Check
                 if (phaseName === 'recordingPhase') {
                     logoutContainer.style.display = 'block';
-                    console.log('✅ Logout-Button angezeigt (recordingPhase)');
+                    console.log('âœ… Logout-Button angezeigt (recordingPhase)');
                 } else {
                     logoutContainer.style.display = 'none';
-                    console.log('❌ Logout-Button versteckt (nicht recordingPhase)');
+                    console.log('âŒ Logout-Button versteckt (nicht recordingPhase)');
                 }
             } else {
-                console.warn('⚠️ logoutContainer nicht gefunden!');
+                console.warn('âš ï¸ logoutContainer nicht gefunden!');
             }
         }
 
@@ -2625,24 +2625,24 @@ ${err.message}
         function kapitalisiereName(text) {
             if (!text) return text;
 
-            // Teile den Text in Wörter und kapitalisiere jeden ersten Buchstaben
+            // Teile den Text in WÃ¶rter und kapitalisiere jeden ersten Buchstaben
             return text
                 .toLowerCase()  // Alles zuerst klein
-                .split(' ')     // Teile in Wörter
+                .split(' ')     // Teile in WÃ¶rter
                 .map(word => {
-                    // Ersten Buchstabe großschreiben, Rest klein
+                    // Ersten Buchstabe groÃŸschreiben, Rest klein
                     return word.charAt(0).toUpperCase() + word.slice(1);
                 })
                 .join(' ');     // Zusammensetzen
         }
 
-        // 📦 Alle Palettenarten (Neue + Bestehende aus PALETTENLISTE)
+        // ðŸ“¦ Alle Palettenarten (Neue + Bestehende aus PALETTENLISTE)
         const ALLE_PALETTENARTEN = [
             // Neue Palettenarten
             'Grafepalette',
             'Steinzeug Gitterbox',
             'Steinzeugpalette klein',
-            'Steinzeugpalette groß',
+            'Steinzeugpalette groÃŸ',
             'Europalette 2',
             'Europalette 3',
             'Spezialpalette',
@@ -2664,7 +2664,7 @@ ${err.message}
         ].sort();  // Alphabetisch sortiert
 
         async function openManualInput() {
-            console.log('🔓 Öffne manuelle Eingabe...');
+            console.log('ðŸ”“ Ã–ffne manuelle Eingabe...');
 
             let palettenarten = [...ALLE_PALETTENARTEN];  // Standard-Liste verwenden
 
@@ -2675,16 +2675,16 @@ ${err.message}
                     const dbPalettenarten = await response.json();
                     if (dbPalettenarten && dbPalettenarten.length > 0) {
                         palettenarten = dbPalettenarten;
-                        console.log('✅ Palettenarten vom Backend geladen:', palettenarten.length);
+                        console.log('âœ… Palettenarten vom Backend geladen:', palettenarten.length);
                     }
                 }
             } catch (err) {
-                console.warn('⚠️ Backend nicht verfügbar, verwende lokale Liste:', err.message);
+                console.warn('âš ï¸ Backend nicht verfÃ¼gbar, verwende lokale Liste:', err.message);
             }
 
-            // Fülle Dropdown mit Palettenarten
+            // FÃ¼lle Dropdown mit Palettenarten
             const select = document.getElementById('manualPaletteType');
-            select.innerHTML = '<option value="">-- Palettenart auswählen --</option>';
+            select.innerHTML = '<option value="">-- Palettenart auswÃ¤hlen --</option>';
 
             palettenarten.forEach(art => {
                 const option = document.createElement('option');
@@ -2693,7 +2693,7 @@ ${err.message}
                 select.appendChild(option);
             });
 
-            console.log('📦 Palettenarten verfügbar:', palettenarten.length);
+            console.log('ðŸ“¦ Palettenarten verfÃ¼gbar:', palettenarten.length);
 
             // Reset Felder
             document.getElementById('manualPaletteType').value = '';
@@ -2713,7 +2713,7 @@ ${err.message}
 
         function setManualAction(action) {
             manualAction = action;
-            console.log('⚡ Setze Aktion:', action);
+            console.log('âš¡ Setze Aktion:', action);
 
             const addBtn = document.getElementById('manualActionAdd');
             const removeBtn = document.getElementById('manualActionRemove');
@@ -2732,52 +2732,52 @@ ${err.message}
         }
 
         function cancelManualInput() {
-            console.log('❌ Abbrechen - Zurück zur Aufnahme');
+            console.log('âŒ Abbrechen - ZurÃ¼ck zur Aufnahme');
             manualAction = null;
             setPhase('recordingPhase');
         }
 
         async function saveManualInput() {
-            console.log('💾 Speichere manuelle Eingabe...');
+            console.log('ðŸ’¾ Speichere manuelle Eingabe...');
 
             const paletteType = document.getElementById('manualPaletteType').value;
-            // ✅ KAPITALISIERE Namen: "jens meier" → "Jens Meier"
+            // âœ… KAPITALISIERE Namen: "jens meier" â†’ "Jens Meier"
             const customerName = kapitalisiereName(document.getElementById('manualCustomerName').value.trim());
             const customerNumber = document.getElementById('manualCustomerNumber').value.trim();
             const quantityInput = document.getElementById('manualQuantity').value;
             const quantity = quantityInput ? parseInt(quantityInput) : 1;
 
-            console.log('📋 Eingaben gelesen:', {
+            console.log('ðŸ“‹ Eingaben gelesen:', {
                 paletteType: paletteType || '(leer)',
                 customerName: customerName || '(leer)',
                 customerNumber: customerNumber || '(keine)',
                 quantityInput: quantityInput || '(leer)',
                 quantity: quantity,
-                manualAction: manualAction || '(nicht gewählt)'
+                manualAction: manualAction || '(nicht gewÃ¤hlt)'
             });
 
             // Validierung
             if (!paletteType) {
-                console.warn('⚠️ Palettenart nicht gewählt');
-                showError('❌ Bitte Palettenart wählen!');
+                console.warn('âš ï¸ Palettenart nicht gewÃ¤hlt');
+                showError('âŒ Bitte Palettenart wÃ¤hlen!');
                 return;
             }
 
             if (!customerName) {
-                console.warn('⚠️ Kundenname nicht eingegeben');
-                showError('❌ Bitte Kundenname eingeben!');
+                console.warn('âš ï¸ Kundenname nicht eingegeben');
+                showError('âŒ Bitte Kundenname eingeben!');
                 return;
             }
 
             if (!manualAction) {
-                console.warn('⚠️ Aktion nicht gewählt');
-                showError('❌ Bitte Aktion (Zugang/Abgang) wählen!');
+                console.warn('âš ï¸ Aktion nicht gewÃ¤hlt');
+                showError('âŒ Bitte Aktion (Zugang/Abgang) wÃ¤hlen!');
                 return;
             }
 
             if (quantity <= 0) {
-                console.warn('⚠️ Anzahl ungültig:', quantity);
-                showError('❌ Anzahl muss größer als 0 sein!');
+                console.warn('âš ï¸ Anzahl ungÃ¼ltig:', quantity);
+                showError('âŒ Anzahl muss grÃ¶ÃŸer als 0 sein!');
                 return;
             }
 
@@ -2785,7 +2785,7 @@ ${err.message}
             const finalQuantity = manualAction === 'add' ? quantity : -quantity;
             const mitarbeiter = mitarbeiterName || 'System';
 
-            console.log('📊 Manuelle Eingabe validiert:', {
+            console.log('ðŸ“Š Manuelle Eingabe validiert:', {
                 paletteType,
                 customerName,
                 customerNumber,
@@ -2795,8 +2795,8 @@ ${err.message}
             });
 
             try {
-                // Erstelle text_content für den API-Endpoint
-                const textContent = `${customerName} hat ${finalQuantity > 0 ? finalQuantity : Math.abs(finalQuantity)} ${paletteType} ${finalQuantity > 0 ? 'mitgenommen' : 'zurückgebracht'}${customerNumber ? ' (' + customerNumber + ')' : ''}`;
+                // Erstelle text_content fÃ¼r den API-Endpoint
+                const textContent = `${customerName} hat ${finalQuantity > 0 ? finalQuantity : Math.abs(finalQuantity)} ${paletteType} ${finalQuantity > 0 ? 'mitgenommen' : 'zurÃ¼ckgebracht'}${customerNumber ? ' (' + customerNumber + ')' : ''}`;
 
                 // Speichere zu Supabase - Backend erwartet EINZELNE Werte, nicht Arrays!
                 const payload = {
@@ -2805,11 +2805,11 @@ ${err.message}
                     kundennummer: customerNumber || null,
                     palettenart: paletteType,   // Einzelner Wert, nicht Array!
                     menge: finalQuantity,       // Einzelner Wert, nicht Array!
-                    aktion: finalQuantity > 0 ? 'mitgenommen' : 'zurückgebracht',
+                    aktion: finalQuantity > 0 ? 'mitgenommen' : 'zurÃ¼ckgebracht',
                     mitarbeiter: mitarbeiter
                 };
 
-                console.log('📤 Sende Payload zum Backend:', payload);
+                console.log('ðŸ“¤ Sende Payload zum Backend:', payload);
 
                 const response = await fetch('/api/save', {
                     method: 'POST',
@@ -2819,30 +2819,30 @@ ${err.message}
                     body: JSON.stringify(payload)
                 });
 
-                console.log('📨 Response Status:', response.status, response.statusText);
+                console.log('ðŸ“¨ Response Status:', response.status, response.statusText);
 
                 if (!response.ok) {
                     const errorText = await response.text();
-                    console.error('🔴 Backend Fehler:', errorText);
+                    console.error('ðŸ”´ Backend Fehler:', errorText);
                     throw new Error(`Server Fehler (${response.status}): ${errorText}`);
                 }
 
                 const result = await response.json();
-                console.log('✅ Manuelle Eingabe gespeichert:', result);
+                console.log('âœ… Manuelle Eingabe gespeichert:', result);
 
                 // Zeige Zusammenfassung in der Erfolgsseite
                 const summaryHtml = `
                     <div style="margin: 20px 0;">
-                        <h3 style="color: #333; margin-top: 0;">📋 Gespeicherte Daten:</h3>
+                        <h3 style="color: #333; margin-top: 0;">ðŸ“‹ Gespeicherte Daten:</h3>
 
                         <div style="background: white; border-left: 4px solid #51cf66; padding: 15px; margin: 10px 0; border-radius: 8px;">
                             <div style="display: flex; justify-content: space-between; margin: 8px 0;">
-                                <span style="font-weight: bold; color: #666;">👤 Kundenname:</span>
+                                <span style="font-weight: bold; color: #666;">ðŸ‘¤ Kundenname:</span>
                                 <span style="color: #333; font-size: 16px; font-weight: 600;">${escapeHtml(customerName)}</span>
                             </div>
                             ${customerNumber ? `
                             <div style="display: flex; justify-content: space-between; margin: 8px 0;">
-                                <span style="font-weight: bold; color: #666;">🔢 Kundennummer:</span>
+                                <span style="font-weight: bold; color: #666;">ðŸ”¢ Kundennummer:</span>
                                 <span style="color: #333; font-size: 16px; font-weight: 600;">${escapeHtml(customerNumber)}</span>
                             </div>
                             ` : ''}
@@ -2850,22 +2850,22 @@ ${err.message}
 
                         <div style="background: white; border-left: 4px solid #667eea; padding: 15px; margin: 10px 0; border-radius: 8px;">
                             <div style="display: flex; justify-content: space-between; margin: 8px 0;">
-                                <span style="font-weight: bold; color: #666;">📦 Palettenart:</span>
+                                <span style="font-weight: bold; color: #666;">ðŸ“¦ Palettenart:</span>
                                 <span style="color: #333; font-size: 16px; font-weight: 600;">${escapeHtml(paletteType)}</span>
                             </div>
                             <div style="display: flex; justify-content: space-between; margin: 8px 0;">
-                                <span style="font-weight: bold; color: #666;">📊 Menge:</span>
+                                <span style="font-weight: bold; color: #666;">ðŸ“Š Menge:</span>
                                 <span style="color: #333; font-size: 16px; font-weight: 600;">${Math.abs(finalQuantity)}x</span>
                             </div>
                             <div style="display: flex; justify-content: space-between; margin: 8px 0;">
-                                <span style="font-weight: bold; color: #666;">⚡ Aktion:</span>
-                                <span style="color: #333; font-size: 16px; font-weight: 600;">${finalQuantity > 0 ? '➕ Zugang' : '➖ Abgang'}</span>
+                                <span style="font-weight: bold; color: #666;">âš¡ Aktion:</span>
+                                <span style="color: #333; font-size: 16px; font-weight: 600;">${finalQuantity > 0 ? 'âž• Zugang' : 'âž– Abgang'}</span>
                             </div>
                         </div>
 
                         <div style="background: white; border-left: 4px solid #ff9800; padding: 15px; margin: 10px 0; border-radius: 8px;">
                             <div style="display: flex; justify-content: space-between; margin: 8px 0;">
-                                <span style="font-weight: bold; color: #666;">👤 Mitarbeiter:</span>
+                                <span style="font-weight: bold; color: #666;">ðŸ‘¤ Mitarbeiter:</span>
                                 <span style="color: #333; font-size: 16px; font-weight: 600;">${escapeHtml(mitarbeiter)}</span>
                             </div>
                         </div>
@@ -2875,14 +2875,14 @@ ${err.message}
                 document.getElementById('successSummary').innerHTML = summaryHtml;
 
                 // Zeige Erfolgsseite
-                // ✅ WICHTIG: BLEIBT BESTEHEN - Benutzer muss manuell "Zurück" klicken
+                // âœ… WICHTIG: BLEIBT BESTEHEN - Benutzer muss manuell "ZurÃ¼ck" klicken
                 setPhase('successPhase');
 
             } catch (err) {
-                console.error('🔴 Fehler beim Speichern:', err);
+                console.error('ðŸ”´ Fehler beim Speichern:', err);
                 console.error('   Message:', err.message);
                 console.error('   Stack:', err.stack);
-                showError('❌ Fehler beim Speichern: ' + err.message);
+                showError('âŒ Fehler beim Speichern: ' + err.message);
             }
         }
 
@@ -2892,12 +2892,12 @@ ${err.message}
                 const response = await fetch('/api/get-all-saldos');
                 const customers = await response.json();
 
-                console.log('📊 Kundenliste geladen:', customers.length);
+                console.log('ðŸ“Š Kundenliste geladen:', customers.length);
 
                 const container = document.getElementById('kundenlisteContainer');
 
                 if (!customers || customers.length === 0) {
-                    container.innerHTML = '<div class="palettehistorie-empty">📭 Noch keine Kunden</div>';
+                    container.innerHTML = '<div class="palettehistorie-empty">ðŸ“­ Noch keine Kunden</div>';
                     return;
                 }
 
@@ -2908,7 +2908,7 @@ ${err.message}
                 for (let customer of customers) {
                     const gesamtSaldo = customer.paletten.reduce((sum, p) => sum + p.saldo, 0);
 
-                    // 🔥 FILTER: Zeige nur Kunden mit Gesamtsaldo > 0
+                    // ðŸ”¥ FILTER: Zeige nur Kunden mit Gesamtsaldo > 0
                     if (gesamtSaldo === 0) continue;
 
                     gezeigtKunden++;
@@ -2922,27 +2922,27 @@ ${err.message}
                 }
 
                 if (gezeigtKunden === 0) {
-                    container.innerHTML = '<div class="palettehistorie-empty">📭 Noch keine Kunden mit Paletten</div>';
+                    container.innerHTML = '<div class="palettehistorie-empty">ðŸ“­ Noch keine Kunden mit Paletten</div>';
                     return;
                 }
 
                 container.innerHTML = html;
 
-                // 🔥 WICHTIG: Event Listener hinzufügen NACHDEM HTML eingefügt wurde
+                // ðŸ”¥ WICHTIG: Event Listener hinzufÃ¼gen NACHDEM HTML eingefÃ¼gt wurde
                 const items = container.querySelectorAll('.kundenliste-item');
                 items.forEach(item => {
                     item.addEventListener('click', function() {
                         const kundenname = this.getAttribute('data-kundenname');
-                        console.log('🖱️ Klick auf Kunde:', kundenname);
+                        console.log('ðŸ–±ï¸ Klick auf Kunde:', kundenname);
                         showCustomerDetail(kundenname);
                     });
                 });
 
-                console.log('✅ Kundenliste angezeigt mit', gezeigtKunden, 'Kunden');
+                console.log('âœ… Kundenliste angezeigt mit', gezeigtKunden, 'Kunden');
             } catch (err) {
-                console.error('❌ Fehler beim Laden der Kundenliste:', err);
+                console.error('âŒ Fehler beim Laden der Kundenliste:', err);
                 const container = document.getElementById('kundenlisteContainer');
-                container.innerHTML = `<div class="palettehistorie-empty">❌ Fehler: ${err.message}</div>`;
+                container.innerHTML = `<div class="palettehistorie-empty">âŒ Fehler: ${err.message}</div>`;
             }
         }
 
@@ -2950,10 +2950,10 @@ ${err.message}
         async function showCustomerDetail(kundenname) {
             try {
                 currentCustomer = kundenname;
-                console.log('👤 Lade Details für:', kundenname);
+                console.log('ðŸ‘¤ Lade Details fÃ¼r:', kundenname);
 
                 // Update Title
-                document.getElementById('detailCustomerTitle').textContent = `📦 ${kundenname}`;
+                document.getElementById('detailCustomerTitle').textContent = `ðŸ“¦ ${kundenname}`;
 
                 const response = await fetch(`/api/customer-detail/${encodeURIComponent(kundenname)}`);
                 const data = await response.json();
@@ -2976,7 +2976,7 @@ ${err.message}
                                     ${displayPalette}
                                 </div>
                                 <div class="kundendetail-saldo" data-kundenname="${escapeHtml(kundenname)}" data-palettenart="${displayPalette}" data-saldo="${palette.saldo}" style="cursor: pointer;">
-                                    <span>${palette.saldo}</span> ✏️
+                                    <span>${palette.saldo}</span> âœï¸
                                 </div>
                             </div>
                         `;
@@ -2985,13 +2985,13 @@ ${err.message}
 
                 container.innerHTML = html;
 
-                // 🔥 WICHTIG: Event Listener hinzufügen NACHDEM HTML eingefügt wurde
+                // ðŸ”¥ WICHTIG: Event Listener hinzufÃ¼gen NACHDEM HTML eingefÃ¼gt wurde
                 const paletteItems = container.querySelectorAll('.kundendetail-palettenart');
                 paletteItems.forEach(item => {
                     item.addEventListener('click', function() {
                         const kname = this.getAttribute('data-kundenname');
                         const pname = this.getAttribute('data-palettenart');
-                        console.log('🖱️ Klick auf Palette:', pname);
+                        console.log('ðŸ–±ï¸ Klick auf Palette:', pname);
                         showPaletteHistory(kname, pname);
                     });
                 });
@@ -3002,17 +3002,17 @@ ${err.message}
                         const kname = this.getAttribute('data-kundenname');
                         const pname = this.getAttribute('data-palettenart');
                         const saldo = parseInt(this.getAttribute('data-saldo'));
-                        console.log('🖱️ Klick auf Saldo:', kname, pname, saldo);
+                        console.log('ðŸ–±ï¸ Klick auf Saldo:', kname, pname, saldo);
                         editSaldo(kname, pname, saldo);
                     });
                 });
 
                 setPhase('kundendetailPhase');
-                console.log('✅ Kundendetails angezeigt');
+                console.log('âœ… Kundendetails angezeigt');
             } catch (err) {
-                console.error('❌ Fehler beim Laden der Details:', err);
+                console.error('âŒ Fehler beim Laden der Details:', err);
                 const container = document.getElementById('kundendetailContainer');
-                container.innerHTML = `<div class="palettehistorie-empty">❌ Fehler: ${err.message}</div>`;
+                container.innerHTML = `<div class="palettehistorie-empty">âŒ Fehler: ${err.message}</div>`;
             }
         }
 
@@ -3020,10 +3020,10 @@ ${err.message}
         async function showPaletteHistory(kundenname, palettenart) {
             try {
                 currentPalette = palettenart;
-                console.log('⏱️ Lade Historie für:', kundenname, '-', palettenart);
+                console.log('â±ï¸ Lade Historie fÃ¼r:', kundenname, '-', palettenart);
 
                 // Update Title
-                document.getElementById('historieTitle').textContent = `⏱️ ${palettenart}`;
+                document.getElementById('historieTitle').textContent = `â±ï¸ ${palettenart}`;
 
                 const response = await fetch(`/api/palette-history/${encodeURIComponent(kundenname)}/${encodeURIComponent(palettenart)}`);
                 const data = await response.json();
@@ -3036,16 +3036,16 @@ ${err.message}
                 let html = '';
 
                 if (!data.history || data.history.length === 0) {
-                    html = '<div class="palettehistorie-empty">📭 Keine Transaktionen</div>';
+                    html = '<div class="palettehistorie-empty">ðŸ“­ Keine Transaktionen</div>';
                 } else {
                     for (let transaction of data.history) {
                         // Bestimme Symbol basierend auf Aktion
                         const aktion = transaction.aktion ? transaction.aktion.toLowerCase() : '';
-                        let symbol = '❓';
-                        if (aktion.includes('mitgenommen') || aktion.includes('zurück') === false) {
-                            symbol = '➕';
-                        } else if (aktion.includes('zurück') || aktion.includes('zuruck') || aktion.includes('erhalten') || aktion.includes('abgegeben')) {
-                            symbol = '➖';
+                        let symbol = 'â“';
+                        if (aktion.includes('mitgenommen') || aktion.includes('zurÃ¼ck') === false) {
+                            symbol = 'âž•';
+                        } else if (aktion.includes('zurÃ¼ck') || aktion.includes('zuruck') || aktion.includes('erhalten') || aktion.includes('abgegeben')) {
+                            symbol = 'âž–';
                         }
 
                         html += `
@@ -3061,45 +3061,45 @@ ${err.message}
 
                 container.innerHTML = html;
                 setPhase('paletteHistoriePhase');
-                console.log('✅ Palettenhistorie angezeigt');
+                console.log('âœ… Palettenhistorie angezeigt');
             } catch (err) {
-                console.error('❌ Fehler beim Laden der Historie:', err);
+                console.error('âŒ Fehler beim Laden der Historie:', err);
                 const container = document.getElementById('paletteHistorieContainer');
-                container.innerHTML = `<div class="palettehistorie-empty">❌ Fehler: ${err.message}</div>`;
+                container.innerHTML = `<div class="palettehistorie-empty">âŒ Fehler: ${err.message}</div>`;
             }
         }
 
-        // ========== SALDO BEARBEITEN (Manuelle Änderung mit Transaktion) ==========
+        // ========== SALDO BEARBEITEN (Manuelle Ã„nderung mit Transaktion) ==========
         async function editSaldo(kundenname, palettenart, aktuellerSaldo) {
-            const neuerSaldo = prompt(`Neuer Saldo für ${palettenart}?\n(Aktuell: ${aktuellerSaldo})`, aktuellerSaldo);
+            const neuerSaldo = prompt(`Neuer Saldo fÃ¼r ${palettenart}?\n(Aktuell: ${aktuellerSaldo})`, aktuellerSaldo);
 
             if (neuerSaldo === null) return;  // Benutzer hat Abbrechen geklickt
 
             const saldoZahl = parseInt(neuerSaldo);
             if (isNaN(saldoZahl) || saldoZahl < 0) {
-                alert('⚠️ Bitte geben Sie eine gültige Zahl ein (>= 0)');
+                alert('âš ï¸ Bitte geben Sie eine gÃ¼ltige Zahl ein (>= 0)');
                 return;
             }
 
-            // Wenn sich nichts geändert hat, abbrechen
+            // Wenn sich nichts geÃ¤ndert hat, abbrechen
             if (saldoZahl === aktuellerSaldo) {
-                console.log('ℹ️ Saldo gleich geblieben, keine Änderung');
+                console.log('â„¹ï¸ Saldo gleich geblieben, keine Ã„nderung');
                 return;
             }
 
             try {
-                console.log('💾 Manuelle Saldo-Änderung:', kundenname, palettenart, aktuellerSaldo, '→', saldoZahl);
+                console.log('ðŸ’¾ Manuelle Saldo-Ã„nderung:', kundenname, palettenart, aktuellerSaldo, 'â†’', saldoZahl);
 
-                // 🔥 WICHTIG: Sende alterSaldo und Mitarbeiter
+                // ðŸ”¥ WICHTIG: Sende alterSaldo und Mitarbeiter
                 const response = await fetch('/api/update-saldo', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         kundenname,
                         palettenart,
-                        alterSaldo: aktuellerSaldo,      // 🔥 NEUER PARAMETER
+                        alterSaldo: aktuellerSaldo,      // ðŸ”¥ NEUER PARAMETER
                         neuerSaldo: saldoZahl,
-                        mitarbeiter: mitarbeiterName      // 🔥 NEUER PARAMETER
+                        mitarbeiter: mitarbeiterName      // ðŸ”¥ NEUER PARAMETER
                     })
                 });
 
@@ -3109,19 +3109,19 @@ ${err.message}
                     throw new Error(result.error || 'Fehler beim Speichern');
                 }
 
-                // 🔥 ZEIGE TRANSAKTION DETAILS
+                // ðŸ”¥ ZEIGE TRANSAKTION DETAILS
                 const differenz = result.differenz;
                 const menge = result.menge;
-                const symbol = differenz > 0 ? '➕' : '➖';
+                const symbol = differenz > 0 ? 'âž•' : 'âž–';
 
-                console.log(`✅ Transaktion erstellt: ${symbol} ${menge}x ${palettenart} (${result.aktion})`);
-                alert(`✅ Saldo aktualisiert: ${aktuellerSaldo} → ${saldoZahl}\n\n${symbol} ${menge}x ${palettenart} ${result.aktion}\n📝 Eintrag erstellt für: ${mitarbeiterName}`);
+                console.log(`âœ… Transaktion erstellt: ${symbol} ${menge}x ${palettenart} (${result.aktion})`);
+                alert(`âœ… Saldo aktualisiert: ${aktuellerSaldo} â†’ ${saldoZahl}\n\n${symbol} ${menge}x ${palettenart} ${result.aktion}\nðŸ“ Eintrag erstellt fÃ¼r: ${mitarbeiterName}`);
 
                 // Aktualisiere die Kundendetails
                 await showCustomerDetail(kundenname);
             } catch (err) {
-                console.error('❌ Fehler beim Speichern:', err);
-                alert('❌ Fehler: ' + err.message);
+                console.error('âŒ Fehler beim Speichern:', err);
+                alert('âŒ Fehler: ' + err.message);
             }
         }
 
@@ -3140,21 +3140,21 @@ ${err.message}
                     const session = JSON.parse(sessionData);
                     if (isSessionValid(session)) {
                         mitarbeiterName = session.mitarbeiter;
-                        console.log('✅ Session gültig, Mitarbeiter:', mitarbeiterName);
+                        console.log('âœ… Session gÃ¼ltig, Mitarbeiter:', mitarbeiterName);
                         document.getElementById('mitarbeiterDisplay').textContent = mitarbeiterName;
                         setPhase('recordingPhase');
                         return;
                     } else {
-                        console.log('⏰ Session abgelaufen');
+                        console.log('â° Session abgelaufen');
                         localStorage.removeItem('palettenSession');
                     }
                 } catch (err) {
-                    console.error('❌ Fehler beim Parsen der Session:', err);
+                    console.error('âŒ Fehler beim Parsen der Session:', err);
                     localStorage.removeItem('palettenSession');
                 }
             }
 
-            // Keine gültige Session: Zeige Login
+            // Keine gÃ¼ltige Session: Zeige Login
             setPhase('loginPhase');
         }
 
@@ -3170,10 +3170,10 @@ ${err.message}
             const mitarbeitername = document.getElementById('loginMitarbeiter').value.trim();
             const passwort = document.getElementById('loginPassword').value;
 
-            console.log('🔐 Login-Versuch:', mitarbeitername);
+            console.log('ðŸ” Login-Versuch:', mitarbeitername);
 
             if (!mitarbeitername || !passwort) {
-                showLoginError('❌ Mitarbeitername und Passwort erforderlich');
+                showLoginError('âŒ Mitarbeitername und Passwort erforderlich');
                 return;
             }
 
@@ -3198,7 +3198,7 @@ ${err.message}
                     localStorage.setItem('palettenSession', JSON.stringify(sessionData));
                     mitarbeiterName = mitarbeitername;
 
-                    console.log('✅ Login erfolgreich:', mitarbeitername);
+                    console.log('âœ… Login erfolgreich:', mitarbeitername);
                     document.getElementById('mitarbeiterDisplay').textContent = mitarbeitername;
 
                     // Zeige Error-Box verstecken
@@ -3208,19 +3208,19 @@ ${err.message}
                     setPhase('recordingPhase');
                 } else if (result.firstTime) {
                     // Mitarbeiter existiert, aber Passwort muss noch gesetzt werden
-                    showLoginError(`⚠️ ${result.error}\n\nBitte setzen Sie ein Passwort.`);
+                    showLoginError(`âš ï¸ ${result.error}\n\nBitte setzen Sie ein Passwort.`);
 
                     // Automatisch Passwort-Dialog anzeigen
-                    const newPassword = prompt(`Passwort für "${mitarbeitername}" setzen:\n\n(mind. 4 Zeichen)`, '');
+                    const newPassword = prompt(`Passwort fÃ¼r "${mitarbeitername}" setzen:\n\n(mind. 4 Zeichen)`, '');
                     if (newPassword && newPassword.length >= 4) {
                         await setPassword(mitarbeitername, newPassword);
                     }
                 } else {
-                    showLoginError('❌ ' + result.error);
+                    showLoginError('âŒ ' + result.error);
                 }
             } catch (err) {
-                console.error('❌ Fehler beim Login:', err);
-                showLoginError('❌ Fehler: ' + err.message);
+                console.error('âŒ Fehler beim Login:', err);
+                showLoginError('âŒ Fehler: ' + err.message);
             }
         }
 
@@ -3239,16 +3239,16 @@ ${err.message}
                 const result = await response.json();
 
                 if (result.success) {
-                    alert('✅ Passwort gesetzt! Melden Sie sich jetzt an.');
+                    alert('âœ… Passwort gesetzt! Melden Sie sich jetzt an.');
                     // Versuche erneut zu loggen
                     document.getElementById('loginPassword').value = passwort;
                     handleLoginNew();
                 } else {
-                    showLoginError('❌ ' + result.error);
+                    showLoginError('âŒ ' + result.error);
                 }
             } catch (err) {
-                console.error('❌ Fehler beim Setzen des Passworts:', err);
-                showLoginError('❌ Fehler: ' + err.message);
+                console.error('âŒ Fehler beim Setzen des Passworts:', err);
+                showLoginError('âŒ Fehler: ' + err.message);
             }
         }
 
@@ -3273,7 +3273,7 @@ ${err.message}
             const adminPassword = document.getElementById('adminPassword').value;
 
             if (!name) {
-                showAdminError('❌ Mitarbeitername erforderlich');
+                showAdminError('âŒ Mitarbeitername erforderlich');
                 return;
             }
 
@@ -3290,7 +3290,7 @@ ${err.message}
                 const result = await response.json();
 
                 if (result.success) {
-                    showAdminSuccess(`✅ ${result.message}`);
+                    showAdminSuccess(`âœ… ${result.message}`);
                     document.getElementById('adminMitarbeitername').value = '';
                     document.getElementById('adminPassword').value = '';
 
@@ -3298,17 +3298,17 @@ ${err.message}
                         backToLogin();
                     }, 2000);
                 } else {
-                    showAdminError('❌ ' + result.error);
+                    showAdminError('âŒ ' + result.error);
                 }
             } catch (err) {
-                console.error('❌ Fehler beim Hinzufügen des Mitarbeiters:', err);
-                showAdminError('❌ Fehler: ' + err.message);
+                console.error('âŒ Fehler beim HinzufÃ¼gen des Mitarbeiters:', err);
+                showAdminError('âŒ Fehler: ' + err.message);
             }
         }
 
         // ========== LOGOUT ==========
         function logoutUser() {
-            console.log('👋 Logout');
+            console.log('ðŸ‘‹ Logout');
             localStorage.removeItem('palettenSession');
             mitarbeiterName = null;
 
@@ -3353,9 +3353,10 @@ ${err.message}
                 });
             }
 
-            // Initialisiere App (überprüfe Session)
+            // Initialisiere App (Ã¼berprÃ¼fe Session)
             initializeApp();
         });
     </script>
 </body>
 </html>
+
