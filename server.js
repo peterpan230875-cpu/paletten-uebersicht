@@ -1204,16 +1204,21 @@ app.get('/api/test', async (req, res) => {
 });
 
 // ============================================
-// MAIN ROUTE
+// STATISCHE DATEIEN (nach allen API-Routen!)
+// ============================================
+app.use(express.static(path.join(__dirname, 'public')));
+
+// ============================================
+// MAIN ROUTE - Serviere index.html für alle unbekannten Routen
 // ============================================
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
-// ============================================
-// STATISCHE DATEIEN (nach allen API-Routen!)
-// ============================================
-app.use(express.static(path.join(__dirname)));
+// Route für Dark Mode Version
+app.get('/dark', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/index-dark.html'));
+});
 
 // ============================================
 // SERVER START
