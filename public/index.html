@@ -1906,13 +1906,6 @@
                     <h2>Eingabe</h2>
                     <p class="subtitle">Geben Sie Palettenart und Anzahl ein</p>
 
-                    <!-- Fallback-Hinweis wenn Groq nicht verfügbar war -->
-                    <div id="speechFallbackHint" style="display:none; background:#fff3cd; border:2px solid #ffc107; border-radius:10px; padding:12px 14px; margin-bottom:16px;">
-                        <div style="font-size:12px; font-weight:700; color:#856404; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">🎤 Erkannter Text</div>
-                        <div id="speechFallbackText" style="font-size:14px; color:#533f03; line-height:1.5;"></div>
-                        <div style="font-size:11px; color:#856404; margin-top:6px;">Bitte Felder manuell ausfüllen</div>
-                    </div>
-
                     <label class="form-label">Palettenart</label>
                     <select id="manualPaletteType">
                         <option value="">-- Palettenart auswählen --</option>
@@ -2550,10 +2543,9 @@
                 showReviewPhase(recognizedText);
 
             } catch (err) {
-                console.error('❌ processWithGroq Fehler:', err.message);
+                console.error('❌ processWithGroq Fehler:', err);
 
-                // 🔄 FALLBACK: Groq gescheitert → Manuelle Eingabe mit erkanntem Text
-                console.log('🔄 Fallback: Öffne manuelle Eingabe mit erkanntem Text...');
+                showError("Groq API Fehler: " + err.message);
 
                 const btn = document.getElementById("recordingButton");
                 if (btn) {
@@ -2561,9 +2553,6 @@
                     btn.disabled = false;
                     btn.classList.remove("recording");
                 }
-
-                // Öffne manuelle Eingabe und fülle erkannten Text ein
-                await openManualInputWithSpeech(rohText);
             }
         }
 
@@ -3558,46 +3547,8 @@
             }
         }
 
-        // 🔄 FALLBACK: Manuelle Eingabe mit erkanntem Sprach-Text vorausfüllen
-        async function openManualInputWithSpeech(speechText) {
-            console.log('🔄 openManualInputWithSpeech:', speechText);
-
-            // Normale manuelle Eingabe öffnen
-            await openManualInput();
-
-            // Erkannten Text als Hinweis oben einblenden
-            const hintBox = document.getElementById('speechFallbackHint');
-            if (hintBox) {
-                hintBox.style.display = 'block';
-                document.getElementById('speechFallbackText').textContent = '"' + speechText + '"';
-            }
-
-            // Versuche Namen aus Sprache zu extrahieren (einfache Heuristik)
-            if (speechText) {
-                const nameField = document.getElementById('manualCustomerName');
-                if (nameField && nameField.value === '') {
-                    // Nimm das erste Wort/die ersten 2-3 Wörter als Kundennamen-Hinweis
-                    const words = speechText.trim().split(' ');
-                    // Stoppe bei Schlüsselwörtern
-                    const stopWords = ['nimmt', 'hat', 'bringt', 'gibt', 'eine', 'einen', 'zwei', 'drei', 'vier', 'fünf', 'mit', 'zurück', 'erhalten'];
-                    let nameWords = [];
-                    for (let w of words) {
-                        if (stopWords.includes(w.toLowerCase())) break;
-                        nameWords.push(w);
-                        if (nameWords.length >= 3) break;
-                    }
-                    if (nameWords.length > 0) {
-                        nameField.value = nameWords.join(' ');
-                    }
-                }
-            }
-        }
-
         function cancelManualInput() {
             console.log('❌ Abbrechen - Zurück zur Aufnahme');
-            // Hint Box verstecken
-            const hintBox = document.getElementById('speechFallbackHint');
-            if (hintBox) hintBox.style.display = 'none';
             manualAction = null;
             setPhase('recordingPhase');
         }
