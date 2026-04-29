@@ -349,27 +349,34 @@
         /* ===== LOGOUT BUTTON ===== */
         #logoutContainer {
             position: fixed;
-            top: 16px;
-            right: 16px;
-            z-index: 100;
+            top: 0;
+            right: 0;
+            z-index: 200;
+            padding: 19px 16px;
+            display: flex;
+            align-items: center;
         }
 
         #logoutContainer button {
-            background: rgba(255, 107, 74, 0.9) !important;
-            color: white !important;
-            border: 1px solid rgba(255, 255, 255, 0.2) !important;
-            padding: 8px 16px !important;
-            border-radius: 8px !important;
-            font-size: 13px !important;
-            font-weight: 600 !important;
+            background: none !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 4px 6px !important;
+            border-radius: 6px !important;
             cursor: pointer !important;
-            transition: all 0.2s !important;
-            box-shadow: 0 4px 12px rgba(255, 107, 74, 0.3) !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 5px !important;
+            color: rgba(255, 255, 255, 0.65) !important;
+            font-size: 12px !important;
+            font-weight: 500 !important;
+            transition: color 0.2s !important;
         }
 
         #logoutContainer button:hover {
-            background: rgba(255, 107, 74, 1) !important;
-            transform: translateY(-1px);
+            color: rgba(255, 255, 255, 1) !important;
+            background: none !important;
+            transform: none !important;
         }
 
         /* ===== LOGIN CARD (VIBRANT Design) ===== */
@@ -1401,13 +1408,15 @@
 
             /* LOGOUT */
             #logoutContainer {
-                top: 12px;
-                right: 12px;
+                top: 0;
+                right: 0;
+                padding: 16px 14px;
             }
 
             #logoutContainer button {
-                font-size: 12px !important;
-                padding: 7px 12px !important;
+                font-size: 11px !important;
+                padding: 3px 4px !important;
+                gap: 4px !important;
             }
 
             /* ERROR / INFO */
@@ -1688,8 +1697,15 @@
 <body>
     <div class="container" style="position: relative;">
         <!-- Logout Button oben -->
-        <div id="logoutContainer" style="display: none; text-align: right; margin-bottom: 15px;">
-            <button onclick="logoutUser()" style="padding: 10px 16px; background: #ff6b6b; color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap;">👋 Logout (<span id="mitarbeiterDisplay">Marcel</span>)</button>
+        <div id="logoutContainer" style="display: none;">
+            <button onclick="logoutUser()">
+                <span id="mitarbeiterDisplay">Marcel</span>
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+            </button>
         </div>
 
         <!-- <h1>Paletten Übersicht</h1>
