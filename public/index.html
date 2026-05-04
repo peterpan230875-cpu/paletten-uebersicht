@@ -325,6 +325,57 @@
             margin-top: 12px;
         }
 
+        /* ===== AUTOCOMPLETE KUNDENNAMEN ===== */
+        .autocomplete-wrapper {
+            position: relative;
+        }
+
+        .autocomplete-list {
+            position: absolute;
+            top: calc(100% - 6px);
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #FF6B4A;
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            max-height: 220px;
+            overflow-y: auto;
+            z-index: 500;
+            box-shadow: 0 8px 24px rgba(255, 107, 74, 0.15);
+            display: none;
+        }
+
+        .autocomplete-item {
+            padding: 11px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #1a1a1a;
+            border-bottom: 1px solid #f5f5f5;
+            transition: background 0.15s;
+        }
+
+        .autocomplete-item:last-child {
+            border-bottom: none;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .autocomplete-item:hover {
+            background: #fff5f0;
+            color: #FF6B4A;
+        }
+
+        .autocomplete-item strong {
+            color: #FF6B4A;
+            font-weight: 700;
+        }
+
+        /* Input wenn Dropdown offen: untere Radien entfernen */
+        .autocomplete-wrapper.open input {
+            border-radius: 10px 10px 0 0;
+            border-color: #FF6B4A;
+        }
+
         /* ===== STATUS-ANZEIGE / ERROR / SUCCESS BOXES ===== */
         .vibrant-error-box {
             background: #ffe0e0;
@@ -1932,7 +1983,10 @@
                     </select>
 
                     <label class="form-label">Kundenname</label>
-                    <input type="text" id="manualCustomerName" placeholder="Kundenname eingeben...">
+                    <div class="autocomplete-wrapper" id="customerAutocompleteWrapper">
+                        <input type="text" id="manualCustomerName" placeholder="Kundenname eingeben..." autocomplete="off">
+                        <div class="autocomplete-list" id="customerAutocompleteList"></div>
+                    </div>
 
                     <label class="form-label">Kundennummer (optional)</label>
                     <input type="text" id="manualCustomerNumber" placeholder="Kundennummer eingeben...">
@@ -3542,12 +3596,103 @@
             document.getElementById('manualQuantity').value = '1';
             manualAction = null;
 
+            // Autocomplete zurücksetzen
+            schliesseAutocomplete();
+
             // Reset Action Buttons (entferne aktive Klassen)
             document.getElementById('manualActionAdd').classList.remove('active-add', 'active-remove');
             document.getElementById('manualActionRemove').classList.remove('active-add', 'active-remove');
 
             setPhase('manualInputPhase');
+
+            // Kundennamen für Autocomplete laden (einmalig)
+            ladeKundenFuerAutocomplete();
         }
+
+        // ============================================================
+        // AUTOCOMPLETE FÜR KUNDENNAMEN
+        // ============================================================
+        let _autocompleteKunden = [];
+        let _autocompleteGeladen = false;
+
+        async function ladeKundenFuerAutocomplete() {
+            if (_autocompleteGeladen) return;
+            try {
+                const res = await fetch('/api/get-all-customers');
+                if (res.ok) {
+                    _autocompleteKunden = await res.json();
+                    _autocompleteGeladen = true;
+                    console.log('✅ Autocomplete: ' + _autocompleteKunden.length + ' Kunden geladen');
+                }
+            } catch (e) {
+                console.warn('⚠️ Autocomplete konnte Kunden nicht laden:', e.message);
+            }
+        }
+
+        function zeigeAutocomplete(query) {
+            const list = document.getElementById('customerAutocompleteList');
+            const wrapper = document.getElementById('customerAutocompleteWrapper');
+
+            if (!query || query.length === 0) {
+                schliesseAutocomplete();
+                return;
+            }
+
+            const q = query.toLowerCase();
+            const treffer = _autocompleteKunden
+                .filter(name => name.toLowerCase().includes(q))
+                .slice(0, 8);
+
+            if (treffer.length === 0) {
+                schliesseAutocomplete();
+                return;
+            }
+
+            list.innerHTML = treffer.map(name => {
+                // Passenden Teil fett hervorheben
+                const idx = name.toLowerCase().indexOf(q);
+                const hervorgehoben = name.slice(0, idx)
+                    + '<strong>' + name.slice(idx, idx + q.length) + '</strong>'
+                    + name.slice(idx + q.length);
+                return `<div class="autocomplete-item" onmousedown="waehleAutocompleteKunde('${name.replace(/'/g, "\\'")}')">${hervorgehoben}</div>`;
+            }).join('');
+
+            list.style.display = 'block';
+            wrapper.classList.add('open');
+        }
+
+        function schliesseAutocomplete() {
+            const list = document.getElementById('customerAutocompleteList');
+            const wrapper = document.getElementById('customerAutocompleteWrapper');
+            if (list) list.style.display = 'none';
+            if (wrapper) wrapper.classList.remove('open');
+        }
+
+        function waehleAutocompleteKunde(name) {
+            document.getElementById('manualCustomerName').value = name;
+            schliesseAutocomplete();
+        }
+
+        // Event Listener auf das Eingabefeld
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('manualCustomerName');
+            if (!input) return;
+
+            input.addEventListener('input', function() {
+                zeigeAutocomplete(this.value.trim());
+            });
+
+            input.addEventListener('focus', function() {
+                if (this.value.trim().length > 0) {
+                    zeigeAutocomplete(this.value.trim());
+                }
+            });
+
+            input.addEventListener('blur', function() {
+                // Kurz warten damit onmousedown des Items noch feuert
+                setTimeout(schliesseAutocomplete, 150);
+            });
+        });
 
         function setManualAction(action) {
             manualAction = action;
