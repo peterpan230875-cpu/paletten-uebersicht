@@ -22,17 +22,11 @@
         }
 
         .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 40px 40px 60px 40px;
+            background: transparent;
             max-width: 600px;
             width: 100%;
-            max-height: 95vh;
             display: flex;
             flex-direction: column;
-            overflow-y: auto;
-            overflow-x: hidden;
         }
 
         /* ===== ALLE PHASEN: Container transparent (eigenes Card-Design) ===== */
@@ -52,6 +46,11 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             position: relative;
             width: 100%;
+            /* Einheitliche Höhe auf allen Seiten */
+            display: flex;
+            flex-direction: column;
+            height: 85vh;
+            max-height: 820px;
         }
 
         .phase-card::before {
@@ -72,6 +71,7 @@
             align-items: center;
             justify-content: space-between;
             gap: 14px;
+            flex-shrink: 0;
         }
 
         .phase-header-left {
@@ -137,6 +137,10 @@
         .phase-content {
             background: white;
             padding: 28px 24px;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
         }
 
         .phase-content h2 {
@@ -386,6 +390,10 @@
             overflow: hidden;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 85vh;
+            max-height: 820px;
         }
 
         .login-card::before {
@@ -405,6 +413,7 @@
             display: flex;
             align-items: center;
             gap: 14px;
+            flex-shrink: 0;
         }
 
         .login-header-icon {
@@ -436,6 +445,10 @@
         .login-content {
             background: white;
             padding: 32px 28px;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
         }
 
         .login-content h2 {
@@ -857,9 +870,7 @@
             padding: 0;
             display: flex;
             flex-direction: column;
-            height: 100%;
             width: 100%;
-            overflow: hidden;
         }
 
         .kundenliste-header, .kundendetail-header, .palettehistorie-header {
@@ -903,9 +914,6 @@
             grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             gap: 12px;
             width: 100%;
-            overflow-y: auto;
-            overflow-x: hidden;
-            flex: 1;
             padding: 20px;
             box-sizing: border-box;
         }
@@ -1028,11 +1036,8 @@
             display: flex;
             flex-direction: column;
             width: 100%;
-            overflow-y: auto;
-            overflow-x: hidden;
-            flex: 1;
-            padding: 30px;
-            gap: 20px;
+            padding: 20px;
+            gap: 12px;
             box-sizing: border-box;
         }
 
@@ -1134,21 +1139,13 @@
                 overflow: visible !important;
             }
 
-            /* PHASE CARD - vollbreite, scrollbar, kein Radius */
+            /* PHASE CARD - Vollbild auf Mobile */
             .phase-card,
             .login-card {
                 border-radius: 0;
-                min-height: 100svh;
+                height: 100svh;
+                max-height: 100svh;
                 box-shadow: none;
-                overflow: visible;
-            }
-
-            /* PHASE - kein height-limit, scrollt mit der Seite */
-            .phase,
-            .phase.active {
-                height: auto !important;
-                overflow: visible !important;
-                flex: none !important;
             }
 
             /* PHASE HEADER */
@@ -1232,16 +1229,6 @@
 
             .recording-section {
                 padding: 12px;
-                flex: none;
-                height: auto;
-            }
-
-            /* SECTIONS - kein overflow-hidden, kein height fix */
-            .kundenliste-section,
-            .kundendetail-section,
-            .palettehistorie-section {
-                height: auto !important;
-                overflow: visible !important;
             }
 
             /* ALTE BUTTONS (Review-Phase) */
@@ -1262,9 +1249,6 @@
                 grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
                 gap: 10px;
                 padding: 14px;
-                overflow: visible !important;
-                flex: none !important;
-                height: auto !important;
             }
 
             .kundenliste-item {
@@ -1273,15 +1257,9 @@
                 min-height: 62px;
             }
 
-            /* PALETTENHISTORIE - scrollt mit Seite */
             .palettehistorie-list {
-                overflow: visible !important;
-                flex: none !important;
-                height: auto !important;
-            }
-
-            .kundendetail-list {
-                overflow: visible !important;
+                padding: 14px;
+                gap: 10px;
             }
 
             /* KUNDENDETAILS */
@@ -1311,12 +1289,6 @@
             .saldo-button {
                 padding: 7px 14px;
                 font-size: 13px;
-            }
-
-            /* PALETTENHISTORIE */
-            .palettehistorie-list {
-                padding: 14px;
-                gap: 10px;
             }
 
             .palettehistorie-item {
@@ -1534,6 +1506,8 @@
             .phase-card,
             .login-card {
                 border-radius: 20px;
+                height: 82vh;
+                max-height: 760px;
             }
 
             .phase-header {
@@ -1804,7 +1778,7 @@
 
                         <button onclick="showOverview()" class="btn-vibrant-success">📊 Übersicht</button>
 
-                        <div style="text-align: center; margin-top: 16px; font-size: 12px; color: #999; font-weight: 600;">V1.383</div>
+                        <div style="text-align: center; margin-top: 16px; font-size: 12px; color: #999; font-weight: 600;">V1.384</div>
                     </div>
                 </div>
             </div>
