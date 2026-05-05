@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Paletten Übersicht</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -1829,7 +1830,7 @@
 
                         <button onclick="showOverview()" class="btn-vibrant-success">📊 Übersicht</button>
 
-                        <div style="text-align: center; margin-top: 16px; font-size: 12px; color: #999; font-weight: 600;">V1.384</div>
+                        <div style="text-align: center; margin-top: 16px; font-size: 12px; color: #999; font-weight: 600;">V1.385</div>
                     </div>
                 </div>
             </div>
@@ -1929,7 +1930,15 @@
                             <p>Paletten verwalten</p>
                         </div>
                     </div>
-                    <button class="phase-back-btn" onclick="backToCustomerList()">← Zurück</button>
+                    <div style="display:flex; gap:8px; align-items:center; flex-shrink:0;">
+                        <button class="phase-back-btn" id="qrCodeBtn" onclick="zeigeQRCode()" title="QR-Code anzeigen" style="padding:8px 10px;">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                                <path d="M14 14h3v3h-3zM17 17h3v3h-3zM14 20h3"/>
+                            </svg>
+                        </button>
+                        <button class="phase-back-btn" onclick="backToCustomerList()">← Zurück</button>
+                    </div>
                 </div>
                 <div class="phase-content">
                     <div id="kundendetailContainer" class="kundendetail-list">
@@ -2004,6 +2013,27 @@
                         <button onclick="saveManualInput()" class="btn-vibrant-success" style="margin-top: 8px;">✅ Speichern</button>
                         <button onclick="cancelManualInput()" class="btn-vibrant-danger" style="margin-top: 8px;">❌ Abbrechen</button>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- QR-CODE MODAL -->
+        <div id="qrCodeModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:2000; align-items:center; justify-content:center; padding:20px;">
+            <div style="background:white; border-radius:20px; overflow:hidden; max-width:340px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+                <div style="background:#1a2538; padding:18px 20px; display:flex; align-items:center; justify-content:space-between;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div style="width:36px; height:36px; background:linear-gradient(135deg,#FF6B4A,#FF8C42); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px;">📱</div>
+                        <div>
+                            <div style="color:white; font-size:15px; font-weight:700;">QR-Code</div>
+                            <div id="qrModalSubtitle" style="color:rgba(255,255,255,0.6); font-size:11px;"></div>
+                        </div>
+                    </div>
+                    <button onclick="schliesseQRModal()" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:white; border-radius:8px; padding:6px 12px; font-size:13px; cursor:pointer;">✕</button>
+                </div>
+                <div style="padding:24px; text-align:center;">
+                    <p style="font-size:13px; color:#888; margin-bottom:16px;">Kunde scannt diesen Code um seinen Palettenstand zu sehen</p>
+                    <div id="qrCodeContainer" style="display:inline-block; padding:12px; border:2px solid #f0f0f0; border-radius:12px;"></div>
+                    <div id="qrUrlText" style="margin-top:14px; font-size:11px; color:#aaa; word-break:break-all; padding:0 8px;"></div>
                 </div>
             </div>
         </div>
@@ -3474,6 +3504,48 @@
             currentCustomer = null;
             setPhase('kundenlistePhase');
         }
+
+        // ============================================================
+        // QR-CODE ANZEIGE
+        // ============================================================
+        function zeigeQRCode() {
+            if (!currentCustomer) return;
+
+            const modal = document.getElementById('qrCodeModal');
+            const container = document.getElementById('qrCodeContainer');
+            const subtitle = document.getElementById('qrModalSubtitle');
+            const urlText = document.getElementById('qrUrlText');
+
+            // URL für den Kunden
+            const kundeUrl = window.location.origin + '/kunde/' + encodeURIComponent(currentCustomer);
+
+            // Subtitle setzen
+            subtitle.textContent = currentCustomer;
+            urlText.textContent = kundeUrl;
+
+            // QR Container leeren und neu erstellen
+            container.innerHTML = '';
+            new QRCode(container, {
+                text: kundeUrl,
+                width: 200,
+                height: 200,
+                colorDark: '#1a2538',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.M
+            });
+
+            // Modal anzeigen
+            modal.style.display = 'flex';
+        }
+
+        function schliesseQRModal() {
+            document.getElementById('qrCodeModal').style.display = 'none';
+        }
+
+        // Klick außerhalb des Modals schließt es
+        document.getElementById('qrCodeModal') && document.getElementById('qrCodeModal').addEventListener('click', function(e) {
+            if (e.target === this) schliesseQRModal();
+        });
 
         function backToCustomerDetail() {
             currentPalette = null;

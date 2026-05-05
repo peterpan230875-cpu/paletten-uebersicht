@@ -1204,6 +1204,276 @@ app.get('/api/test', async (req, res) => {
 });
 
 // ============================================
+// API: ÖFFENTLICHE KUNDENSALDO-ANSICHT (kein Login nötig)
+// ============================================
+app.get('/api/public/kunde/:kundenname', async (req, res) => {
+    try {
+        const kundenname = decodeURIComponent(req.params.kundenname);
+
+        const { data, error } = await supabase
+            .from('Kunden_Saldo')
+            .select('Palettenart, Saldo')
+            .eq('Kundenname', kundenname)
+            .order('Palettenart', { ascending: true });
+
+        if (error) return res.json({ success: false, error: error.message });
+
+        res.json({
+            success: true,
+            kundenname,
+            paletten: data || []
+        });
+    } catch (err) {
+        res.json({ success: false, error: err.message });
+    }
+});
+
+// ============================================
+// ROUTE: ÖFFENTLICHE KUNDEN-SEITE (QR-Code Ziel)
+// ============================================
+app.get('/kunde/:kundenname', async (req, res) => {
+    try {
+        const kundenname = decodeURIComponent(req.params.kundenname);
+
+        // Palettendaten laden
+        const { data, error } = await supabase
+            .from('Kunden_Saldo')
+            .select('Palettenart, Saldo')
+            .eq('Kundenname', kundenname)
+            .order('Palettenart', { ascending: true });
+
+        const paletten = (data || []).filter(p => p.Saldo > 0);
+
+        let palettenHTML = '';
+        if (paletten.length === 0) {
+            palettenHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <p>Du hast aktuell keine Paletten bei uns.</p>
+                </div>`;
+        } else {
+            palettenHTML = paletten.map(p => `
+                <div class="palette-item">
+                    <span class="palette-name">${p.Palettenart}</span>
+                    <span class="palette-count">${p.Saldo}</span>
+                </div>`).join('');
+        }
+
+        const gesamtSaldo = paletten.reduce((sum, p) => sum + p.Saldo, 0);
+        const heute = new Date().toLocaleDateString('de-DE', {
+            day: '2-digit', month: '2-digit', year: 'numeric'
+        });
+
+        const html = `<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paletten – ${kundenname}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: radial-gradient(ellipse at center, #1a2a3a 0%, #0f1820 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card {
+            background: #1a2538;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 480px;
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #FF6B4A 0%, #FF8C42 50%, #FFD700 100%);
+            z-index: 2;
+        }
+
+        .header {
+            padding: 24px 22px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .header-icon {
+            width: 50px; height: 50px;
+            background: linear-gradient(135deg, #FF6B4A, #FF8C42);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(255,107,74,0.35);
+        }
+
+        .header-text h1 {
+            color: white;
+            font-size: 19px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .header-text p {
+            color: rgba(255,255,255,0.55);
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .content {
+            background: white;
+            padding: 24px 20px 28px;
+        }
+
+        .customer-name {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+            letter-spacing: -0.4px;
+        }
+
+        .customer-meta {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .palette-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            background: linear-gradient(135deg, #f8f9fa, #fff5f0);
+            border: 1.5px solid #ffe5dc;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .palette-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .palette-count {
+            font-size: 22px;
+            font-weight: 800;
+            color: #FF6B4A;
+            min-width: 40px;
+            text-align: right;
+        }
+
+        .gesamt-box {
+            background: linear-gradient(135deg, #FF6B4A, #FF8C42);
+            border-radius: 10px;
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+        }
+
+        .gesamt-label {
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        .gesamt-count {
+            color: white;
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .empty-icon {
+            font-size: 56px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            color: #888;
+            line-height: 1.5;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 11px;
+            color: rgba(255,255,255,0.3);
+            padding-bottom: 4px;
+        }
+
+        @media (max-width: 480px) {
+            body { padding: 0; align-items: flex-start; }
+            .card { border-radius: 0; min-height: 100svh; }
+            .customer-name { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="header">
+            <div class="header-icon">📦</div>
+            <div class="header-text">
+                <h1>Meine Paletten</h1>
+                <p>Aktueller Kontostand</p>
+            </div>
+        </div>
+        <div class="content">
+            <div class="customer-name">👤 ${kundenname}</div>
+            <div class="customer-meta">Stand: ${heute}</div>
+
+            ${paletten.length > 0 ? `<div class="section-label">Palettenarten</div>` : ''}
+
+            ${palettenHTML}
+
+            ${paletten.length > 1 ? `
+            <div class="gesamt-box">
+                <span class="gesamt-label">Gesamt</span>
+                <span class="gesamt-count">${gesamtSaldo}</span>
+            </div>` : ''}
+        </div>
+        <div class="footer">paletten-uebersicht-app.vercel.app</div>
+    </div>
+</body>
+</html>`;
+
+        res.send(html);
+    } catch (err) {
+        res.status(500).send(`<p>Fehler: ${err.message}</p>`);
+    }
+});
+
+// ============================================
 // STATISCHE DATEIEN (nach allen API-Routen!)
 // ============================================
 app.use(express.static(path.join(__dirname, 'public')));
