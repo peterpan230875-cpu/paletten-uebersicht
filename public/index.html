@@ -435,6 +435,40 @@
             transform: none !important;
         }
 
+        /* ===== READONLY MODE ===== */
+        #readonlyBadge {
+            display: none;
+            align-items: center;
+            gap: 4px;
+            background: linear-gradient(135deg, #f97316 0%, #ef4444 100%);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 10px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        body.readonly-mode #readonlyBadge {
+            display: inline-flex;
+        }
+
+        /* In readonly mode: hide back-button on kundenliste (no recording phase home) */
+        body.readonly-mode #kundenlistePhase .phase-back-btn {
+            display: none !important;
+        }
+
+        /* In readonly mode: saldo is not clickable */
+        body.readonly-mode .kundendetail-saldo {
+            cursor: default !important;
+        }
+
+        body.readonly-mode .saldo-edit-icon {
+            display: none !important;
+        }
+
         /* ===== LOGIN CARD (VIBRANT Design) ===== */
         .login-card {
             background: #1a2538;
@@ -1723,7 +1757,8 @@
 <body>
     <div class="container" style="position: relative;">
         <!-- Logout Button oben -->
-        <div id="logoutContainer" style="display: none;">
+        <div id="logoutContainer" style="display: none; align-items: center; gap: 8px;">
+            <span id="readonlyBadge">👁 Nur-Lese</span>
             <button onclick="logoutUser()">
                 <span id="mitarbeiterDisplay">Marcel</span>
                 <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1791,6 +1826,12 @@
                     <label class="form-label">Mitarbeitername</label>
                     <input type="text" id="adminMitarbeitername" placeholder="z.B. Klaus">
 
+                    <label class="form-label">Berechtigungen</label>
+                    <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-size:14px; color:#ccc; margin-bottom:16px; padding:12px 14px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px;">
+                        <input type="checkbox" id="adminReadOnly" style="width:18px; height:18px; cursor:pointer; accent-color:#FF6B4A; flex-shrink:0;">
+                        <span>Nur-Lese-Zugriff <span style="color:#FF6B4A; font-size:11px;">(Kontroll-Mitarbeiter)</span></span>
+                    </label>
+
                     <label class="form-label">Admin-Passwort</label>
                     <input type="password" id="adminPassword" placeholder="Admin-Passwort">
 
@@ -1830,7 +1871,7 @@
 
                         <button onclick="showOverview()" class="btn-vibrant-success">📊 Übersicht</button>
 
-                        <div style="text-align: center; margin-top: 16px; font-size: 12px; color: #999; font-weight: 600;">V1.385</div>
+                        <div style="text-align: center; margin-top: 16px; font-size: 12px; color: #999; font-weight: 600;">V1.386</div>
                     </div>
                 </div>
             </div>
@@ -1927,7 +1968,7 @@
                         <div class="phase-header-icon">📦</div>
                         <div class="phase-header-text">
                             <h1 id="detailCustomerTitle">Kundendetails</h1>
-                            <p>Paletten verwalten</p>
+                            <p id="detailCustomerSubtitle">Paletten verwalten</p>
                         </div>
                     </div>
                     <div style="display:flex; gap:8px; align-items:center; flex-shrink:0;">
@@ -2178,6 +2219,7 @@
 
         // Login & Mitarbeiter
         let mitarbeiterName = null;
+        let isReadOnly = false;
 
         // ============================================
         // 📱 DEVICE-DETECTION FÜR MOBILE-KOMPATIBILITÄT
@@ -2797,7 +2839,7 @@
                 }
                 const logoutContainer = document.getElementById('logoutContainer');
                 if (logoutContainer) {
-                    logoutContainer.style.display = 'block';
+                    logoutContainer.style.display = 'flex';
                 }
             }
         }
@@ -3565,15 +3607,17 @@
                 targetPhase.classList.add('active');
             }
 
-            // Zeige Logout-Button nur in recordingPhase
+            // Zeige Logout-Button: in recordingPhase ODER (readonly) in Übersicht-Phasen
             const logoutContainer = document.getElementById('logoutContainer');
             if (logoutContainer) {  // ✅ Sicherer Null-Check
-                if (phaseName === 'recordingPhase') {
-                    logoutContainer.style.display = 'block';
-                    console.log('✅ Logout-Button angezeigt (recordingPhase)');
+                const readonlyPhases = ['kundenlistePhase', 'kundendetailPhase', 'paletteHistoriePhase'];
+                const showLogout = phaseName === 'recordingPhase' ||
+                    (isReadOnly && readonlyPhases.includes(phaseName));
+                logoutContainer.style.display = showLogout ? 'flex' : 'none';
+                if (showLogout) {
+                    console.log('✅ Logout-Button angezeigt (' + phaseName + ')');
                 } else {
-                    logoutContainer.style.display = 'none';
-                    console.log('❌ Logout-Button versteckt (nicht recordingPhase)');
+                    console.log('❌ Logout-Button versteckt (' + phaseName + ')');
                 }
             } else {
                 console.warn('⚠️ logoutContainer nicht gefunden!');
@@ -4007,6 +4051,7 @@
 
                 // Update Title
                 document.getElementById('detailCustomerTitle').textContent = `📦 ${kundenname}`;
+                document.getElementById('detailCustomerSubtitle').textContent = isReadOnly ? 'Nur-Lese-Ansicht' : 'Paletten verwalten';
 
                 const response = await fetch(`/api/customer-detail/${encodeURIComponent(kundenname)}`);
                 const data = await response.json();
@@ -4028,8 +4073,8 @@
                                 <div class="kundendetail-palettenart" data-kundenname="${escapeHtml(kundenname)}" data-palettenart="${displayPalette}" style="cursor: pointer; text-decoration: underline;">
                                     ${displayPalette}
                                 </div>
-                                <div class="kundendetail-saldo" data-kundenname="${escapeHtml(kundenname)}" data-palettenart="${displayPalette}" data-saldo="${palette.saldo}" style="cursor: pointer;">
-                                    <span>${palette.saldo}</span> ✏️
+                                <div class="kundendetail-saldo" data-kundenname="${escapeHtml(kundenname)}" data-palettenart="${displayPalette}" data-saldo="${palette.saldo}" style="cursor: ${isReadOnly ? 'default' : 'pointer'};">
+                                    <span>${palette.saldo}</span> <span class="saldo-edit-icon">✏️</span>
                                 </div>
                             </div>
                         `;
@@ -4049,16 +4094,19 @@
                     });
                 });
 
-                const saldoItems = container.querySelectorAll('.kundendetail-saldo');
-                saldoItems.forEach(item => {
-                    item.addEventListener('click', function() {
-                        const kname = this.getAttribute('data-kundenname');
-                        const pname = this.getAttribute('data-palettenart');
-                        const saldo = parseInt(this.getAttribute('data-saldo'));
-                        console.log('🖱️ Klick auf Saldo:', kname, pname, saldo);
-                        editSaldo(kname, pname, saldo);
+                // Saldo-Bearbeitung nur für Mitarbeiter mit Vollzugriff
+                if (!isReadOnly) {
+                    const saldoItems = container.querySelectorAll('.kundendetail-saldo');
+                    saldoItems.forEach(item => {
+                        item.addEventListener('click', function() {
+                            const kname = this.getAttribute('data-kundenname');
+                            const pname = this.getAttribute('data-palettenart');
+                            const saldo = parseInt(this.getAttribute('data-saldo'));
+                            console.log('🖱️ Klick auf Saldo:', kname, pname, saldo);
+                            editSaldo(kname, pname, saldo);
+                        });
                     });
-                });
+                }
 
                 setPhase('kundendetailPhase');
                 console.log('✅ Kundendetails angezeigt');
@@ -4193,9 +4241,17 @@
                     const session = JSON.parse(sessionData);
                     if (isSessionValid(session)) {
                         mitarbeiterName = session.mitarbeiter;
-                        console.log('✅ Session gültig, Mitarbeiter:', mitarbeiterName);
+                        isReadOnly = !!session.readOnly;
+                        console.log('✅ Session gültig, Mitarbeiter:', mitarbeiterName, isReadOnly ? '(Nur-Lese)' : '(Vollzugriff)');
                         document.getElementById('mitarbeiterDisplay').textContent = mitarbeiterName;
-                        setPhase('recordingPhase');
+
+                        if (isReadOnly) {
+                            document.body.classList.add('readonly-mode');
+                            showOverview();
+                        } else {
+                            document.body.classList.remove('readonly-mode');
+                            setPhase('recordingPhase');
+                        }
                         return;
                     } else {
                         console.log('⏰ Session abgelaufen');
@@ -4244,21 +4300,30 @@
 
                 if (result.success) {
                     // Login erfolgreich
+                    isReadOnly = !!result.readOnly;
                     const sessionData = {
                         mitarbeiter: mitarbeitername,
-                        timestamp: Date.now()
+                        timestamp: Date.now(),
+                        readOnly: isReadOnly
                     };
                     localStorage.setItem('palettenSession', JSON.stringify(sessionData));
                     mitarbeiterName = mitarbeitername;
 
-                    console.log('✅ Login erfolgreich:', mitarbeitername);
+                    console.log('✅ Login erfolgreich:', mitarbeitername, isReadOnly ? '(Nur-Lese)' : '(Vollzugriff)');
                     document.getElementById('mitarbeiterDisplay').textContent = mitarbeitername;
 
-                    // Zeige Error-Box verstecken
+                    // Error-Box verstecken
                     document.getElementById('loginErrorBox').style.display = 'none';
 
-                    // Wechsle zur Recording-Phase
-                    setPhase('recordingPhase');
+                    if (isReadOnly) {
+                        // Kontroll-Mitarbeiter: direkt zur Kundenliste (Nur-Lese)
+                        document.body.classList.add('readonly-mode');
+                        showOverview();
+                    } else {
+                        // Normaler Mitarbeiter: zur Aufnahme
+                        document.body.classList.remove('readonly-mode');
+                        setPhase('recordingPhase');
+                    }
                 } else if (result.firstTime) {
                     // Mitarbeiter existiert, aber Passwort muss noch gesetzt werden
                     showLoginError(`⚠️ ${result.error}\n\nBitte setzen Sie ein Passwort.`);
@@ -4312,6 +4377,7 @@
             document.getElementById('adminSuccessBox').style.display = 'none';
             document.getElementById('adminMitarbeitername').value = '';
             document.getElementById('adminPassword').value = '';
+            document.getElementById('adminReadOnly').checked = false;
         }
 
         function backToLogin() {
@@ -4324,6 +4390,7 @@
         async function addNewEmployee() {
             const name = document.getElementById('adminMitarbeitername').value.trim();
             const adminPassword = document.getElementById('adminPassword').value;
+            const readOnly = document.getElementById('adminReadOnly').checked;
 
             if (!name) {
                 showAdminError('❌ Mitarbeitername erforderlich');
@@ -4336,16 +4403,18 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         name,
-                        adminPassword
+                        adminPassword,
+                        readOnly
                     })
                 });
 
                 const result = await response.json();
 
                 if (result.success) {
-                    showAdminSuccess(`✅ ${result.message}`);
+                    showAdminSuccess(`✅ ${result.message}${readOnly ? ' (Nur-Lese-Zugriff)' : ''}`);
                     document.getElementById('adminMitarbeitername').value = '';
                     document.getElementById('adminPassword').value = '';
+                    document.getElementById('adminReadOnly').checked = false;
 
                     setTimeout(() => {
                         backToLogin();
@@ -4364,6 +4433,8 @@
             console.log('👋 Logout');
             localStorage.removeItem('palettenSession');
             mitarbeiterName = null;
+            isReadOnly = false;
+            document.body.classList.remove('readonly-mode');
 
             // Leere Input-Felder
             document.getElementById('loginMitarbeiter').value = '';

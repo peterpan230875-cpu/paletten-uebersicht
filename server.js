@@ -868,7 +868,7 @@ app.post('/api/login-mitarbeiter', async (req, res) => {
         // Suche Mitarbeiter
         const { data: mitarbeiterData, error } = await supabase
             .from('Mitarbeiter')
-            .select('Name, Passwort')
+            .select('*')
             .eq('Name', mitarbeitername)
             .limit(1);
 
@@ -911,6 +911,7 @@ app.post('/api/login-mitarbeiter', async (req, res) => {
         res.json({
             success: true,
             mitarbeitername: mitarbeitername,
+            readOnly: mitarbeiter.ReadOnly === true,
             message: 'Login erfolgreich'
         });
     } catch (err) {
@@ -978,7 +979,7 @@ app.post('/api/set-password', async (req, res) => {
 // ============================================
 app.post('/api/add-employee', async (req, res) => {
     try {
-        const { name, adminPassword } = req.body;
+        const { name, adminPassword, readOnly } = req.body;
 
         // Simple Admin-Authentifizierung (sollte verbessert werden)
         if (adminPassword !== 'admin1234') {
@@ -1015,7 +1016,8 @@ app.post('/api/add-employee', async (req, res) => {
             .insert([{
                 Name: name.trim(),
                 Passwort: null,  // Muss beim ersten Login gesetzt werden
-                ErstelltAm: new Date().toISOString()
+                ErstelltAm: new Date().toISOString(),
+                ReadOnly: readOnly === true
             }]);
 
         if (error) {
