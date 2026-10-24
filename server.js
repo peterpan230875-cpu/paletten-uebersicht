@@ -37,7 +37,7 @@ eder / eder-palette → Eder-Palette
 limex / limes / lime x → Limex-Palette
 leipfinger / leipfinger ziegel / lipfinger / laipfinger / leifinger → Leipfinger Ziegelpalette
 ziegel / ziegel-palette / ziegelpalette → Ziegelpalette (NUR wenn kein Leipfinger dabei)
-grafe / grafepalette / graffe → Grafepalette
+grafe / grafepalette / graffe / graphe / graphe palette / graph palette → Grafepalette
 spezial / spezial-palette → Spezialpalette
 
 Zahlen können als Wort (zwanzig) oder Ziffer (20) auftauchen.

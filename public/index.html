@@ -300,6 +300,24 @@
         }
         .picker-tile:active { background: rgba(255,140,66,0.18); border-color: #FF8C42; color: #FF8C42; }
 
+        /* ===== BESTÄTIGUNGS-LEISTE ===== */
+        #bestaetBar {
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+            background: #1e2d42;
+            border-top: 2px solid #FF8C42;
+            padding: 14px 16px 20px;
+            transform: translateY(100%);
+            transition: transform 0.25s ease;
+        }
+        #bestaetBar.visible { transform: translateY(0); }
+        .bestaet-label { font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .bestaet-erkannt { font-size: 18px; font-weight: 800; color: white; margin-bottom: 14px; }
+        .bestaet-erkannt span { color: #FF8C42; }
+        .bestaet-btns { display: flex; gap: 8px; }
+        .bestaet-nein { flex: 0 0 48px; background: rgba(255,100,100,0.12); border: 1px solid rgba(255,100,100,0.3); color: rgba(255,150,150,0.9); border-radius: 10px; font-size: 18px; cursor: pointer; }
+        .bestaet-aendern { flex: 1; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.14); color: rgba(255,255,255,0.7); border-radius: 10px; padding: 12px; font-size: 13px; font-weight: 600; cursor: pointer; }
+        .bestaet-ja { flex: 1; background: linear-gradient(135deg,#51cf66,#37b24d); border: none; color: white; border-radius: 10px; padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; }
+
         /* ===== VERWALTUNG ===== */
         .gear-btn {
             background: rgba(255,255,255,0.07);
@@ -458,6 +476,17 @@
         </div>
     </div>
 
+    <!-- BESTÄTIGUNGS-LEISTE -->
+    <div id="bestaetBar">
+        <div class="bestaet-label">Erkannt — stimmt das?</div>
+        <div class="bestaet-erkannt"><span id="bestaetAnzahl"></span>× <span id="bestaetArt"></span></div>
+        <div class="bestaet-btns">
+            <button class="bestaet-nein" onclick="verwerfEintrag()">✕</button>
+            <button class="bestaet-aendern" onclick="aendereArt()">✏️ Palettenart ändern</button>
+            <button class="bestaet-ja" onclick="bestaetigeEintrag()">✓ Speichern</button>
+        </div>
+    </div>
+
     <!-- ZUORDNEN OVERLAY -->
     <div id="zuordnenOverlay" class="overlay">
         <div class="overlay-card scrollable">
@@ -593,6 +622,7 @@
             // Ziegelpalette (allgemein – nach Leipfinger, damit Leipfinger zuerst greift)
             'ziegel':'Ziegelpalette','ziegelpalette':'Ziegelpalette',
             'grafe':'Grafepalette','grafepalette':'Grafepalette','graffe':'Grafepalette',
+            'graphe':'Grafepalette','graphe palette':'Grafepalette','graph palette':'Grafepalette',
             'spezial':'Spezialpalette','spezialpalette':'Spezialpalette'
         };
 
@@ -708,28 +738,55 @@
             toastTimer = setTimeout(() => { toast.className = ''; }, 3200);
         }
 
-        function zeigeToastMitKorrigieren(details, transcript, eintrag) {
+        // ============================================
+        // BESTÄTIGUNGS-LEISTE
+        // ============================================
+        let _pending = null; // { palettenart, anzahl, transcript }
+
+        function zeigeBestaetigungsLeiste(palettenart, anzahl, transcript) {
+            _pending = { palettenart, anzahl, transcript };
             _pendingZuordnenText = transcript;
-            _letzterEintrag = eintrag;
-            const toast = document.getElementById('toast');
-            toast.innerHTML = escapeHtml('✅ ' + details) +
-                ' <button onclick="korrigiereEintrag()" style="margin-left:10px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.6);border-radius:6px;padding:3px 10px;font-size:12px;cursor:pointer">Korrigieren</button>';
-            toast.className = 'show success';
-            clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => { toast.className = ''; _letzterEintrag = null; }, 5000);
+            document.getElementById('bestaetArt').textContent = palettenart;
+            document.getElementById('bestaetAnzahl').textContent = anzahl;
+            document.getElementById('bestaetBar').classList.add('visible');
         }
 
-        function korrigiereEintrag() {
-            if (!_letzterEintrag) return;
-            // Letzten Eintrag rückgängig machen
-            const { palettenart, anzahl } = _letzterEintrag;
-            inventur[palettenart] = (inventur[palettenart] || 0) - anzahl;
-            if (inventur[palettenart] <= 0) delete inventur[palettenart];
+        function verbergeBestaetigungsLeiste() {
+            document.getElementById('bestaetBar').classList.remove('visible');
+            _pending = null;
+        }
+
+        function bestaetigeEintrag() {
+            if (!_pending) return;
+            const { palettenart, anzahl, transcript } = _pending;
+            inventur[palettenart] = (inventur[palettenart] || 0) + anzahl;
             speichereInventur();
             aktualisiereAnzeige();
-            _letzterEintrag = null;
-            // Zuordnen-Dialog öffnen
-            oeffneZuordnen();
+            verbergeBestaetigungsLeiste();
+            zeigeToast(`✅ +${anzahl} ${palettenart}`, 'success');
+        }
+
+        function verwerfEintrag() {
+            verbergeBestaetigungsLeiste();
+            zeigeToast('✕ Verworfen', '');
+        }
+
+        function aendereArt() {
+            // Picker öffnen im "Ändern"-Modus — Auswahl aktualisiert nur die Leiste
+            const grid = document.getElementById('pickerGrid');
+            grid.innerHTML = getAllePalettenarten().map(name =>
+                `<button class="picker-tile" onclick="pickerAendern('${escapeAttr(name)}')">${escapeHtml(name)}</button>`
+            ).join('');
+            document.getElementById('pickerOverlay').classList.add('visible');
+        }
+
+        function pickerAendern(name) {
+            document.getElementById('pickerOverlay').classList.remove('visible');
+            if (!_pending) return;
+            // Zuordnung merken damit App beim nächsten Mal direkt richtig liegt
+            lerneZuordnung(_pending.transcript, name);
+            _pending.palettenart = name;
+            document.getElementById('bestaetArt').textContent = name;
         }
 
         function zeigeToastNichtErkannt(text, transcript) {
@@ -850,14 +907,7 @@
             if (paletten.length > 1) paletten = [paletten[0]];
 
             if (paletten.length > 0) {
-                for (const p of paletten) {
-                    inventur[p.palettenart] = (inventur[p.palettenart] || 0) + p.anzahl;
-                }
-                speichereInventur();
-                aktualisiereAnzeige();
-
-                const details = paletten.map(p => `+${p.anzahl} ${p.palettenart}`).join(', ');
-                zeigeToastMitKorrigieren(details, text, paletten[0]);
+                zeigeBestaetigungsLeiste(paletten[0].palettenart, paletten[0].anzahl, text);
             } else {
                 zeigeToastNichtErkannt('', text);
             }
