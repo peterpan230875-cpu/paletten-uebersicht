@@ -1021,7 +1021,10 @@
         }
 
         function getAllePalettenarten() {
-            return [...PALETTENARTEN, ...ladeCustomArten()];
+            const custom = ladeCustomArten().filter(
+                c => !PALETTENARTEN.some(p => p.toLowerCase() === c.toLowerCase())
+            );
+            return [...PALETTENARTEN, ...custom];
         }
 
         // ============================================
