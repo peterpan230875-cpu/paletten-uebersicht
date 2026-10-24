@@ -15,12 +15,17 @@ Erlaubte Palettenarten (verwende exakt diese Schreibweise):
 Europalette, Europalette 2, Europalette 3, Gitterbox, Steinzeug Gitterbox, Ziegelpalette, Gipskartonpalette, Fermacellpalette, MUHR-Palette, Steinzeugpalette, Steinzeugpalette klein, Steinzeugpalette groß, EHL-Palette, Eder-Palette, Limex-Palette, KS-Palette, Porenbetonpalette, KB-Palette, Velux-Palette, Spezialpalette, Grafepalette
 
 Synonyme und typische Spracherkennungs-Fehler:
-euro / europalette / europool / epal → Europalette
+europalette 2 / euro 2 / ep2 → Europalette 2
+europalette 3 / euro 3 / ep3 → Europalette 3
+euro / europalette / europool / epal → Europalette (NUR wenn KEINE 2 oder 3 dabei)
 gitterbox / gitter box / gitter-box / gkr → Gitterbox
 gipskarton / gips karton / gips-karton / gips / gkb → Gipskartonpalette
 fermacell / ferma cell / ferma zell / fermazell / fels / ferma → Fermacellpalette
 muhr / mur / moor / muhr-palette → MUHR-Palette
-steinzeug / stein zeug / steinzeug-palette / stg → Steinzeugpalette
+steinzeug gitterbox / steinzeug-gitterbox / stein zeug gitterbox → Steinzeug Gitterbox
+steinzeug groß / steinzeugpalette groß / steinzeug gross → Steinzeugpalette groß
+steinzeug klein / steinzeugpalette klein → Steinzeugpalette klein
+steinzeug / stein zeug / stg → Steinzeugpalette (NUR wenn KEIN groß/klein/gitterbox dabei)
 ks / kalksandstein / kalk sandstein → KS-Palette
 porenbeton / poren beton / ytong / gasbeton / h+h → Porenbetonpalette
 klinker / kb / klinker-palette → KB-Palette

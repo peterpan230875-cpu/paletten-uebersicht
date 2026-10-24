@@ -434,21 +434,47 @@
         ];
 
         // Lokaler Fallback-Parser (Synonyme + typische Spracherkennungs-Varianten)
+        // WICHTIG: Längere/spezifischere Einträge müssen vor kürzeren stehen.
+        // parseFallback sortiert automatisch nach Länge (längste zuerst).
         const SYNONYME = {
+            // ── Zusammengesetzte Namen zuerst (müssen VOR den Einzelteilen treffen) ──
+            // Steinzeug Gitterbox
+            'steinzeug gitterbox':'Steinzeug Gitterbox',
+            'steinzeug-gitterbox':'Steinzeug Gitterbox',
+            'steinzeug gitter box':'Steinzeug Gitterbox',
+            'stein zeug gitterbox':'Steinzeug Gitterbox',
+            // Steinzeugpalette groß
+            'steinzeugpalette groß':'Steinzeugpalette groß',
+            'steinzeugpalette gross':'Steinzeugpalette groß',
+            'steinzeug paletten groß':'Steinzeugpalette groß',
+            'steinzeug groß':'Steinzeugpalette groß',
+            'steinzeug gross':'Steinzeugpalette groß',
+            'stg groß':'Steinzeugpalette groß',
+            'stg gross':'Steinzeugpalette groß',
+            // Steinzeugpalette klein
+            'steinzeugpalette klein':'Steinzeugpalette klein',
+            'steinzeug paletten klein':'Steinzeugpalette klein',
+            'steinzeug klein':'Steinzeugpalette klein',
+            'stg klein':'Steinzeugpalette klein',
+            // Europalette 2 / 3
+            'europalette 2':'Europalette 2','euro 2':'Europalette 2','ep2':'Europalette 2',
+            'europalette 3':'Europalette 3','euro 3':'Europalette 3','ep3':'Europalette 3',
+
+            // ── Einzelne Typen ──
             // Europalette
             'euro':'Europalette','europalette':'Europalette','europool':'Europalette','epal':'Europalette',
-            // Gitterbox
+            // Gitterbox (nur die einfache – Steinzeug Gitterbox steht oben)
             'gitterbox':'Gitterbox','gitter box':'Gitterbox','gitter-box':'Gitterbox','gkr':'Gitterbox',
-            // Gipskartonpalette – "gips karton" (mit Leerzeichen) kommt oft aus Spracherkennung
+            // Gipskartonpalette
             'gipskarton':'Gipskartonpalette','gips karton':'Gipskartonpalette','gips-karton':'Gipskartonpalette',
             'gips carton':'Gipskartonpalette','gkb':'Gipskartonpalette',
-            // Fermacellpalette – häufig als "ferma zell" oder "ferma cell" erkannt
+            // Fermacellpalette
             'fermacell':'Fermacellpalette','ferma cell':'Fermacellpalette','ferma zell':'Fermacellpalette',
             'fermazell':'Fermacellpalette','ferma-cell':'Fermacellpalette','ferma-zell':'Fermacellpalette',
             'ferma':'Fermacellpalette','fels':'Fermacellpalette',
-            // MUHR – oft als "mur" oder "moor" erkannt
+            // MUHR
             'muhr':'MUHR-Palette','mur':'MUHR-Palette','moor':'MUHR-Palette','mohr':'MUHR-Palette',
-            // Steinzeugpalette
+            // Steinzeugpalette (allgemein – greift nur wenn kein groß/klein/gitterbox davor passte)
             'steinzeug':'Steinzeugpalette','stein zeug':'Steinzeugpalette','steinzeugpalette':'Steinzeugpalette',
             'stg':'Steinzeugpalette',
             // KS-Palette
@@ -457,9 +483,9 @@
             'porenbeton':'Porenbetonpalette','poren beton':'Porenbetonpalette','poren-beton':'Porenbetonpalette',
             'ytong':'Porenbetonpalette','gasbeton':'Porenbetonpalette','gas beton':'Porenbetonpalette',
             // KB-Palette (Klinker)
-            'klinker':'KB-Palette','kb':'KB-Palette','klinker-palette':'KB-Palette',
-            // Velux – manchmal als "welux" erkannt
-            'velux':'Velux-Palette','welux':'Velux-Palette','velux-palette':'Velux-Palette',
+            'klinker':'KB-Palette','kb':'KB-Palette',
+            // Velux
+            'velux':'Velux-Palette','welux':'Velux-Palette',
             // Sonstige
             'ehl':'EHL-Palette','eder':'Eder-Palette',
             'limex':'Limex-Palette','limes':'Limex-Palette','lime x':'Limex-Palette',
@@ -701,26 +727,38 @@
         // Lokaler Fallback ohne Netz
         function parseFallback(text) {
             const results = [];
-            const lower = text.toLowerCase();
-            // Leerzeichen+Bindestriche entfernen für Vergleich bei Leerzeichen-Fehlern
-            const lowerKompakt = lower.replace(/[\s\-]+/g, '');
-
-            // Zahl im gesamten Text suchen (nur einmal nötig)
-            const anzahl = findeZahl(lower);
+            const anzahl = findeZahl(text.toLowerCase());
             if (!anzahl || anzahl <= 0) return results;
 
-            for (const [syn, art] of Object.entries(SYNONYME)) {
-                // Normaler Vergleich
-                let gefunden = lower.includes(syn);
-                // Fallback: Leerzeichen-normierter Vergleich
-                if (!gefunden) {
-                    const synKompakt = syn.replace(/[\s\-]+/g, '');
-                    gefunden = lowerKompakt.includes(synKompakt);
+            // Längste Synonyme zuerst → spezifische Matches schlagen allgemeine
+            const sorted = Object.entries(SYNONYME).sort((a, b) => b[0].length - a[0].length);
+
+            // Arbeitskopie: gematchte Bereiche werden mit Leerzeichen überschrieben
+            let workText = text.toLowerCase();
+
+            for (const [syn, art] of sorted) {
+                // Versuch 1: direkt im (noch nicht gematchten) Text
+                let idx = workText.indexOf(syn);
+
+                // Versuch 2: Leerzeichen-normiert (falls Spracherkennung z.B. "gips karton" → "gipskarton")
+                if (idx === -1) {
+                    const compact = workText.replace(/[\s\-]+/g, '');
+                    const synCompact = syn.replace(/[\s\-]+/g, '');
+                    if (compact.includes(synCompact)) {
+                        // Ungefähre Position im Original-Text ermitteln
+                        idx = 0;
+                    }
                 }
-                if (!gefunden) continue;
-                if (!results.find(r => r.palettenart === art)) {
-                    results.push({ palettenart: art, anzahl });
-                }
+
+                if (idx === -1) continue;
+                if (results.find(r => r.palettenart === art)) continue;
+
+                results.push({ palettenart: art, anzahl });
+
+                // Erkannten Bereich sperren, damit keine Teilwörter mehr matchen
+                workText = workText.substring(0, idx) +
+                    '\u0000'.repeat(syn.length) +
+                    workText.substring(idx + syn.length);
             }
             return results;
         }
