@@ -416,9 +416,7 @@
                 </div>
 
                 <!-- BOTTOM ACTIONS -->
-                <div class="bottom-actions">
-                    <button class="btn-danger-outline" id="btnNeuStarten" onclick="neueInventur()" style="display:none">🗑️ Neu starten</button>
-                </div>
+                <div class="bottom-actions"></div>
 
                 <div class="version">V2.0</div>
             </div>
@@ -556,6 +554,8 @@
                 </p>
                 <div class="section-label" style="margin-top:18px">Standard-Palettenarten</div>
                 <div id="standardArtenListe" style="font-size:12px;color:rgba(255,255,255,0.3);line-height:2"></div>
+                <hr style="border:none;border-top:1px solid rgba(255,255,255,0.1);margin:24px 0 16px">
+                <button class="btn-danger-outline" style="width:100%" onclick="schliesseVerwaltung();neueInventur()">🗑️ Neu starten</button>
             </div>
         </div>
     </div>
@@ -707,7 +707,6 @@
                 .filter(([, v]) => v > 0)
                 .sort((a, b) => b[1] - a[1]);
 
-            const neuStartenBtn = document.getElementById('btnNeuStarten');
             if (eintraege.length === 0) {
                 liste.innerHTML = `
                     <div class="empty-state">
@@ -717,12 +716,10 @@
                         z.B. „15 Europaletten"
                     </div>`;
                 label.style.display = 'none';
-                neuStartenBtn.style.display = 'none';
                 headerCount.textContent = 'Bereit';
             } else {
                 const total = eintraege.reduce((s, [, v]) => s + v, 0);
                 label.style.display = 'block';
-                neuStartenBtn.style.display = '';
                 headerCount.textContent = `${eintraege.length} Arten · ${total} gesamt`;
 
                 liste.innerHTML = eintraege.map(([name, count]) => `
