@@ -128,18 +128,30 @@
             border: 1px solid rgba(255,255,255,0.08);
             border-radius: 10px; padding: 11px 14px;
             display: flex; align-items: center; gap: 10px;
+            cursor: pointer; -webkit-tap-highlight-color: transparent;
         }
+        .palette-row:active { background: rgba(255,255,255,0.09); }
 
         .palette-name { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.88); flex: 1; }
         .palette-count { font-size: 20px; font-weight: 800; color: #FF8C42; min-width: 36px; text-align: right; }
+        .palette-chevron { font-size: 14px; color: rgba(255,255,255,0.2); flex-shrink: 0; }
 
-        .palette-edit-btn {
-            background: rgba(255,255,255,0.07); border: none;
-            color: rgba(255,255,255,0.35); border-radius: 6px;
-            width: 28px; height: 28px; font-size: 13px;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
+        /* ===== DETAIL-OVERLAY ===== */
+        .detail-row {
+            display: flex; align-items: center; gap: 10px;
+            padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
         }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-zeit { font-size: 12px; color: rgba(255,255,255,0.35); flex-shrink: 0; min-width: 42px; }
+        .detail-delta { font-size: 18px; font-weight: 800; flex: 1; }
+        .detail-delta.plus { color: #51cf66; }
+        .detail-delta.minus { color: #ff6b6b; }
+        .detail-del {
+            background: rgba(255,100,100,0.1); border: 1px solid rgba(255,100,100,0.22);
+            color: rgba(255,150,150,0.8); border-radius: 6px;
+            width: 30px; height: 30px; font-size: 14px; cursor: pointer; flex-shrink: 0;
+        }
+        .detail-empty { color: rgba(255,255,255,0.3); font-size: 13px; padding: 16px 0; text-align: center; }
 
         .empty-state {
             text-align: center; padding: 28px 16px;
@@ -486,6 +498,24 @@
         </div>
     </div>
 
+    <!-- DETAIL OVERLAY -->
+    <div id="detailOverlay" class="overlay">
+        <div class="overlay-card scrollable">
+            <div class="overlay-header">
+                <div class="overlay-header-left">
+                    <div>
+                        <div class="overlay-title" id="detailTitel"></div>
+                        <div class="overlay-subtitle" id="detailGesamt"></div>
+                    </div>
+                </div>
+                <button class="close-btn" onclick="schliesseDetail()">✕</button>
+            </div>
+            <div class="overlay-content">
+                <div id="detailListe"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- ZUORDNEN OVERLAY -->
     <div id="zuordnenOverlay" class="overlay">
         <div class="overlay-card scrollable">
@@ -648,6 +678,22 @@
             try { localStorage.setItem('palettenInventur_v2', JSON.stringify(inventur)); } catch (e) {}
         }
 
+        // Verlauf: jede einzelne Eingabe mit Uhrzeit
+        function ladeVerlauf() {
+            try { return JSON.parse(localStorage.getItem('palettenVerlauf_v1') || '{}'); } catch(e) { return {}; }
+        }
+        function speichereVerlauf(v) {
+            try { localStorage.setItem('palettenVerlauf_v1', JSON.stringify(v)); } catch(e) {}
+        }
+        function verlaufHinzufuegen(palettenart, delta) {
+            const v = ladeVerlauf();
+            if (!v[palettenart]) v[palettenart] = [];
+            const jetzt = new Date();
+            const zeit = jetzt.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+            v[palettenart].push({ delta, zeit });
+            speichereVerlauf(v);
+        }
+
         // ============================================
         // ANZEIGE
         // ============================================
@@ -679,10 +725,10 @@
                 headerCount.textContent = `${eintraege.length} Arten · ${total} gesamt`;
 
                 liste.innerHTML = eintraege.map(([name, count]) => `
-                    <div class="palette-row">
+                    <div class="palette-row" onclick="oeffneDetail('${escapeAttr(name)}')">
                         <span class="palette-name">${escapeHtml(name)}</span>
                         <span class="palette-count">${count}</span>
-                        <button class="palette-edit-btn" onclick="bearbeiteEintrag('${escapeAttr(name)}')">✏️</button>
+                        <span class="palette-chevron">›</span>
                     </div>
                 `).join('');
             }
@@ -759,6 +805,7 @@
             if (!_pending) return;
             const { palettenart, anzahl, transcript } = _pending;
             inventur[palettenart] = (inventur[palettenart] || 0) + anzahl;
+            verlaufHinzufuegen(palettenart, anzahl);
             speichereInventur();
             aktualisiereAnzeige();
             verbergeBestaetigungsLeiste();
@@ -1102,6 +1149,68 @@
         }
 
         // ============================================
+        // DETAIL-ANSICHT (Verlauf pro Palettenart)
+        // ============================================
+        let _detailArt = null;
+
+        function oeffneDetail(name) {
+            _detailArt = name;
+            aktualisiereDetail();
+            document.getElementById('detailOverlay').classList.add('visible');
+        }
+
+        function schliesseDetail() {
+            document.getElementById('detailOverlay').classList.remove('visible');
+            _detailArt = null;
+        }
+
+        function aktualisiereDetail() {
+            if (!_detailArt) return;
+            const name = _detailArt;
+            const gesamt = inventur[name] || 0;
+            document.getElementById('detailTitel').textContent = name;
+            document.getElementById('detailGesamt').textContent = 'Gesamt: ' + gesamt;
+
+            const v = ladeVerlauf();
+            const eintraege = (v[name] || []).slice().reverse(); // neueste zuerst
+            const liste = document.getElementById('detailListe');
+
+            if (eintraege.length === 0) {
+                liste.innerHTML = '<div class="detail-empty">Noch keine Einzeleinträge vorhanden.</div>';
+                return;
+            }
+            liste.innerHTML = eintraege.map((e, i) => {
+                const realIdx = (v[name] || []).length - 1 - i; // echter Index (nicht reversed)
+                const cls = e.delta >= 0 ? 'plus' : 'minus';
+                const prefix = e.delta >= 0 ? '+' : '';
+                return `<div class="detail-row">
+                    <span class="detail-zeit">${e.zeit}</span>
+                    <span class="detail-delta ${cls}">${prefix}${e.delta}</span>
+                    <button class="detail-del" onclick="loescheVerlaufEintrag('${escapeAttr(name)}', ${realIdx})">✕</button>
+                </div>`;
+            }).join('');
+        }
+
+        function loescheVerlaufEintrag(palettenart, idx) {
+            const v = ladeVerlauf();
+            if (!v[palettenart] || !v[palettenart][idx]) return;
+            const delta = v[palettenart][idx].delta;
+            v[palettenart].splice(idx, 1);
+            speichereVerlauf(v);
+            // Gesamt anpassen
+            inventur[palettenart] = (inventur[palettenart] || 0) - delta;
+            if (inventur[palettenart] <= 0) delete inventur[palettenart];
+            speichereInventur();
+            aktualisiereAnzeige();
+            // Detail aktualisieren oder schließen wenn leer
+            if (!inventur[palettenart]) {
+                schliesseDetail();
+            } else {
+                aktualisiereDetail();
+            }
+        }
+
+        // ============================================
         // ZUORDNEN (Lernfunktion)
         // ============================================
         function oeffneZuordnen() {
@@ -1123,12 +1232,10 @@
             schliesseZuordnen();
             const transcript = _pendingZuordnenText;
             if (!transcript) return;
-            // Zahl aus dem Transcript holen
             const anzahl = findeZahl(transcript.toLowerCase()) || 1;
-            // Zuordnung merken
             lerneZuordnung(transcript, palettenart);
-            // Sofort in Inventur eintragen
             inventur[palettenart] = (inventur[palettenart] || 0) + anzahl;
+            verlaufHinzufuegen(palettenart, anzahl);
             speichereInventur();
             aktualisiereAnzeige();
             zeigeToast(`✅ +${anzahl} ${palettenart} (gelernt)`, 'success');
@@ -1216,6 +1323,7 @@
             const n = parseInt(eingabe);
             if (!n || n <= 0) return;
             inventur[name] = (inventur[name] || 0) + n;
+            verlaufHinzufuegen(name, n);
             speichereInventur();
             aktualisiereAnzeige();
             zeigeToast(`✅ ${n}× ${name}`, 'success');
@@ -1249,10 +1357,12 @@
 
             if (manualAction === 'add') {
                 inventur[typ] = (inventur[typ] || 0) + qty;
+                verlaufHinzufuegen(typ, qty);
                 zeigeToast(`✅ +${qty} ${typ}`, 'success');
             } else {
                 const neu = (inventur[typ] || 0) - qty;
                 if (neu <= 0) { delete inventur[typ]; } else { inventur[typ] = neu; }
+                verlaufHinzufuegen(typ, -qty);
                 zeigeToast(`✅ -${qty} ${typ}`, 'success');
             }
 
@@ -1271,6 +1381,7 @@
             if (confirm(`Alle ${arten} Einträge löschen und neu starten?`)) {
                 inventur = {};
                 speichereInventur();
+                speichereVerlauf({});
                 aktualisiereAnzeige();
                 zeigeToast('🆕 Neue Inventur gestartet', 'success');
             }
