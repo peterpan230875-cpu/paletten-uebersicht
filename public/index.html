@@ -698,6 +698,7 @@
         // ============================================
         let toastTimer;
         let _pendingZuordnenText = null;
+        let _letzterEintrag = null; // { palettenart, anzahl } für Korrigieren
 
         function zeigeToast(text, typ) {
             const toast = document.getElementById('toast');
@@ -705,6 +706,30 @@
             toast.className = 'show' + (typ ? ' ' + typ : '');
             clearTimeout(toastTimer);
             toastTimer = setTimeout(() => { toast.className = ''; }, 3200);
+        }
+
+        function zeigeToastMitKorrigieren(details, transcript, eintrag) {
+            _pendingZuordnenText = transcript;
+            _letzterEintrag = eintrag;
+            const toast = document.getElementById('toast');
+            toast.innerHTML = escapeHtml('✅ ' + details) +
+                ' <button onclick="korrigiereEintrag()" style="margin-left:10px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.6);border-radius:6px;padding:3px 10px;font-size:12px;cursor:pointer">Korrigieren</button>';
+            toast.className = 'show success';
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => { toast.className = ''; _letzterEintrag = null; }, 5000);
+        }
+
+        function korrigiereEintrag() {
+            if (!_letzterEintrag) return;
+            // Letzten Eintrag rückgängig machen
+            const { palettenart, anzahl } = _letzterEintrag;
+            inventur[palettenart] = (inventur[palettenart] || 0) - anzahl;
+            if (inventur[palettenart] <= 0) delete inventur[palettenart];
+            speichereInventur();
+            aktualisiereAnzeige();
+            _letzterEintrag = null;
+            // Zuordnen-Dialog öffnen
+            oeffneZuordnen();
         }
 
         function zeigeToastNichtErkannt(text, transcript) {
@@ -832,7 +857,7 @@
                 aktualisiereAnzeige();
 
                 const details = paletten.map(p => `+${p.anzahl} ${p.palettenart}`).join(', ');
-                zeigeToast('✅ ' + details, 'success');
+                zeigeToastMitKorrigieren(details, text, paletten[0]);
             } else {
                 zeigeToastNichtErkannt('', text);
             }
