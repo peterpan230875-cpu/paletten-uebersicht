@@ -41,6 +41,10 @@ Zahlen können als Wort (zwanzig) oder Ziffer (20) auftauchen.
 Plural-Endungen ignorieren: "Europaletten" = "Europalette".
 Wenn ein Wort phonetisch ähnlich klingt, verwende die beste Übereinstimmung.
 
+WICHTIG: Der Nutzer nennt pro Spracheingabe IMMER NUR EINE Palettenart.
+Gib deshalb immer genau ein Element zurück (nie mehrere).
+Wähle die spezifischste Übereinstimmung (z.B. "Steinzeug Gitterbox" schlägt "Gitterbox" allein).
+
 Antworte AUSSCHLIESSLICH mit gültigem JSON-Array, kein Text davor oder danach:
 [{"palettenart":"Europalette","anzahl":15}]
 Wenn nichts erkannt: []`;

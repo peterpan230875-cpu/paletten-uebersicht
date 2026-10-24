@@ -683,6 +683,9 @@
                 paletten = parseFallback(text);
             }
 
+            // Pro Spracheingabe immer nur eine Palettenart verwenden
+            if (paletten.length > 1) paletten = [paletten[0]];
+
             if (paletten.length > 0) {
                 for (const p of paletten) {
                     inventur[p.palettenart] = (inventur[p.palettenart] || 0) + p.anzahl;
@@ -725,42 +728,26 @@
         }
 
         // Lokaler Fallback ohne Netz
+        // Liefert immer GENAU EINEN Treffer (längster/spezifischster Synonym-Match).
         function parseFallback(text) {
-            const results = [];
-            const anzahl = findeZahl(text.toLowerCase());
-            if (!anzahl || anzahl <= 0) return results;
+            const lower = text.toLowerCase();
+            const anzahl = findeZahl(lower);
+            if (!anzahl || anzahl <= 0) return [];
 
-            // Längste Synonyme zuerst → spezifische Matches schlagen allgemeine
+            // Längste Synonyme zuerst → spezifischster Match gewinnt
             const sorted = Object.entries(SYNONYME).sort((a, b) => b[0].length - a[0].length);
-
-            // Arbeitskopie: gematchte Bereiche werden mit Leerzeichen überschrieben
-            let workText = text.toLowerCase();
+            const compact = lower.replace(/[\s\-]+/g, '');
 
             for (const [syn, art] of sorted) {
-                // Versuch 1: direkt im (noch nicht gematchten) Text
-                let idx = workText.indexOf(syn);
-
-                // Versuch 2: Leerzeichen-normiert (falls Spracherkennung z.B. "gips karton" → "gipskarton")
-                if (idx === -1) {
-                    const compact = workText.replace(/[\s\-]+/g, '');
-                    const synCompact = syn.replace(/[\s\-]+/g, '');
-                    if (compact.includes(synCompact)) {
-                        // Ungefähre Position im Original-Text ermitteln
-                        idx = 0;
-                    }
+                // Direkter Treffer
+                if (lower.includes(syn)) return [{ palettenart: art, anzahl }];
+                // Leerzeichen-normierter Treffer (z.B. "gips karton" → "gipskarton")
+                const synCompact = syn.replace(/[\s\-]+/g, '');
+                if (synCompact.length > 2 && compact.includes(synCompact)) {
+                    return [{ palettenart: art, anzahl }];
                 }
-
-                if (idx === -1) continue;
-                if (results.find(r => r.palettenart === art)) continue;
-
-                results.push({ palettenart: art, anzahl });
-
-                // Erkannten Bereich sperren, damit keine Teilwörter mehr matchen
-                workText = workText.substring(0, idx) +
-                    '\u0000'.repeat(syn.length) +
-                    workText.substring(idx + syn.length);
             }
-            return results;
+            return [];
         }
 
         // ============================================
