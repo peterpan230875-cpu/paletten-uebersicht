@@ -89,13 +89,9 @@ app.post('/api/parse-palette', async (req, res) => {
     }
 });
 
-// Fallback: alle Routes → index.html
-app.get('*', (req, res) => {
+// Root → index.html
+app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-if (require.main === module) {
-    app.listen(port, () => console.log(`✅ Server läuft auf Port ${port}`));
-}
-
-module.exports = app;
+app.listen(port, () => console.log(`✅ Server läuft auf Port ${port}`));
