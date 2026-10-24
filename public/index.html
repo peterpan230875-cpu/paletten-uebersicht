@@ -385,9 +385,9 @@
                 </div>
 
                 <!-- BOTTOM ACTIONS -->
-                <div class="bottom-actions" id="bottomActions" style="display:none">
+                <div class="bottom-actions">
                     <button class="btn-outline" onclick="oeffneManual()">✏️ Manuell</button>
-                    <button class="btn-danger-outline" onclick="neueInventur()">🗑️ Neu starten</button>
+                    <button class="btn-danger-outline" id="btnNeuStarten" onclick="neueInventur()" style="display:none">🗑️ Neu starten</button>
                 </div>
 
                 <div class="version">V2.0</div>
@@ -625,13 +625,13 @@
         function aktualisiereAnzeige() {
             const liste = document.getElementById('palettenListe');
             const label = document.getElementById('listLabel');
-            const actions = document.getElementById('bottomActions');
             const headerCount = document.getElementById('headerCount');
 
             const eintraege = Object.entries(inventur)
                 .filter(([, v]) => v > 0)
                 .sort((a, b) => b[1] - a[1]);
 
+            const neuStartenBtn = document.getElementById('btnNeuStarten');
             if (eintraege.length === 0) {
                 liste.innerHTML = `
                     <div class="empty-state">
@@ -641,12 +641,12 @@
                         z.B. „15 Europaletten"
                     </div>`;
                 label.style.display = 'none';
-                actions.style.display = 'none';
+                neuStartenBtn.style.display = 'none';
                 headerCount.textContent = 'Bereit';
             } else {
                 const total = eintraege.reduce((s, [, v]) => s + v, 0);
                 label.style.display = 'block';
-                actions.style.display = 'flex';
+                neuStartenBtn.style.display = '';
                 headerCount.textContent = `${eintraege.length} Arten · ${total} gesamt`;
 
                 liste.innerHTML = eintraege.map(([name, count]) => `
