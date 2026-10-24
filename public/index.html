@@ -526,6 +526,7 @@
             recognition.onresult = async (e) => {
                 const text = e.results[0][0].transcript.trim();
                 console.log('Erkannt:', text);
+                setzeStatus('💬 "' + text + '"');
                 await verarbeiteText(text);
             };
 
@@ -609,7 +610,7 @@
                 const details = paletten.map(p => `+${p.anzahl} ${p.palettenart}`).join(', ');
                 zeigeToast('✅ ' + details, 'success');
             } else {
-                zeigeToast('❓ Nichts erkannt – bitte wiederholen', 'error');
+                zeigeToast('❓ Nicht erkannt: „' + text + '"', 'error');
             }
 
             isProcessing = false;
@@ -617,26 +618,46 @@
             setzeStatus('Tippe um zu sprechen');
         }
 
+        // Ausgeschriebene Zahlen (Deutsch)
+        const ZAHLWOERTER = {
+            'ein': 1, 'eine': 1, 'einer': 1, 'eins': 1,
+            'zwei': 2, 'drei': 3, 'vier': 4, 'fünf': 5,
+            'sechs': 6, 'sieben': 7, 'acht': 8, 'neun': 9, 'zehn': 10,
+            'elf': 11, 'zwölf': 12, 'dreizehn': 13, 'vierzehn': 14,
+            'fünfzehn': 15, 'sechzehn': 16, 'siebzehn': 17, 'achtzehn': 18,
+            'neunzehn': 19, 'zwanzig': 20, 'dreißig': 30, 'vierzig': 40,
+            'fünfzig': 50, 'sechzig': 60, 'siebzig': 70, 'achtzig': 80,
+            'neunzig': 90, 'hundert': 100
+        };
+
+        function findeZahl(ctx) {
+            // Zuerst Ziffern suchen
+            const m = ctx.match(/\b(\d+)\b/);
+            if (m) return parseInt(m[1]);
+            // Dann Zahlwörter
+            for (const [wort, zahl] of Object.entries(ZAHLWOERTER)) {
+                if (ctx.includes(wort)) return zahl;
+            }
+            return null;
+        }
+
         // Lokaler Fallback ohne Netz
         function parseFallback(text) {
             const results = [];
             const lower = text.toLowerCase();
-            const numPattern = /(\d+)/g;
-            let m;
 
-            while ((m = numPattern.exec(lower)) !== null) {
-                const anzahl = parseInt(m[1]);
-                if (anzahl <= 0) continue;
+            for (const [syn, art] of Object.entries(SYNONYME)) {
+                const idx = lower.indexOf(syn);
+                if (idx === -1) continue;
 
-                const start = Math.max(0, m.index - 35);
-                const end = Math.min(lower.length, m.index + m[0].length + 35);
+                // Suche Zahl in ±40 Zeichen um das Synonym
+                const start = Math.max(0, idx - 40);
+                const end = Math.min(lower.length, idx + syn.length + 40);
                 const ctx = lower.substring(start, end);
+                const anzahl = findeZahl(ctx);
 
-                for (const [syn, art] of Object.entries(SYNONYME)) {
-                    if (ctx.includes(syn) && !results.find(r => r.palettenart === art)) {
-                        results.push({ palettenart: art, anzahl });
-                        break;
-                    }
+                if (anzahl && anzahl > 0 && !results.find(r => r.palettenart === art)) {
+                    results.push({ palettenart: art, anzahl });
                 }
             }
             return results;
