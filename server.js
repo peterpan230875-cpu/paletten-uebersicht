@@ -22,10 +22,12 @@ gitterbox / gitter box / gitter-box / gkr → Gitterbox
 gipskarton / gips karton / gips-karton / gips / gkb → Gipskartonpalette
 fermacell / ferma cell / ferma zell / fermazell / fels / ferma → Fermacellpalette
 muhr / mur / moor / muhr-palette → MUHR-Palette
-steinzeug gitterbox / steinzeug-gitterbox / stein zeug gitterbox → Steinzeug Gitterbox
-steinzeug groß / steinzeugpalette groß / steinzeug gross → Steinzeugpalette groß
+steinzeug gitterbox / steinzeug-gitterbox → Steinzeug Gitterbox
+steinzeug deckel groß / stg deckel groß / steinzeug deckel gross → Steinzeug Deckel groß
+steinzeug deckel klein / stg deckel klein → Steinzeug Deckel klein
+steinzeug groß / steinzeugpalette groß → Steinzeugpalette groß
 steinzeug klein / steinzeugpalette klein → Steinzeugpalette klein
-steinzeug / stein zeug / stg → Steinzeugpalette (NUR wenn KEIN groß/klein/gitterbox dabei)
+steinzeug / stein zeug / stg → Steinzeugpalette (NUR wenn kein groß/klein/gitterbox/deckel dabei)
 ks / kalksandstein / kalk sandstein → KS-Palette
 porenbeton / poren beton / ytong / gasbeton / h+h → Porenbetonpalette
 klinker / kb / klinker-palette → KB-Palette
@@ -33,7 +35,8 @@ velux / welux / felix → Velux-Palette
 ehl / eel / eel-palette → EHL-Palette
 eder / eder-palette → Eder-Palette
 limex / limes / lime x → Limex-Palette
-ziegel / ziegel-palette / ziegelpalette → Ziegelpalette
+leipfinger / leipfinger ziegel / lipfinger / laipfinger / leifinger → Leipfinger Ziegelpalette
+ziegel / ziegel-palette / ziegelpalette → Ziegelpalette (NUR wenn kein Leipfinger dabei)
 grafe / grafepalette / graffe → Grafepalette
 spezial / spezial-palette → Spezialpalette
 

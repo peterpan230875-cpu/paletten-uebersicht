@@ -458,6 +458,25 @@
         </div>
     </div>
 
+    <!-- ZUORDNEN OVERLAY -->
+    <div id="zuordnenOverlay" class="overlay">
+        <div class="overlay-card scrollable">
+            <div class="overlay-header">
+                <div>
+                    <div class="overlay-title">🎯 Was hast du gemeint?</div>
+                    <div class="overlay-subtitle" id="zuordnenTranscript"></div>
+                </div>
+                <button class="close-btn" onclick="schliesseZuordnen()">✕</button>
+            </div>
+            <div class="overlay-content">
+                <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:10px">
+                    Wähle die richtige Palettenart — die App merkt sie sich für nächstes Mal.
+                </div>
+                <div class="picker-grid" id="zuordnenGrid"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- VERWALTUNG OVERLAY -->
     <div id="verwaltungOverlay" class="overlay">
         <div class="overlay-card scrollable">
@@ -489,9 +508,10 @@
         const PALETTENARTEN = [
             'Europalette','Europalette 2','Europalette 3',
             'Gitterbox','Steinzeug Gitterbox',
-            'Ziegelpalette','Gipskartonpalette','Fermacellpalette',
+            'Ziegelpalette','Leipfinger Ziegelpalette','Gipskartonpalette','Fermacellpalette',
             'MUHR-Palette','Steinzeugpalette','Steinzeugpalette klein',
-            'Steinzeugpalette groß','EHL-Palette','Eder-Palette',
+            'Steinzeugpalette groß','Steinzeug Deckel klein','Steinzeug Deckel groß',
+            'EHL-Palette','Eder-Palette',
             'Limex-Palette','KS-Palette','Porenbetonpalette',
             'KB-Palette','Velux-Palette','Spezialpalette','Grafepalette'
         ];
@@ -519,6 +539,16 @@
             'steinzeug paletten klein':'Steinzeugpalette klein',
             'steinzeug klein':'Steinzeugpalette klein',
             'stg klein':'Steinzeugpalette klein',
+            // Steinzeug Deckel groß
+            'steinzeug deckel groß':'Steinzeug Deckel groß',
+            'steinzeug deckel gross':'Steinzeug Deckel groß',
+            'stein zeug deckel groß':'Steinzeug Deckel groß',
+            'stg deckel groß':'Steinzeug Deckel groß',
+            'stg deckel gross':'Steinzeug Deckel groß',
+            // Steinzeug Deckel klein
+            'steinzeug deckel klein':'Steinzeug Deckel klein',
+            'stein zeug deckel klein':'Steinzeug Deckel klein',
+            'stg deckel klein':'Steinzeug Deckel klein',
             // Europalette 2 / 3
             'europalette 2':'Europalette 2','euro 2':'Europalette 2','ep2':'Europalette 2',
             'europalette 3':'Europalette 3','euro 3':'Europalette 3','ep3':'Europalette 3',
@@ -552,6 +582,15 @@
             // Sonstige
             'ehl':'EHL-Palette','eder':'Eder-Palette',
             'limex':'Limex-Palette','limes':'Limex-Palette','lime x':'Limex-Palette',
+            // Leipfinger Ziegelpalette – "Leipfinger" wird manchmal als "Leip Finger", "Lipfinger", "Laipfinger" erkannt
+            'leipfinger ziegelpalette':'Leipfinger Ziegelpalette',
+            'leipfinger ziegel':'Leipfinger Ziegelpalette',
+            'leip finger':'Leipfinger Ziegelpalette',
+            'lipfinger':'Leipfinger Ziegelpalette',
+            'laipfinger':'Leipfinger Ziegelpalette',
+            'leifinger':'Leipfinger Ziegelpalette',
+            'leipfinger':'Leipfinger Ziegelpalette',
+            // Ziegelpalette (allgemein – nach Leipfinger, damit Leipfinger zuerst greift)
             'ziegel':'Ziegelpalette','ziegelpalette':'Ziegelpalette',
             'grafe':'Grafepalette','grafepalette':'Grafepalette','graffe':'Grafepalette',
             'spezial':'Spezialpalette','spezialpalette':'Spezialpalette'
@@ -631,15 +670,51 @@
         }
 
         // ============================================
+        // GELERNTE SYNONYME (Lernfunktion)
+        // ============================================
+        function ladeGelernte() {
+            try { return JSON.parse(localStorage.getItem('palettenGelernt_v1') || '[]'); } catch(e) { return []; }
+        }
+        function speichereGelernte(liste) {
+            try { localStorage.setItem('palettenGelernt_v1', JSON.stringify(liste)); } catch(e) {}
+        }
+        function lerneZuordnung(transcript, palettenart) {
+            const liste = ladeGelernte();
+            const lower = transcript.toLowerCase().trim();
+            if (!liste.find(e => e.t === lower)) {
+                liste.push({ t: lower, p: palettenart });
+                speichereGelernte(liste);
+            }
+        }
+        function sucheGelernte(lower) {
+            for (const { t, p } of ladeGelernte()) {
+                if (lower.includes(t)) return p;
+            }
+            return null;
+        }
+
+        // ============================================
         // TOAST
         // ============================================
         let toastTimer;
+        let _pendingZuordnenText = null;
+
         function zeigeToast(text, typ) {
             const toast = document.getElementById('toast');
-            toast.textContent = text;
+            toast.innerHTML = escapeHtml(text);
             toast.className = 'show' + (typ ? ' ' + typ : '');
             clearTimeout(toastTimer);
             toastTimer = setTimeout(() => { toast.className = ''; }, 3200);
+        }
+
+        function zeigeToastNichtErkannt(text, transcript) {
+            _pendingZuordnenText = transcript;
+            const toast = document.getElementById('toast');
+            toast.innerHTML = escapeHtml('❓ Nicht erkannt: „' + transcript + '"') +
+                ' <button onclick="oeffneZuordnen()" style="margin-left:10px;background:rgba(255,140,66,0.25);border:1px solid rgba(255,140,66,0.5);color:#FFD700;border-radius:6px;padding:3px 10px;font-size:12px;cursor:pointer;font-weight:700">Zuordnen</button>';
+            toast.className = 'show error';
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => { toast.className = ''; }, 6000);
         }
 
         // ============================================
@@ -759,7 +834,7 @@
                 const details = paletten.map(p => `+${p.anzahl} ${p.palettenart}`).join(', ');
                 zeigeToast('✅ ' + details, 'success');
             } else {
-                zeigeToast('❓ Nicht erkannt: „' + text + '"', 'error');
+                zeigeToastNichtErkannt('', text);
             }
 
             isProcessing = false;
@@ -820,6 +895,10 @@
                     return [{ palettenart: name, anzahl }];
                 }
             }
+
+            // Gelernte Zuordnungen prüfen
+            const gelernt = sucheGelernte(lower);
+            if (gelernt) return [{ palettenart: gelernt, anzahl }];
 
             return [];
         }
@@ -943,6 +1022,40 @@
 
         function getAllePalettenarten() {
             return [...PALETTENARTEN, ...ladeCustomArten()];
+        }
+
+        // ============================================
+        // ZUORDNEN (Lernfunktion)
+        // ============================================
+        function oeffneZuordnen() {
+            if (!_pendingZuordnenText) return;
+            document.getElementById('zuordnenTranscript').textContent =
+                'Erkannt: „' + _pendingZuordnenText + '"';
+            const grid = document.getElementById('zuordnenGrid');
+            grid.innerHTML = getAllePalettenarten().map(name =>
+                `<button class="picker-tile" onclick="zuordneWaehle('${escapeAttr(name)}')">${escapeHtml(name)}</button>`
+            ).join('');
+            document.getElementById('zuordnenOverlay').classList.add('visible');
+        }
+
+        function schliesseZuordnen() {
+            document.getElementById('zuordnenOverlay').classList.remove('visible');
+        }
+
+        function zuordneWaehle(palettenart) {
+            schliesseZuordnen();
+            const transcript = _pendingZuordnenText;
+            if (!transcript) return;
+            // Zahl aus dem Transcript holen
+            const anzahl = findeZahl(transcript.toLowerCase()) || 1;
+            // Zuordnung merken
+            lerneZuordnung(transcript, palettenart);
+            // Sofort in Inventur eintragen
+            inventur[palettenart] = (inventur[palettenart] || 0) + anzahl;
+            speichereInventur();
+            aktualisiereAnzeige();
+            zeigeToast(`✅ +${anzahl} ${palettenart} (gelernt)`, 'success');
+            _pendingZuordnenText = null;
         }
 
         // ============================================
