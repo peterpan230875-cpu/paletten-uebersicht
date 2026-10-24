@@ -9,31 +9,32 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
-const SYSTEM_PROMPT = `Du bist ein Inventur-Assistent für Palettenlager. Extrahiere Palettenarten und Anzahlen aus gesprochenem Text auf Deutsch.
+const SYSTEM_PROMPT = `Du bist ein Inventur-Assistent für Palettenlager. Der Text kommt von einer Spracherkennung und kann Tippfehler oder phonetische Fehler enthalten – sei bei der Erkennung großzügig.
 
 Erlaubte Palettenarten (verwende exakt diese Schreibweise):
 Europalette, Europalette 2, Europalette 3, Gitterbox, Steinzeug Gitterbox, Ziegelpalette, Gipskartonpalette, Fermacellpalette, MUHR-Palette, Steinzeugpalette, Steinzeugpalette klein, Steinzeugpalette groß, EHL-Palette, Eder-Palette, Limex-Palette, KS-Palette, Porenbetonpalette, KB-Palette, Velux-Palette, Spezialpalette, Grafepalette
 
-Synonyme:
+Synonyme und typische Spracherkennungs-Fehler:
 euro / europalette / europool / epal → Europalette
-gitterbox / gkr → Gitterbox
-gipskarton / gkb → Gipskartonpalette
-fermacell / fels → Fermacellpalette
-muhr → MUHR-Palette
-steinzeug / stg → Steinzeugpalette
-ks / kalksandstein → KS-Palette
-porenbeton / ytong / gasbeton → Porenbetonpalette
-klinker / kb → KB-Palette
-velux → Velux-Palette
-ehl → EHL-Palette
-eder → Eder-Palette
-limex → Limex-Palette
-ziegel → Ziegelpalette
-grafe / grafepalette → Grafepalette
-spezial → Spezialpalette
+gitterbox / gitter box / gitter-box / gkr → Gitterbox
+gipskarton / gips karton / gips-karton / gips / gkb → Gipskartonpalette
+fermacell / ferma cell / ferma zell / fermazell / fels / ferma → Fermacellpalette
+muhr / mur / moor / muhr-palette → MUHR-Palette
+steinzeug / stein zeug / steinzeug-palette / stg → Steinzeugpalette
+ks / kalksandstein / kalk sandstein → KS-Palette
+porenbeton / poren beton / ytong / gasbeton / h+h → Porenbetonpalette
+klinker / kb / klinker-palette → KB-Palette
+velux / welux / felix → Velux-Palette
+ehl / eel / eel-palette → EHL-Palette
+eder / eder-palette → Eder-Palette
+limex / limes / lime x → Limex-Palette
+ziegel / ziegel-palette / ziegelpalette → Ziegelpalette
+grafe / grafepalette / graffe → Grafepalette
+spezial / spezial-palette → Spezialpalette
 
 Zahlen können als Wort (zwanzig) oder Ziffer (20) auftauchen.
 Plural-Endungen ignorieren: "Europaletten" = "Europalette".
+Wenn ein Wort phonetisch ähnlich klingt, verwende die beste Übereinstimmung.
 
 Antworte AUSSCHLIESSLICH mit gültigem JSON-Array, kein Text davor oder danach:
 [{"palettenart":"Europalette","anzahl":15}]

@@ -274,6 +274,32 @@
         .action-btn.active-add { border-color: #51cf66; background: rgba(81,207,102,0.12); color: #51cf66; }
         .action-btn.active-remove { border-color: #ff6b6b; background: rgba(255,107,107,0.12); color: #ff6b6b; }
 
+        /* ===== PICK BUTTON ===== */
+        .pick-btn {
+            margin-top: 8px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.5);
+            border-radius: 8px; padding: 6px 16px;
+            font-size: 12px; font-weight: 600; cursor: pointer;
+        }
+
+        /* ===== PICKER GRID ===== */
+        .picker-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 8px; margin-top: 4px;
+        }
+        .picker-tile {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px; padding: 12px 10px;
+            font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8);
+            cursor: pointer; text-align: center;
+            transition: all 0.15s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .picker-tile:active { background: rgba(255,140,66,0.18); border-color: #FF8C42; color: #FF8C42; }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 480px) {
             body { padding: 8px; align-items: flex-start; }
@@ -305,6 +331,7 @@
                 <div class="mic-section">
                     <button id="micBtn" onclick="toggleRecording()"></button>
                     <p id="status">Tippe um zu sprechen</p>
+                    <button class="pick-btn" onclick="oeffnePicker()">📋 Tippen statt Sprechen</button>
                 </div>
 
                 <!-- LIST -->
@@ -379,6 +406,19 @@
         </div>
     </div>
 
+    <!-- PICKER OVERLAY -->
+    <div id="pickerOverlay" class="overlay">
+        <div class="overlay-card scrollable">
+            <div class="overlay-header">
+                <div class="overlay-title">📋 Palettenart wählen</div>
+                <button class="close-btn" onclick="schliessePicker()">✕</button>
+            </div>
+            <div class="overlay-content">
+                <div class="picker-grid" id="pickerGrid"></div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ============================================
         // PALETTENARTEN
@@ -393,22 +433,39 @@
             'KB-Palette','Velux-Palette','Spezialpalette','Grafepalette'
         ];
 
-        // Lokaler Fallback-Parser (Synonyme)
+        // Lokaler Fallback-Parser (Synonyme + typische Spracherkennungs-Varianten)
         const SYNONYME = {
+            // Europalette
             'euro':'Europalette','europalette':'Europalette','europool':'Europalette','epal':'Europalette',
-            'gitterbox':'Gitterbox','gkr':'Gitterbox',
-            'gipskarton':'Gipskartonpalette','gkb':'Gipskartonpalette',
-            'fermacell':'Fermacellpalette','fels':'Fermacellpalette',
-            'muhr':'MUHR-Palette',
-            'steinzeug':'Steinzeugpalette','stg':'Steinzeugpalette',
-            'ks':'KS-Palette','kalksandstein':'KS-Palette',
-            'porenbeton':'Porenbetonpalette','ytong':'Porenbetonpalette','gasbeton':'Porenbetonpalette',
-            'klinker':'KB-Palette','kb':'KB-Palette',
-            'velux':'Velux-Palette',
-            'ehl':'EHL-Palette','eder':'Eder-Palette','limex':'Limex-Palette',
+            // Gitterbox
+            'gitterbox':'Gitterbox','gitter box':'Gitterbox','gitter-box':'Gitterbox','gkr':'Gitterbox',
+            // Gipskartonpalette – "gips karton" (mit Leerzeichen) kommt oft aus Spracherkennung
+            'gipskarton':'Gipskartonpalette','gips karton':'Gipskartonpalette','gips-karton':'Gipskartonpalette',
+            'gips carton':'Gipskartonpalette','gkb':'Gipskartonpalette',
+            // Fermacellpalette – häufig als "ferma zell" oder "ferma cell" erkannt
+            'fermacell':'Fermacellpalette','ferma cell':'Fermacellpalette','ferma zell':'Fermacellpalette',
+            'fermazell':'Fermacellpalette','ferma-cell':'Fermacellpalette','ferma-zell':'Fermacellpalette',
+            'ferma':'Fermacellpalette','fels':'Fermacellpalette',
+            // MUHR – oft als "mur" oder "moor" erkannt
+            'muhr':'MUHR-Palette','mur':'MUHR-Palette','moor':'MUHR-Palette','mohr':'MUHR-Palette',
+            // Steinzeugpalette
+            'steinzeug':'Steinzeugpalette','stein zeug':'Steinzeugpalette','steinzeugpalette':'Steinzeugpalette',
+            'stg':'Steinzeugpalette',
+            // KS-Palette
+            'ks':'KS-Palette','kalksandstein':'KS-Palette','kalk sandstein':'KS-Palette','kalk-sandstein':'KS-Palette',
+            // Porenbetonpalette
+            'porenbeton':'Porenbetonpalette','poren beton':'Porenbetonpalette','poren-beton':'Porenbetonpalette',
+            'ytong':'Porenbetonpalette','gasbeton':'Porenbetonpalette','gas beton':'Porenbetonpalette',
+            // KB-Palette (Klinker)
+            'klinker':'KB-Palette','kb':'KB-Palette','klinker-palette':'KB-Palette',
+            // Velux – manchmal als "welux" erkannt
+            'velux':'Velux-Palette','welux':'Velux-Palette','velux-palette':'Velux-Palette',
+            // Sonstige
+            'ehl':'EHL-Palette','eder':'Eder-Palette',
+            'limex':'Limex-Palette','limes':'Limex-Palette','lime x':'Limex-Palette',
             'ziegel':'Ziegelpalette','ziegelpalette':'Ziegelpalette',
-            'grafe':'Grafepalette','grafepalette':'Grafepalette',
-            'spezial':'Spezialpalette'
+            'grafe':'Grafepalette','grafepalette':'Grafepalette','graffe':'Grafepalette',
+            'spezial':'Spezialpalette','spezialpalette':'Spezialpalette'
         };
 
         // ============================================
@@ -645,18 +702,23 @@
         function parseFallback(text) {
             const results = [];
             const lower = text.toLowerCase();
+            // Leerzeichen+Bindestriche entfernen für Vergleich bei Leerzeichen-Fehlern
+            const lowerKompakt = lower.replace(/[\s\-]+/g, '');
+
+            // Zahl im gesamten Text suchen (nur einmal nötig)
+            const anzahl = findeZahl(lower);
+            if (!anzahl || anzahl <= 0) return results;
 
             for (const [syn, art] of Object.entries(SYNONYME)) {
-                const idx = lower.indexOf(syn);
-                if (idx === -1) continue;
-
-                // Suche Zahl in ±40 Zeichen um das Synonym
-                const start = Math.max(0, idx - 40);
-                const end = Math.min(lower.length, idx + syn.length + 40);
-                const ctx = lower.substring(start, end);
-                const anzahl = findeZahl(ctx);
-
-                if (anzahl && anzahl > 0 && !results.find(r => r.palettenart === art)) {
+                // Normaler Vergleich
+                let gefunden = lower.includes(syn);
+                // Fallback: Leerzeichen-normierter Vergleich
+                if (!gefunden) {
+                    const synKompakt = syn.replace(/[\s\-]+/g, '');
+                    gefunden = lowerKompakt.includes(synKompakt);
+                }
+                if (!gefunden) continue;
+                if (!results.find(r => r.palettenart === art)) {
                     results.push({ palettenart: art, anzahl });
                 }
             }
@@ -764,6 +826,33 @@
             const sel = document.getElementById('manualType');
             sel.innerHTML = '<option value="">-- Bitte wählen --</option>' +
                 PALETTENARTEN.map(n => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
+        }
+
+        // ============================================
+        // PICKER (Tippen statt Sprechen)
+        // ============================================
+        function oeffnePicker() {
+            const grid = document.getElementById('pickerGrid');
+            grid.innerHTML = PALETTENARTEN.map(name =>
+                `<button class="picker-tile" onclick="pickerWaehle('${escapeAttr(name)}')">${escapeHtml(name)}</button>`
+            ).join('');
+            document.getElementById('pickerOverlay').classList.add('visible');
+        }
+
+        function schliessePicker() {
+            document.getElementById('pickerOverlay').classList.remove('visible');
+        }
+
+        function pickerWaehle(name) {
+            schliessePicker();
+            const eingabe = prompt(`Anzahl für:\n${name}`, '1');
+            if (eingabe === null) return;
+            const n = parseInt(eingabe);
+            if (!n || n <= 0) return;
+            inventur[name] = (inventur[name] || 0) + n;
+            speichereInventur();
+            aktualisiereAnzeige();
+            zeigeToast(`✅ ${n}× ${name}`, 'success');
         }
 
         function oeffneManual() {
