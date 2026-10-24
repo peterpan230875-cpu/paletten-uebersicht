@@ -54,9 +54,16 @@ Wenn nichts erkannt: []`;
 // ============================================
 app.post('/api/parse-palette', async (req, res) => {
     try {
-        const { text } = req.body;
+        const { text, extraTypes = [] } = req.body;
         if (!text?.trim()) return res.json({ success: false, error: 'Kein Text' });
         if (!GROQ_API_KEY) return res.json({ success: false, error: 'API Key fehlt' });
+
+        // Eigene Palettenarten dynamisch anhängen
+        let systemPrompt = SYSTEM_PROMPT;
+        if (Array.isArray(extraTypes) && extraTypes.length > 0) {
+            const sanitized = extraTypes.map(t => String(t).replace(/[`"]/g, '')).slice(0, 50);
+            systemPrompt += `\n\nZusätzliche benutzerdefinierte Palettenarten (ebenfalls gültig, exakt so zurückgeben):\n${sanitized.join(', ')}`;
+        }
 
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
@@ -67,7 +74,7 @@ app.post('/api/parse-palette', async (req, res) => {
             body: JSON.stringify({
                 model: 'llama-3.3-70b-versatile',
                 messages: [
-                    { role: 'system', content: SYSTEM_PROMPT },
+                    { role: 'system', content: systemPrompt },
                     { role: 'user', content: text }
                 ],
                 max_tokens: 300,

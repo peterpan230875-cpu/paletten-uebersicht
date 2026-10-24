@@ -300,6 +300,42 @@
         }
         .picker-tile:active { background: rgba(255,140,66,0.18); border-color: #FF8C42; color: #FF8C42; }
 
+        /* ===== VERWALTUNG ===== */
+        .gear-btn {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5);
+            border-radius: 8px; padding: 8px 10px;
+            font-size: 16px; cursor: pointer; line-height: 1;
+        }
+        .header-right { display: flex; align-items: center; gap: 8px; }
+
+        .custom-art-row {
+            display: flex; align-items: center; gap: 8px;
+            padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .custom-art-name { flex: 1; font-size: 14px; color: rgba(255,255,255,0.85); }
+        .custom-art-del {
+            background: rgba(255,100,100,0.1); border: 1px solid rgba(255,100,100,0.22);
+            color: rgba(255,150,150,0.8); border-radius: 6px;
+            padding: 5px 10px; font-size: 12px; cursor: pointer;
+        }
+        .add-row { display: flex; gap: 8px; margin-top: 12px; }
+        .add-row input {
+            flex: 1; padding: 11px 14px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 8px; color: white; font-size: 15px;
+        }
+        .add-row input:focus { outline: none; border-color: #FF8C42; }
+        .add-row input::placeholder { color: rgba(255,255,255,0.25); }
+        .add-btn {
+            background: linear-gradient(135deg,#FF6B4A,#FF8C42);
+            border: none; border-radius: 8px; color: white;
+            padding: 11px 18px; font-size: 16px; cursor: pointer;
+        }
+        .hint-text { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 10px; line-height: 1.5; }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 480px) {
             body { padding: 8px; align-items: flex-start; }
@@ -323,7 +359,10 @@
                         <div class="header-subtitle" id="headerCount">Bereit</div>
                     </div>
                 </div>
-                <button class="summary-btn" onclick="zeigeSummary()">📊 Übersicht</button>
+                <div class="header-right">
+                    <button class="gear-btn" onclick="oeffneVerwaltung()" title="Palettenarten verwalten">⚙️</button>
+                    <button class="summary-btn" onclick="zeigeSummary()">📊 Übersicht</button>
+                </div>
             </div>
 
             <div class="card-content">
@@ -415,6 +454,30 @@
             </div>
             <div class="overlay-content">
                 <div class="picker-grid" id="pickerGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VERWALTUNG OVERLAY -->
+    <div id="verwaltungOverlay" class="overlay">
+        <div class="overlay-card scrollable">
+            <div class="overlay-header">
+                <div class="overlay-title">⚙️ Palettenarten verwalten</div>
+                <button class="close-btn" onclick="schliesseVerwaltung()">✕</button>
+            </div>
+            <div class="overlay-content">
+                <div class="section-label">Eigene Palettenarten</div>
+                <div id="customArtenListe"></div>
+                <div class="add-row">
+                    <input type="text" id="newArtInput" placeholder="z.B. Sonderpalette XL">
+                    <button class="add-btn" onclick="fuegeCustomHinzu()">➕</button>
+                </div>
+                <p class="hint-text">
+                    Neue Arten werden sofort bei Sprache, Tippen und manueller Eingabe erkannt.<br>
+                    Standard-Arten (Europalette, Gitterbox …) sind immer vorhanden.
+                </p>
+                <div class="section-label" style="margin-top:18px">Standard-Palettenarten</div>
+                <div id="standardArtenListe" style="font-size:12px;color:rgba(255,255,255,0.3);line-height:2"></div>
             </div>
         </div>
     </div>
@@ -667,7 +730,7 @@
                 const res = await fetch('/api/parse-palette', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text })
+                    body: JSON.stringify({ text, extraTypes: ladeCustomArten() })
                 });
                 const data = await res.json();
                 if (data.success && data.paletten?.length > 0) {
@@ -747,6 +810,17 @@
                     return [{ palettenart: art, anzahl }];
                 }
             }
+
+            // Eigene Palettenarten direkt am Namen prüfen
+            for (const name of ladeCustomArten()) {
+                const nameLower = name.toLowerCase();
+                if (lower.includes(nameLower)) return [{ palettenart: name, anzahl }];
+                const nameCompact = nameLower.replace(/[\s\-]+/g, '');
+                if (nameCompact.length > 2 && compact.includes(nameCompact)) {
+                    return [{ palettenart: name, anzahl }];
+                }
+            }
+
             return [];
         }
 
@@ -854,11 +928,88 @@
         }
 
         // ============================================
+        // CUSTOM PALETTENARTEN (localStorage)
+        // ============================================
+        function ladeCustomArten() {
+            try {
+                const s = localStorage.getItem('palettenArtenCustom_v1');
+                return s ? JSON.parse(s) : [];
+            } catch (e) { return []; }
+        }
+
+        function speichereCustomArten(arten) {
+            try { localStorage.setItem('palettenArtenCustom_v1', JSON.stringify(arten)); } catch (e) {}
+        }
+
+        function getAllePalettenarten() {
+            return [...PALETTENARTEN, ...ladeCustomArten()];
+        }
+
+        // ============================================
+        // VERWALTUNG
+        // ============================================
+        function oeffneVerwaltung() {
+            aktualisiereVerwaltungsListe();
+            document.getElementById('standardArtenListe').textContent = PALETTENARTEN.join(' · ');
+            document.getElementById('verwaltungOverlay').classList.add('visible');
+        }
+
+        function schliesseVerwaltung() {
+            document.getElementById('verwaltungOverlay').classList.remove('visible');
+        }
+
+        function aktualisiereVerwaltungsListe() {
+            const custom = ladeCustomArten();
+            const liste = document.getElementById('customArtenListe');
+            if (custom.length === 0) {
+                liste.innerHTML = '<div style="color:rgba(255,255,255,0.28);font-size:13px;padding:8px 0">Noch keine eigenen Arten vorhanden.</div>';
+                return;
+            }
+            liste.innerHTML = custom.map((name, i) => `
+                <div class="custom-art-row">
+                    <span class="custom-art-name">${escapeHtml(name)}</span>
+                    <button class="custom-art-del" onclick="loescheCustomArt(${i})">✕ Löschen</button>
+                </div>
+            `).join('');
+        }
+
+        function fuegeCustomHinzu() {
+            const input = document.getElementById('newArtInput');
+            const name = input.value.trim();
+            if (!name) return;
+            const alle = getAllePalettenarten();
+            if (alle.some(a => a.toLowerCase() === name.toLowerCase())) {
+                zeigeToast('⚠️ Bereits vorhanden', 'error'); return;
+            }
+            const custom = ladeCustomArten();
+            custom.push(name);
+            speichereCustomArten(custom);
+            input.value = '';
+            aktualisiereVerwaltungsListe();
+            zeigeToast('✅ ' + name + ' hinzugefügt', 'success');
+        }
+
+        function loescheCustomArt(index) {
+            const custom = ladeCustomArten();
+            const name = custom[index];
+            if (!confirm(`"${name}" wirklich löschen?`)) return;
+            custom.splice(index, 1);
+            speichereCustomArten(custom);
+            if (inventur[name] !== undefined) {
+                delete inventur[name];
+                speichereInventur();
+                aktualisiereAnzeige();
+            }
+            aktualisiereVerwaltungsListe();
+            zeigeToast('🗑️ ' + name + ' entfernt');
+        }
+
+        // ============================================
         // PICKER (Tippen statt Sprechen)
         // ============================================
         function oeffnePicker() {
             const grid = document.getElementById('pickerGrid');
-            grid.innerHTML = PALETTENARTEN.map(name =>
+            grid.innerHTML = getAllePalettenarten().map(name =>
                 `<button class="picker-tile" onclick="pickerWaehle('${escapeAttr(name)}')">${escapeHtml(name)}</button>`
             ).join('');
             document.getElementById('pickerOverlay').classList.add('visible');
@@ -881,7 +1032,9 @@
         }
 
         function oeffneManual() {
-            document.getElementById('manualType').value = '';
+            const sel = document.getElementById('manualType');
+            sel.innerHTML = getAllePalettenarten()
+                .map(n => `<option value="${escapeAttr(n)}">${escapeHtml(n)}</option>`).join('');
             document.getElementById('manualQty').value = '1';
             setAction('add');
             document.getElementById('manualOverlay').classList.add('visible');
